@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    @Styles.Render("~/content/bootstrap/dist/css/bootstrap.min.css")
+
+    <!-- Font Awesome -->
+    @Styles.Render("~/content/font-awesome/css/font-awesome.min.css")
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- Custom Theme Style -->
+    @Styles.Render("~/Content/custom.css")
+    @Styles.Render("~/Content/Alignments.css")
+
+    @Styles.Render("~/Content/style.css")
+    @Styles.Render("~/Content/custom-breadcrums.css")
+
+    @RenderSection("Styles", false)
+</head>
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container" style="background-color:#b20000">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0; background-color: #FFFFFF">
+
+                        <a href="/" class="site_title img-circle">
+                            <img src="~/Content/images/RCLogo.PNG" alt="logo" id="site_logo_id" />
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                    <!-- /menu profile quick info -->
+                    <br />
+
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+
+                            <h3>General</h3>
+                            <ul class="nav side-menu">
+
+
+                                <li>
+                                    <a><i class="fa fa-home"></i> Dashboards <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="/CRM">Dashboard CRM</a></li>
+                                        <li><a href="/Sales">Dashboard Sales</a></li>
+                                        <li><a href="/KPI">KPIs</a></li>
+                                        <li><a href="/KPI/Sales">KPI Sales</a></li>
+                                        <li><a href="/KPI/Manager">KPI Manager</a></li>
+                                        <li><a href="/KPI/Marketing">KPI Marketing</a></li>
+                                    </ul>
+                                </li>
+
+
+                                <li>
+                                    <a><i class="fa fa-calendar"></i> Schedules <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="/FollowUpSchedules/DailyTasks">Daily Tasks</a></li>
+                                        <li><a href="/FollowUpSchedules">Follow Up</a></li>
+                                        <li><a href="/FollowUpSchedules/TrainingSchedule">Training Schedule</a></li>
+                                        <li><a href="/FollowUpSchedules/RoadTestSchedule">Road Test Schedule</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><a href="/Leads"><i class="fa fa-hand-o-right"></i>Leads</a></li>
+                                <li><a href="/Students"><i class="fa fa-group"></i> Students </a></li>
+                                <li><a href="/StudentsPool"><i class="fa fa-group"></i> Students Pool</a></li>
+                                <li><a href="/StudentsPool/Rotation"><i class="fa fa-group"></i>Yards Rotation</a></li>
+
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <div class="nav toggle">
+                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                        </div>
+                        @*@Html.Partial("_LoginPartial")*@
+
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+
+            <!-- page content -->
+            <div class="right_col" role="main">
+                @RenderBody()
+            </div>
+            <!-- /page content -->
+
+            <!-- footer content -->
+            @*<footer>
+                    <div class="pull-right">
+                        All right reserved by
+                    </div>
+                    <div class="clearfix"></div>
+                </footer>*@
+            <!-- /footer content -->
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <!-- Custom Theme Scripts -->
+    @Scripts.Render("~/Scripts/custom.js")
+    @Scripts.Render("~/Scripts/custom-layout.js")
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

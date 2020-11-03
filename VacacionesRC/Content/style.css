@@ -1,0 +1,250 @@
+﻿/*
+/* Created by Filipe Pina
+ * Specific styles of signin, register, component
+ */
+/*
+ * General styles
+ */
+#playground-container {
+    
+    max-height: 400px;
+    overflow: hidden !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+body, html {
+    height: 100%;
+    background-repeat: no-repeat;
+    background: url(https://i.ytimg.com/vi/4kfXjatgeEU/maxresdefault.jpg);
+    font-family: 'Oxygen', sans-serif;
+    background-size: cover;
+}
+
+.main {
+    margin: 75px 15px;
+}
+
+h1.title {
+    font-size: 50px;
+    font-family: 'Passion One', cursive;
+    font-weight: 400;
+}
+
+hr {
+    width: 10%;
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    margin-bottom: 15px;
+}
+
+input,
+input::-webkit-input-placeholder {
+    font-size: 11px;
+    padding-top: 3px;
+}
+
+.main-login {
+    background-color: #fff;
+    /* shadows and rounded borders */
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.form-control {
+    height: auto !important;
+    padding: 8px 12px !important;
+}
+
+.input-group {
+    -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.21) !important;
+    -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.21) !important;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.21) !important;
+}
+
+#button {
+    border: 1px solid #ccc;
+    margin-top: 28px;
+    padding: 6px 12px;
+    color: #666;
+    text-shadow: 0 1px #fff;
+    cursor: pointer;
+    -moz-border-radius: 3px 3px;
+    -webkit-border-radius: 3px 3px;
+    border-radius: 3px 3px;
+    -moz-box-shadow: 0 1px #fff inset, 0 1px #ddd;
+    -webkit-box-shadow: 0 1px #fff inset, 0 1px #ddd;
+    box-shadow: 0 1px #fff inset, 0 1px #ddd;
+    background: #f5f5f5;
+    background: -moz-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f5f5f5), color-stop(100%, #eeeeee));
+    background: -webkit-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+    background: -o-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+    background: -ms-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+    background: linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#eeeeee', GradientType=0);
+}
+.destacados {
+    padding: 70px 0;
+    text-align: center;
+}
+
+.box1 {
+    /* See "NOTE 3" */
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 20px;
+    margin: -50px auto;
+    border: 1px solid rgb(200, 200, 200);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 5px 2px;
+    background: #009edf;
+    border-radius: 4px;
+}
+
+    .box1 h3 {
+        position: relative;
+        padding: 10px 30px;
+        margin: 0 -50px 30px!important;
+        font-size: 28px;
+        line-height: 32px;
+        font-weight: bold;
+        text-align: center;
+        color: #fff;
+        background:#cc0000;
+        /* css3 extras */
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        /* See "NOTE 1" */
+        zoom: 1;
+    }
+
+        .box1 h3:before,
+        .box1 h3:after {
+            content: "";
+            position: absolute;
+            /* See "NOTE 2" */
+            z-index: -1;
+            top: 100%;
+            left: 0;
+            border-width: 0 10px 10px 0;
+            border-style: solid;
+            border-color: transparent maroon;
+        }
+
+        .box1 h3:after {
+            left: auto;
+            right: 0;
+            border-width: 0 0 10px 10px;
+        }
+
+
+
+
+
+
+    .box1 h4 {
+        position: relative;
+        padding: 10px 30px;
+        margin: 0 -50px 30px;
+        font-size: 28px;
+        line-height: 32px;
+        font-weight: bold;
+        text-align: center;
+        color: #fff;
+        background: #87A800;
+        /* css3 extras */
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        /* See "NOTE 1" */
+        zoom: 1;
+    }
+
+        .box1 h4:before,
+        .box1 h4:after {
+            content: "";
+            position: absolute;
+            /* See "NOTE 2" */
+            z-index: -1;
+            top: 100%;
+            left: 0;
+            border-width: 0 10px 10px 0;
+            border-style: solid;
+            border-color: transparent #647D01;
+        }
+
+        .box1 h4:after {
+            left: auto;
+            right: 0;
+            border-width: 0 0 10px 10px;
+        }
+.main-center {
+    margin-top: 30px;
+    margin: 0 auto;
+    max-width: 926px;
+    padding: 10px 40px;
+    background: #009edf;
+    color: #FFF;
+    text-shadow: none;
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.31);
+    -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.31);
+    box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.31);
+}
+
+span.input-group-addon i {
+    color: #009edf;
+    font-size: 17px;
+}
+
+.login-button {
+    margin-top: 5px;
+}
+
+.login-register {
+    font-size: 11px;
+    text-align: center;
+}
+/* Hiding the checkbox, but allowing it to be focused */
+.badgebox {
+    opacity: 0;
+}
+
+.badgebox + .badge {
+    /* Move the check mark away when unchecked */
+    text-indent: -999999px;
+    /* Makes the badge's width stay the same checked and unchecked */
+    width: 27px;
+}
+
+.badgebox:focus + .badge {
+    /* Set something to make the badge looks focused */
+    /* This really depends on the application, in my case it was: */
+    /* Adding a light border */
+    box-shadow: inset 0px 0px 5px;
+    /* Taking the difference out of the padding */
+}
+
+.badgebox:checked + .badge {
+    /* Move the check mark back when checked */
+    text-indent: 0;
+}
+.file-field.big .file-path-wrapper {
+    height: 3.2rem;
+}
+
+.file-field.big .file-path-wrapper .file-path {
+    height: 3rem;
+}
