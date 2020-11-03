@@ -107,12 +107,12 @@ $MENU_TOGGLE.on('click', function() {
 			$SIDEBAR_MENU.find('li.active ul').hide();
             $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
      
-            $("#site_logo_id").attr("src", "/images/LogoDA_small.PNG");
+            $("#site_logo_id").attr("src", "/Content/images/RCLogoSmall.PNG");
 		} else {
 			$SIDEBAR_MENU.find('li.active-sm ul').show();
             $SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
           
-            $("#site_logo_id").attr("src", "/images/DALogo_5.png");
+            $("#site_logo_id").attr("src", "/Content/images/RCLogo.PNG");
 		}
 
 	$BODY.toggleClass('nav-md nav-sm');

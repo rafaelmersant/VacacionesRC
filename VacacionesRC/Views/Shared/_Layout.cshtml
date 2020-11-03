@@ -43,24 +43,20 @@
                     <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                         <div class="menu_section">
 
-                            <h3>General</h3>
+                            <h3>MENU</h3>
                             <ul class="nav side-menu">
 
-
-                                <li>
-                                    <a><i class="fa fa-home"></i> Dashboards <span class="fa fa-chevron-down"></span></a>
+                                @*<li>
+                                    <a><i class="fa fa-home"></i> Test Tree <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        <li><a href="/CRM">Dashboard CRM</a></li>
-                                        <li><a href="/Sales">Dashboard Sales</a></li>
-                                        <li><a href="/KPI">KPIs</a></li>
-                                        <li><a href="/KPI/Sales">KPI Sales</a></li>
-                                        <li><a href="/KPI/Manager">KPI Manager</a></li>
-                                        <li><a href="/KPI/Marketing">KPI Marketing</a></li>
+                                        <li><a href="/CRM">Opcion 1</a></li>
+                                        <li><a href="/Sales">Opcion 2</a></li>
+                                        <li><a href="/KPI">Opcion 3</a></li>
+                                        <li><a href="/KPI/Sales">Opcion 4</a></li>
                                     </ul>
-                                </li>
+                                </li>*@
 
-
-                                <li>
+                                @*<li>
                                     <a><i class="fa fa-calendar"></i> Schedules <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
                                         <li><a href="/FollowUpSchedules/DailyTasks">Daily Tasks</a></li>
@@ -68,12 +64,12 @@
                                         <li><a href="/FollowUpSchedules/TrainingSchedule">Training Schedule</a></li>
                                         <li><a href="/FollowUpSchedules/RoadTestSchedule">Road Test Schedule</a></li>
                                     </ul>
-                                </li>
+                                </li>*@
 
-                                <li><a href="/Leads"><i class="fa fa-hand-o-right"></i>Leads</a></li>
-                                <li><a href="/Students"><i class="fa fa-group"></i> Students </a></li>
-                                <li><a href="/StudentsPool"><i class="fa fa-group"></i> Students Pool</a></li>
-                                <li><a href="/StudentsPool/Rotation"><i class="fa fa-group"></i>Yards Rotation</a></li>
+                                <li><a href="/vacations"><i class="fa fa-calendar"></i>Vacaciones</a></li>
+                                <li><a href="/form"><i class="fa fa-newspaper-o"></i>Formulario (Solicitud)</a></li>
+                                <li><a href="/StudentsPool"><i class="fa fa-group"></i>Usuarios</a></li>
+                                <li><a href="/StudentsPool/Rotation"><i class="fa fa-inbox"></i>Enviar Notificaciones</a></li>
 
                             </ul>
 
@@ -84,12 +80,12 @@
 
             <!-- top navigation -->
             <div class="top_nav">
-                <div class="nav_menu">
+                <div class="nav_menu" style="height:57px; background-color: white !important">
                     <nav>
                         <div class="nav toggle">
                             <a id="menu_toggle"><i class="fa fa-bars"></i></a>
                         </div>
-                        @*@Html.Partial("_LoginPartial")*@
+                        @Html.Partial("_LoginPartial")
 
                     </nav>
                 </div>
