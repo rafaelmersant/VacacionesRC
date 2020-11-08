@@ -19,8 +19,8 @@
     @Styles.Render("~/Content/custom.css")
     @Styles.Render("~/Content/Alignments.css")
 
-    @Styles.Render("~/Content/style.css")
-    @Styles.Render("~/Content/custom-breadcrums.css")
+    @*@Styles.Render("~/Content/style.css")*@
+    @*@Styles.Render("~/Content/custom-breadcrums.css")*@
 
     @RenderSection("Styles", false)
 </head>
@@ -29,23 +29,27 @@
         <!-- Sidebar  -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <img src="~/Content/images/RCLogo.PNG" alt="logo" id="site_logo_id" style="width: 220px"/>
+                <img src="~/Content/images/RCLogo.PNG" alt="logo" id="site_logo_id" style="width: 220px" />
                 @*<strong>BS</strong>*@
             </div>
             <ul class="list-unstyled components">
                 <li><a href="/vacations"><i class="fa fa-calendar"></i>Vacaciones</a></li>
                 <li><a href="/form"><i class="fa fa-newspaper-o"></i>Formulario (Solicitud)</a></li>
-                <li><a href="/StudentsPool"><i class="fa fa-group"></i>Usuarios</a></li>
+                <li><a href="/User/UsersList"><i class="fa fa-group"></i>Usuarios</a></li>
                 <li><a href="/StudentsPool/Rotation"><i class="fa fa-inbox"></i>Enviar Notificaciones</a></li>
+                <li><a href="/Rules"><i class="fa fa-address-book"></i>Administrar Reglas</a></li>
             </ul>
-           
+
         </nav>
+
+        @Scripts.Render("~/Scripts/jquery-3.3.1.min.js")
+
         <!-- Page Content  -->
         <div id="content">
             <nav class="navbar navbar-expand-lg navbar-light mb-4" style="padding: 0 !important; height: 50px;">
                 <div class="container-fluid">
                     <button type="button" id="sidebarCollapse" class="btn">
-                        <span class="fa fa-bars text-danger" style="font-size: 1.5em"></span>
+                        <span class="fa fa-bars text-custom" style="font-size: 1.5em"></span>
                     </button>
                     <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fas fa-align-justify"></i>
@@ -73,11 +77,12 @@
     @RenderSection("scripts", required: false)
 
     <!-- jQuery CDN - Slim version (=without AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    @*<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>*@
     <!-- Popper.JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>*@
     <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    @*<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>*@
+
     <script type="text/javascript">
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
