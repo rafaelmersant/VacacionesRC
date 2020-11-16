@@ -1,0 +1,31 @@
+﻿
+Formulario Vacaciones:
+1-Conseguir el empleado por codigo
+2-Calcular que la fecha inicio no sea mayor que la fecha fin
+3-Calcular la cantidad de dias en el rango de fecha (considerando feriados)
+4-Traer cuantos dias tiene disponible
+5-Traer cuantos dias ha tomado
+6-Guardar el formulario
+7-Imprimir el formulario
+
+Listado de solicitud de vacaciones:
+1-Filtrar por dueño o admin (el dueño solo ve sus solicitudes, el admin puede ver todos los empleados y filtrar)
+2-Aprobar o rechazar solicitudes por parte del dueño del departamento
+
+Listado de Departamentos con sus dueños:
+1-Trear todos los departamentos y quieres pueden aprobar en dichos departamentos
+2-CRUD para flujo de aprobar de los departamentos
+
+Enviar alertas:
+1-Mensaje de alerta y destinatario
+2-Poder enviar alerta
+3-Tener el listado de alertas enviadas
+
+Dashboard de Vacaciones:
+1-Mostrar los dias tomados
+2-Mostrar los dias disponibles
+3-Mostrar total de dias para ese año
+
+Pantalla para definir regla de dias disponibles
+1-Cantidad de dias disponibles por antiguedad
+2-Poder agregar por antiguedad (rango) que cantidad de dias disponibles

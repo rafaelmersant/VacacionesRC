@@ -43,7 +43,7 @@ p {
 }
 
 .panel-custom {
-    height: 50px;
+    height: 45px;
     border: 1px solid #ededed;
     border-radius: 3px 3px 0 0;
     padding: 10px 10px;
@@ -76,7 +76,7 @@ a:focus {
     border: none;
     border-radius: 0;
     margin-bottom: 40px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-btn {

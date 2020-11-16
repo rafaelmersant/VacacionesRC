@@ -27,5 +27,8 @@ namespace VacacionesRC.Models
     
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<LoginHistory> LoginHistories { get; set; }
+        public virtual DbSet<Vacation> Vacations { get; set; }
+        public virtual DbSet<Holiday> Holidays { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
     }
 }

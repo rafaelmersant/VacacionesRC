@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Web;
+using VacacionesRC.Models;
 
 namespace VacacionesRC.App_Start
 {
@@ -144,6 +145,16 @@ namespace VacacionesRC.App_Start
 
         //    return ExecuteDataSetODBC(sQuery, null);
         //}
+
+        public static Employee GetEmployeeFromDB(int employeeId)
+        {
+            string environmentID = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
+
+            using(var db = new VacacionesRCEntities())
+            {
+                return db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+            }
+        }
 
         public static DataSet ExecuteDataSetODBC(string query, OdbcParameter[] parameters = null)
         {

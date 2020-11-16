@@ -154,8 +154,15 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\VacationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Employee.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Holiday.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\LoginHistory.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
@@ -177,6 +184,9 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>VacacionesRC.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Vacation.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -323,6 +333,7 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
+    <Content Include="Tasks.txt" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -354,6 +365,7 @@
     <Content Include="Views\User\RecoverPassword.cshtml" />
     <Content Include="Views\User\RegisterUser.cshtml" />
     <Content Include="Views\User\UsersList.cshtml" />
+    <Content Include="Views\Vacation\Formulario.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
