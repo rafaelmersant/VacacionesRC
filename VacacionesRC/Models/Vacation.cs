@@ -23,6 +23,7 @@ namespace VacacionesRC.Models
         public int DaysRequested { get; set; }
         public System.DateTime StartDate { get; set; }
         public System.DateTime EndDate { get; set; }
+        public Nullable<System.DateTime> ReturnDate { get; set; }
         public Nullable<System.DateTime> AcceptedDate { get; set; }
         public string AcceptedBy { get; set; }
         public Nullable<System.DateTime> RejectedDate { get; set; }

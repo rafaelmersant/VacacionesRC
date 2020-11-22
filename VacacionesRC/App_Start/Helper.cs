@@ -121,32 +121,45 @@ namespace VacacionesRC.App_Start
                 return false;
             }
         }
+      
+        public static Employee GetEmployee(int employeeId)
+        {
+            Employee employee = GetEmployeeFromDB(employeeId);
 
-        //public static DataSet GetCustomerName(string order)
-        //{
-        //    string orderNo = order;
-        //    string orderType = string.Empty;
-        //    string sQuery = string.Empty;
-        //    string environmentID = ConfigurationManager.AppSettings["EnvironmentEncuestas"];
+            try
+            {
+                if (employee == null)
+                {
+                    var data = GetEmployeeFromAS400(employeeId.ToString());
+                    if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
+                    {
+                        employee = new Employee
+                        {
+                            EmployeeId = employeeId,
+                            EmployeeName = data.Tables[0].Rows[0].ItemArray[1].ToString(),
+                            EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString(),
+                            EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString(),
+                            AdmissionDate = DateTime.Parse(data.Tables[0].Rows[0].ItemArray[4].ToString()),
+                            CreatedDate = DateTime.Now
+                        };
 
-        //    if (order.Contains("-"))
-        //    {
-        //        orderNo = order.Split('-')[0];
-        //        orderType = order.Split('-')[1];
-        //    }
+                        using (var db = new VacacionesRCEntities())
+                        {
+                            db.Employees.Add(employee);
+                            db.SaveChanges();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
 
-        //    if (string.IsNullOrEmpty(orderType))
-        //        sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura FROM [QS36F.RCOSMF00] WHERE OSNUOS = " + orderNo;
-        //    else
-        //        sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura FROM [QS36F.RCOSMF00] WHERE OSTIDO IN ('" + orderType + "') AND OSNUOS = " + orderNo;
+            return employee;
+        }
 
-        //    if (environmentID != "DEV")
-        //        sQuery = sQuery.Replace("[", "").Replace("]", "");
-
-        //    return ExecuteDataSetODBC(sQuery, null);
-        //}
-
-        public static Employee GetEmployeeFromDB(int employeeId)
+        private static Employee GetEmployeeFromDB(int employeeId)
         {
             string environmentID = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
 
@@ -154,6 +167,19 @@ namespace VacacionesRC.App_Start
             {
                 return db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
             }
+        }
+
+        private static DataSet GetEmployeeFromAS400(string employeeId)
+        {
+            string sQuery = string.Empty;
+
+            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, '2020-01-01' AS AdmissionDate FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+            " ORDER BY CECICLOPAG DESC";
+
+            if (ConfigurationManager.AppSettings["EnvironmentVolante"] == "PROD")
+                sQuery = sQuery.Replace("[", "").Replace("]", "");
+
+            return ExecuteDataSetODBC(sQuery, null);
         }
 
         public static DataSet ExecuteDataSetODBC(string query, OdbcParameter[] parameters = null)

@@ -161,6 +161,9 @@
     <Compile Include="Models\Employee.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EmployeeDay.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Holiday.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>

@@ -1,12 +1,15 @@
 ﻿
 Formulario Vacaciones:
-1-Conseguir el empleado por codigo
-2-Calcular que la fecha inicio no sea mayor que la fecha fin
-3-Calcular la cantidad de dias en el rango de fecha (considerando feriados)
+******1-Conseguir el empleado por codigo
+******2-Calcular que la fecha inicio no sea mayor que la fecha fin
+******3-Calcular la cantidad de dias en el rango de fecha (considerando feriados)
 4-Traer cuantos dias tiene disponible
 5-Traer cuantos dias ha tomado
 6-Guardar el formulario
 7-Imprimir el formulario
+
+CRUD para Dias Feriados
+CRUD para Dias correspondientes por antiguedad
 
 Listado de solicitud de vacaciones:
 1-Filtrar por dueño o admin (el dueño solo ve sus solicitudes, el admin puede ver todos los empleados y filtrar)

@@ -12,14 +12,12 @@ namespace VacacionesRC.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Employee
+    public partial class DaysBySeniority
     {
-        public int EmployeeId { get; set; }
-        public string EmployeeName { get; set; }
-        public string EmployeePosition { get; set; }
-        public string EmployeeDepto { get; set; }
-        public Nullable<int> EmployeeSupervisorId { get; set; }
-        public Nullable<System.DateTime> AdmissionDate { get; set; }
+        public int Id { get; set; }
+        public int days { get; set; }
+        public int initialYears { get; set; }
+        public int endYears { get; set; }
         public System.DateTime CreatedDate { get; set; }
     }
 }

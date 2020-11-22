@@ -62,10 +62,26 @@
             </h6>
         </div>
 
-        <div class="mt-3 ml-2 mr-2">
+        <div class="mt-3 ml-2 mr-2 pb-3">
             @using (Html.BeginForm())
             {
                 @Html.AntiForgeryToken()
+
+                <div class="form-row">
+                    <div class="col-3 mb-2">
+                        <label for="validationDefault01">Días Correspondientes</label>
+                        <input type="text" id="daysTotal" name="daysTotal" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                    </div>
+                    <div class="col-3 mb-2">
+                        <label for="validationDefault01">Días Disfrutados</label>
+                        <input type="text" id="daysTaken" name="daysTaken" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <label for="validationDefault01">Días Disponibles</label>
+                        <input type="text" id="daysAvailable" name="daysAvailable" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div class="col-3">
                         <label for="validationDefault02">Solicitar <b>Desde</b></label>
@@ -76,24 +92,9 @@
                         <label for="validationDefault02">Solicitar <b>Hasta</b></label>
                         <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
                     </div>
-                    <div class="col-1 mb-2">
+                    <div class="col-2 mb-2">
                         <label for="validationDefault01">Días Solicitados</label>
-                        <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" />
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="col-3 mb-2">
-                        <label for="validationDefault01">Días Correspondientes</label>
-                        <input type="text" id="daysTotal" name="daysTotal" value="" class="form-control form-control-sm" autocomplete="off" />
-                    </div>
-                    <div class="col-3 mb-2">
-                        <label for="validationDefault01">Días Disfrutados</label>
-                        <input type="text" id="daysTaken" name="daysTaken" value="" class="form-control form-control-sm" autocomplete="off" />
-                    </div>
-                    <div class="col-1 mb-2">
-                        <label for="validationDefault01">Días Disponibles</label>
-                        <input type="text" id="daysAvailable" name="daysAvailable" value="" class="form-control form-control-sm" autocomplete="off" />
+                        <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
                     </div>
                 </div>
 
@@ -101,7 +102,7 @@
                     Guardar
                 </button>
 
-                <span id="message" class="d-block text-@ViewBag.Result pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
+                <span id="message" class="d-block pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
             }
         </div>
     </section>
@@ -118,13 +119,17 @@
     $(document).ready(function () {
 
         //$(".datepicker").val(new Date().toLocaleDateString())
-        $(".datepicker").datepicker();
+        $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
 
         $(".numericOnly").keypress(function (e) {
             if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false;
         });
 
-        $("#employeeId").keypress(function () {
+        $("#employeeId").keypress(function (evt) {
+            if (evt.charCode === 13 && this.value.length > 1) {
+                $("#btnSearchEmployee").click();
+            }
+
             if (this.value.length >= 5)
                 return false;
         });
@@ -133,6 +138,10 @@
             e.preventDefault();
 
             const employeeId = $("#employeeId").val();
+
+            $("#employeeName").val('')
+            $("#employeePosition").val('')
+            $("#employeeDepto").val('')
 
             if (employeeId) {
                 $.ajax({
@@ -158,20 +167,63 @@
             }
         });
 
-        $("#PasswordHash").keyup(function () {
-            if (this.value.length < 4 || this.value === $("#EmployeeID").val()) {
-                $("#createUser").attr("disabled", "disabled");
-                $("#createUser").addClass("disable-button");
-                $("#message").text('Verifique que la contraseña tiene minimo 4 digitos y que no es el mismo Código de Empleado.')
-            }
-            else {
-                $("#createUser").removeAttr("disabled");
-                $("#createUser").removeClass("disable-button");
-                $("#message").text('');
-            }
+        $("#startDate").on("change", function (evt) {
+            validateDate()
         });
 
+        $("#endDate").on("change", function (evt) {
+            validateDate()
+        });
 
     });
+
+    function requestedDays(startDate, endDate) {
+        $.ajax({
+            "url": `/Vacation/RequestedDays?startDate=${startDate}&endDate=${endDate}`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    $("#daysRequested").val(response.message)
+                }
+                else {
+                    $("#daysRequested").val("0")
+                }
+            }
+        });
+    }
+
+    function validateDate() {
+        console.log($("#startDate").val())
+        console.log($("#endDate").val())
+
+        const startDateFormatted = GetDateFormat($("#startDate").val())
+        const endDateFormatted = GetDateFormat($("#endDate").val())
+        
+        const startDate = new Date(startDateFormatted)
+        const endDate = new Date(endDateFormatted)
+
+        console.log("formatted startDate:", startDate.toLocaleDateString())
+        console.log("formatted endDate:", endDate.toLocaleDateString())
+
+        if (startDate > endDate) {
+            $("#message").html("La fecha de inicio no puede ser mayor a la fecha fin")
+            $("#message").addClass("text-danger")
+        } else {
+            $("#message").html("")
+            $("#message").removeClass("text-danger")
+
+            if (startDate instanceof Date && isFinite(startDate) && endDate instanceof Date && isFinite(endDate))
+                requestedDays(startDate.toLocaleDateString(), endDate.toLocaleDateString())
+        }
+    }
+
+    function GetDateFormat(date) {
+        const parts = date.split("/");
+        const dt = new Date(parseInt(parts[2], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[0], 10));
+
+        return dt.toLocaleDateString();
+    }
 
 </script>

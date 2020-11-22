@@ -5,6 +5,28 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="VacacionesRCModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="DaysBySeniority">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="days" Type="int" Nullable="false" />
+          <Property Name="initialYears" Type="int" Nullable="false" />
+          <Property Name="endYears" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DeptoName" />
+            <PropertyRef Name="CreatedDate" />
+          </Key>
+          <Property Name="DeptoCode" Type="varchar" MaxLength="50" />
+          <Property Name="DeptoName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="DeptoOwner" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="Employee">
           <Key>
             <PropertyRef Name="EmployeeId" />
@@ -14,6 +36,20 @@
           <Property Name="EmployeePosition" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="EmployeeDepto" Type="varchar" MaxLength="150" />
           <Property Name="EmployeeSupervisorId" Type="int" />
+          <Property Name="AdmissionDate" Type="date" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EmployeeDays">
+          <Key>
+            <PropertyRef Name="EmployeeId" />
+            <PropertyRef Name="CurrentYear" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EmployeeId" Type="int" Nullable="false" />
+          <Property Name="CurrentYear" Type="int" Nullable="false" />
+          <Property Name="TotalDays" Type="int" Nullable="false" />
+          <Property Name="TakenDays" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Holiday">
           <Key>
@@ -57,6 +93,7 @@
           <Property Name="DaysRequested" Type="int" Nullable="false" />
           <Property Name="StartDate" Type="date" Nullable="false" />
           <Property Name="EndDate" Type="date" Nullable="false" />
+          <Property Name="ReturnDate" Type="date" />
           <Property Name="AcceptedDate" Type="datetime" />
           <Property Name="AcceptedBy" Type="char" MaxLength="4" />
           <Property Name="RejectedDate" Type="datetime" />
@@ -65,11 +102,21 @@
           <Property Name="CreatedBy" Type="char" MaxLength="4" />
         </EntityType>
         <EntityContainer Name="VacacionesRCModelStoreContainer">
+          <EntitySet Name="DaysBySeniority" EntityType="Self.DaysBySeniority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmployeeDays" EntityType="Self.EmployeeDays" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Holiday" EntityType="Self.Holiday" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LoginHistory" EntityType="Self.LoginHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vacation" EntityType="Self.Vacation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Department" EntityType="Self.Department" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Department].[DeptoCode] AS [DeptoCode], 
+    [Department].[DeptoName] AS [DeptoName], 
+    [Department].[DeptoOwner] AS [DeptoOwner], 
+    [Department].[CreatedDate] AS [CreatedDate]
+    FROM [dbo].[Department] AS [Department]</DefiningQuery>
+          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -78,9 +125,12 @@
         <EntityContainer Name="VacacionesRCEntities" annotation:LazyLoadingEnabled="true" >
           <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="LoginHistories" EntityType="VacacionesRCModel.LoginHistory" />
-          <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
           <EntitySet Name="Holidays" EntityType="VacacionesRCModel.Holiday" />
           <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
+          <EntitySet Name="EmployeeDays" EntityType="VacacionesRCModel.EmployeeDay" />
+          <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
+          <EntitySet Name="DaysBySeniorities" EntityType="VacacionesRCModel.DaysBySeniority" />
+          <EntitySet Name="Departments" EntityType="VacacionesRCModel.Department" />
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -102,26 +152,6 @@
           <Property Name="UserID" Type="Int32" Nullable="false" />
           <Property Name="LastLogin" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
-        <EntityType Name="Vacation">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="EmployeeId" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
-          <Property Name="SupervisorId" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
-          <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="false" />
-          <Property Name="DaysTaken" Type="Int32" Nullable="false" />
-          <Property Name="DaysAvailable" Type="Int32" Nullable="false" />
-          <Property Name="DaysRequested" Type="Int32" Nullable="false" />
-          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="AcceptedDate" Type="DateTime" Precision="3" />
-          <Property Name="AcceptedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
-          <Property Name="RejectedDate" Type="DateTime" Precision="3" />
-          <Property Name="RejectedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
-        </EntityType>
         <EntityType Name="Holiday">
           <Key>
             <PropertyRef Name="Id" />
@@ -140,6 +170,61 @@
           <Property Name="EmployeePosition" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="EmployeeDepto" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="EmployeeSupervisorId" Type="Int32" />
+          <Property Name="AdmissionDate" Type="DateTime" Precision="0" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="EmployeeDay">
+          <Key>
+            <PropertyRef Name="EmployeeId" />
+            <PropertyRef Name="CurrentYear" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
+          <Property Name="CurrentYear" Type="Int32" Nullable="false" />
+          <Property Name="TotalDays" Type="Int32" Nullable="false" />
+          <Property Name="TakenDays" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Vacation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmployeeId" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="SupervisorId" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="false" />
+          <Property Name="DaysTaken" Type="Int32" Nullable="false" />
+          <Property Name="DaysAvailable" Type="Int32" Nullable="false" />
+          <Property Name="DaysRequested" Type="Int32" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ReturnDate" Type="DateTime" Precision="0" />
+          <Property Name="AcceptedDate" Type="DateTime" Precision="3" />
+          <Property Name="AcceptedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="RejectedDate" Type="DateTime" Precision="3" />
+          <Property Name="RejectedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="DaysBySeniority">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="days" Type="Int32" Nullable="false" />
+          <Property Name="initialYears" Type="Int32" Nullable="false" />
+          <Property Name="endYears" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DeptoName" />
+            <PropertyRef Name="CreatedDate" />
+          </Key>
+          <Property Name="DeptoCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DeptoName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DeptoOwner" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -169,27 +254,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Vacations">
-            <EntityTypeMapping TypeName="VacacionesRCModel.Vacation">
-              <MappingFragment StoreEntitySet="Vacation">
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="RejectedBy" ColumnName="RejectedBy" />
-                <ScalarProperty Name="RejectedDate" ColumnName="RejectedDate" />
-                <ScalarProperty Name="AcceptedBy" ColumnName="AcceptedBy" />
-                <ScalarProperty Name="AcceptedDate" ColumnName="AcceptedDate" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
-                <ScalarProperty Name="DaysRequested" ColumnName="DaysRequested" />
-                <ScalarProperty Name="DaysAvailable" ColumnName="DaysAvailable" />
-                <ScalarProperty Name="DaysTaken" ColumnName="DaysTaken" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="SupervisorId" ColumnName="SupervisorId" />
-                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Holidays">
             <EntityTypeMapping TypeName="VacacionesRCModel.Holiday">
               <MappingFragment StoreEntitySet="Holiday">
@@ -203,11 +267,68 @@
           <EntitySetMapping Name="Employees">
             <EntityTypeMapping TypeName="VacacionesRCModel.Employee">
               <MappingFragment StoreEntitySet="Employee">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
                 <ScalarProperty Name="EmployeeSupervisorId" ColumnName="EmployeeSupervisorId" />
                 <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
                 <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
                 <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
                 <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmployeeDays">
+            <EntityTypeMapping TypeName="VacacionesRCModel.EmployeeDay">
+              <MappingFragment StoreEntitySet="EmployeeDays">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="TakenDays" ColumnName="TakenDays" />
+                <ScalarProperty Name="TotalDays" ColumnName="TotalDays" />
+                <ScalarProperty Name="CurrentYear" ColumnName="CurrentYear" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vacations">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Vacation">
+              <MappingFragment StoreEntitySet="Vacation">
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="RejectedBy" ColumnName="RejectedBy" />
+                <ScalarProperty Name="RejectedDate" ColumnName="RejectedDate" />
+                <ScalarProperty Name="AcceptedBy" ColumnName="AcceptedBy" />
+                <ScalarProperty Name="AcceptedDate" ColumnName="AcceptedDate" />
+                <ScalarProperty Name="ReturnDate" ColumnName="ReturnDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="DaysRequested" ColumnName="DaysRequested" />
+                <ScalarProperty Name="DaysAvailable" ColumnName="DaysAvailable" />
+                <ScalarProperty Name="DaysTaken" ColumnName="DaysTaken" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="SupervisorId" ColumnName="SupervisorId" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DaysBySeniorities">
+            <EntityTypeMapping TypeName="VacacionesRCModel.DaysBySeniority">
+              <MappingFragment StoreEntitySet="DaysBySeniority">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="endYears" ColumnName="endYears" />
+                <ScalarProperty Name="initialYears" ColumnName="initialYears" />
+                <ScalarProperty Name="days" ColumnName="days" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Departments">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Department">
+              <MappingFragment StoreEntitySet="Department">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="DeptoOwner" ColumnName="DeptoOwner" />
+                <ScalarProperty Name="DeptoName" ColumnName="DeptoName" />
+                <ScalarProperty Name="DeptoCode" ColumnName="DeptoCode" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
