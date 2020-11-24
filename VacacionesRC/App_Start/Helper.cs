@@ -159,7 +159,7 @@ namespace VacacionesRC.App_Start
             return employee;
         }
 
-        private static Employee GetEmployeeFromDB(int employeeId)
+        public static Employee GetEmployeeFromDB(int employeeId)
         {
             string environmentID = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
 
@@ -169,7 +169,7 @@ namespace VacacionesRC.App_Start
             }
         }
 
-        private static DataSet GetEmployeeFromAS400(string employeeId)
+        public static DataSet GetEmployeeFromAS400(string employeeId)
         {
             string sQuery = string.Empty;
 

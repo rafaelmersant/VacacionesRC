@@ -21,10 +21,28 @@ namespace VacacionesRC.Controllers
             return View();
         }
 
+        [HttpGet]
+        public JsonResult GetCorrespondingDays(int employeeId)
+        {
+            int days = 0;
+
+            try
+            {
+                days = HelperDays.GetDaysForEmployee(employeeId);
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = 0 }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+
+            return new JsonResult { Data = new { result = "200", message = days }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
         [HttpPost]
         public JsonResult GetEmployee(int employeeId)
         {
-            var employee = Helper.GetEmployeeFromDB(employeeId);
+            var employee = Helper.GetEmployee(employeeId);
 
             try
             {
@@ -55,7 +73,7 @@ namespace VacacionesRC.Controllers
                 DateTime _endDate = DateTime.Parse(endDate);
 
                 DateTime currentDay = _startDate;
-                int holydays = Helper.GetHolidays(_startDate, _endDate);
+                int holydays = HelperDays.GetHolidays(_startDate, _endDate);
                 
                 while (currentDay < _endDate.AddDays(1))
                 {

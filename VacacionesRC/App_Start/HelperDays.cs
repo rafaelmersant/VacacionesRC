@@ -13,6 +13,7 @@ namespace VacacionesRC.App_Start
 
         }
 
+        //Get Holidays between these dates
         public static int GetHolidays(DateTime startDate, DateTime endDate)
         {
             try
@@ -30,17 +31,21 @@ namespace VacacionesRC.App_Start
             return 0;
         }
 
-        private static int DaysForThisEmployee(Employee employee)
+        //Get how many days belong to this employee according their years in the company
+        private static int DaysForThisEmployeeBySeniority(Employee employee)
         {
-            double totalYears = (DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays / 365;
+            int totalYears = (int)(DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays / 365;
 
             try
             {
                 using (var db = new VacacionesRCEntities())
                 {
-                    int daysForThis = db.DaysBySeniorities.FirstOrDefault(d => d.initialYears >= totalYears && d.endYears <= totalYears).days;
+                    var daysForThis = db.DaysBySeniorities.FirstOrDefault(d => d.initialYears <= totalYears && d.endYears >= totalYears);
 
-                    return daysForThis;
+                    if (daysForThis != null)
+                        return daysForThis.days;
+                    else
+                        return 14; //default days
                 }
             }
             catch (Exception ex)
@@ -51,6 +56,7 @@ namespace VacacionesRC.App_Start
             }
         }
 
+        //Get how many days belong to this employee for the current year
         public static int GetDaysForEmployee(int employeeId)
         {
             int days = 0;
@@ -76,7 +82,7 @@ namespace VacacionesRC.App_Start
                         var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
                         double elapsedDays = (DateTime.Now.Date - anniversaryDate).TotalDays;
 
-                        days = DaysForThisEmployee(employee);
+                        days = DaysForThisEmployeeBySeniority(employee);
 
                         if (elapsedDays >= 180)
                         {
@@ -91,7 +97,15 @@ namespace VacacionesRC.App_Start
 
                             db.EmployeeDays.Add(employeeDay);
                             db.SaveChanges();
+                        } 
+                        else
+                        {
+                            days = 0;
                         }
+                    }
+                    else
+                    {
+                        days = employeeDays.TotalDays;
                     }
                 }
             }
