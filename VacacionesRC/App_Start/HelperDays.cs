@@ -57,19 +57,24 @@ namespace VacacionesRC.App_Start
         }
 
         //Get how many days belong to this employee for the current year
-        public static int GetDaysForEmployee(int employeeId)
+        public static EmployeeDay GetDaysForEmployee(int employeeId)
         {
-            int days = 0;
+            EmployeeDay employeeDay = null;
 
             try
             {
                 using (var db = new VacacionesRCEntities())
                 {
                     Employee employee = Helper.GetEmployee(employeeId);
+                    var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
+                    var renovationDate = anniversaryDate.AddDays(180);
+                    var dueDate = renovationDate.AddDays(180);
+
+                    employeeDay = new EmployeeDay { TotalDays = 0, RenovationDate = renovationDate, DueDate = dueDate, CurrentYear = DateTime.Now.Year };
 
                     //For new employee with less than 6 months working in the Company.
                     double daysWorking = (DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays;
-                    if (daysWorking < 180) return 0;
+                    if (daysWorking < 180) return employeeDay;
 
                     //For employee with more than 6 months working in the Company.
                     var employeeDays = db.EmployeeDays
@@ -79,19 +84,20 @@ namespace VacacionesRC.App_Start
 
                     if (employeeDays == null)
                     {
-                        var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
                         double elapsedDays = (DateTime.Now.Date - anniversaryDate).TotalDays;
 
-                        days = DaysForThisEmployeeBySeniority(employee);
+                        int days = DaysForThisEmployeeBySeniority(employee);
 
                         if (elapsedDays >= 180)
                         {
-                            EmployeeDay employeeDay = new EmployeeDay
+                            employeeDay = new EmployeeDay
                             {
                                 EmployeeId = employeeId,
                                 TakenDays = 0,
                                 TotalDays = days,
                                 CurrentYear = DateTime.Now.Date.Year,
+                                RenovationDate = renovationDate,
+                                DueDate = dueDate,
                                 CreatedDate = DateTime.Now
                             };
 
@@ -100,12 +106,12 @@ namespace VacacionesRC.App_Start
                         } 
                         else
                         {
-                            days = 0;
+                            return employeeDay;
                         }
                     }
                     else
                     {
-                        days = employeeDays.TotalDays;
+                        return employeeDays;
                     }
                 }
             }
@@ -114,7 +120,7 @@ namespace VacacionesRC.App_Start
                 Helper.SendException(ex);
             }
 
-            return days;
+            return employeeDay;
         }
     }
 }

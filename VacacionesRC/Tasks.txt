@@ -8,6 +8,7 @@ Formulario Vacaciones:
 6-Guardar el formulario
 7-Imprimir el formulario
 
+Workflow de aprobacion de vacaciones
 CRUD para Dias Feriados
 CRUD para Dias correspondientes por antiguedad
 

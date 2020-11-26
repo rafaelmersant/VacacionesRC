@@ -133,13 +133,34 @@ namespace VacacionesRC.App_Start
                     var data = GetEmployeeFromAS400(employeeId.ToString());
                     if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
                     {
+                        DateTime? admissionDate = null;
+                        if (data.Tables[0].Rows[0].ItemArray[4].ToString().Length >= 8)
+                        {
+                            int year = int.Parse(data.Tables[0].Rows[0].ItemArray[4].ToString().Substring(0, 4));
+                            int month = int.Parse(data.Tables[0].Rows[0].ItemArray[4].ToString().Substring(4,2));
+                            int day = int.Parse(data.Tables[0].Rows[0].ItemArray[4].ToString().Substring(6, 2));
+
+                            admissionDate = new DateTime(year, month, day);
+                        }
+
+                        DateTime? departureDate = null;
+                        if (data.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+                        {
+                            int year = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
+                            int month = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
+                            int day = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
+
+                            departureDate = new DateTime(year, month, day);
+                        }
+
                         employee = new Employee
                         {
                             EmployeeId = employeeId,
                             EmployeeName = data.Tables[0].Rows[0].ItemArray[1].ToString(),
                             EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString(),
                             EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString(),
-                            AdmissionDate = DateTime.Parse(data.Tables[0].Rows[0].ItemArray[4].ToString()),
+                            AdmissionDate = admissionDate,
+                            DepartureDate = departureDate,
                             CreatedDate = DateTime.Now
                         };
 
@@ -173,7 +194,10 @@ namespace VacacionesRC.App_Start
         {
             string sQuery = string.Empty;
 
-            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, '2020-01-01' AS AdmissionDate FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+            //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00
+            //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
+
+            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
             " ORDER BY CECICLOPAG DESC";
 
             if (ConfigurationManager.AppSettings["EnvironmentVolante"] == "PROD")

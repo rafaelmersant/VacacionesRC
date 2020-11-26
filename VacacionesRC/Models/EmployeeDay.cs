@@ -19,6 +19,8 @@ namespace VacacionesRC.Models
         public int CurrentYear { get; set; }
         public int TotalDays { get; set; }
         public Nullable<int> TakenDays { get; set; }
+        public Nullable<System.DateTime> RenovationDate { get; set; }
+        public Nullable<System.DateTime> DueDate { get; set; }
         public System.DateTime CreatedDate { get; set; }
     }
 }

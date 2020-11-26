@@ -37,6 +37,7 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="EmployeeDepto" Type="varchar" MaxLength="150" />
           <Property Name="EmployeeSupervisorId" Type="int" />
           <Property Name="AdmissionDate" Type="date" />
+          <Property Name="DepartureDate" Type="date" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="EmployeeDays">
@@ -49,6 +50,8 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="CurrentYear" Type="int" Nullable="false" />
           <Property Name="TotalDays" Type="int" Nullable="false" />
           <Property Name="TakenDays" Type="int" />
+          <Property Name="RenovationDate" Type="date" />
+          <Property Name="DueDate" Type="date" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Holiday">
@@ -126,11 +129,11 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="LoginHistories" EntityType="VacacionesRCModel.LoginHistory" />
           <EntitySet Name="Holidays" EntityType="VacacionesRCModel.Holiday" />
-          <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
-          <EntitySet Name="EmployeeDays" EntityType="VacacionesRCModel.EmployeeDay" />
           <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
           <EntitySet Name="DaysBySeniorities" EntityType="VacacionesRCModel.DaysBySeniority" />
           <EntitySet Name="Departments" EntityType="VacacionesRCModel.Department" />
+          <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
+          <EntitySet Name="EmployeeDays" EntityType="VacacionesRCModel.EmployeeDay" />
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -160,30 +163,6 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="CreatedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="Employee">
-          <Key>
-            <PropertyRef Name="EmployeeId" />
-          </Key>
-          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
-          <Property Name="EmployeeName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="EmployeePosition" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="EmployeeDepto" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="EmployeeSupervisorId" Type="Int32" />
-          <Property Name="AdmissionDate" Type="DateTime" Precision="0" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="EmployeeDay">
-          <Key>
-            <PropertyRef Name="EmployeeId" />
-            <PropertyRef Name="CurrentYear" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
-          <Property Name="CurrentYear" Type="Int32" Nullable="false" />
-          <Property Name="TotalDays" Type="Int32" Nullable="false" />
-          <Property Name="TakenDays" Type="Int32" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         <EntityType Name="Vacation">
           <Key>
@@ -226,6 +205,33 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="DeptoOwner" Type="Int32" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
+        <EntityType Name="Employee">
+          <Key>
+            <PropertyRef Name="EmployeeId" />
+          </Key>
+          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
+          <Property Name="EmployeeName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="EmployeePosition" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="EmployeeDepto" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="EmployeeSupervisorId" Type="Int32" />
+          <Property Name="AdmissionDate" Type="DateTime" Precision="0" />
+          <Property Name="DepartureDate" Type="DateTime" Precision="0" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="EmployeeDay">
+          <Key>
+            <PropertyRef Name="EmployeeId" />
+            <PropertyRef Name="CurrentYear" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
+          <Property Name="CurrentYear" Type="Int32" Nullable="false" />
+          <Property Name="TotalDays" Type="Int32" Nullable="false" />
+          <Property Name="TakenDays" Type="Int32" />
+          <Property Name="RenovationDate" Type="DateTime" Precision="0" />
+          <Property Name="DueDate" Type="DateTime" Precision="0" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -260,31 +266,6 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Employees">
-            <EntityTypeMapping TypeName="VacacionesRCModel.Employee">
-              <MappingFragment StoreEntitySet="Employee">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
-                <ScalarProperty Name="EmployeeSupervisorId" ColumnName="EmployeeSupervisorId" />
-                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
-                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
-                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
-                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="EmployeeDays">
-            <EntityTypeMapping TypeName="VacacionesRCModel.EmployeeDay">
-              <MappingFragment StoreEntitySet="EmployeeDays">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="TakenDays" ColumnName="TakenDays" />
-                <ScalarProperty Name="TotalDays" ColumnName="TotalDays" />
-                <ScalarProperty Name="CurrentYear" ColumnName="CurrentYear" />
-                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -329,6 +310,34 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
                 <ScalarProperty Name="DeptoOwner" ColumnName="DeptoOwner" />
                 <ScalarProperty Name="DeptoName" ColumnName="DeptoName" />
                 <ScalarProperty Name="DeptoCode" ColumnName="DeptoCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Employees">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Employee">
+              <MappingFragment StoreEntitySet="Employee">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="DepartureDate" ColumnName="DepartureDate" />
+                <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
+                <ScalarProperty Name="EmployeeSupervisorId" ColumnName="EmployeeSupervisorId" />
+                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmployeeDays">
+            <EntityTypeMapping TypeName="VacacionesRCModel.EmployeeDay">
+              <MappingFragment StoreEntitySet="EmployeeDays">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="DueDate" ColumnName="DueDate" />
+                <ScalarProperty Name="RenovationDate" ColumnName="RenovationDate" />
+                <ScalarProperty Name="TakenDays" ColumnName="TakenDays" />
+                <ScalarProperty Name="TotalDays" ColumnName="TotalDays" />
+                <ScalarProperty Name="CurrentYear" ColumnName="CurrentYear" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

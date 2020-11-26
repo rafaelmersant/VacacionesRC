@@ -8,11 +8,11 @@
         <EntityTypeShape EntityType="VacacionesRCModel.User" Width="1.5" PointX="1.25" PointY="0.5" />
         <EntityTypeShape EntityType="VacacionesRCModel.LoginHistory" Width="1.5" PointX="5.875" PointY="0.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.Holiday" Width="1.5" PointX="3.75" PointY="1.875" />
-        <EntityTypeShape EntityType="VacacionesRCModel.Employee" Width="1.5" PointX="0.75" PointY="3.75" />
-        <EntityTypeShape EntityType="VacacionesRCModel.EmployeeDay" Width="1.5" PointX="3.375" PointY="4.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.Vacation" Width="1.5" PointX="5.375" PointY="4.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.DaysBySeniority" Width="1.5" PointX="9" PointY="2.25" />
         <EntityTypeShape EntityType="VacacionesRCModel.Department" Width="1.5" PointX="11" PointY="2.25" />
+        <EntityTypeShape EntityType="VacacionesRCModel.Employee" Width="1.5" PointX="0.75" PointY="3.75" />
+        <EntityTypeShape EntityType="VacacionesRCModel.EmployeeDay" Width="1.5" PointX="0.75" PointY="7.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

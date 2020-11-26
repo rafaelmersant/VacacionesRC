@@ -174,6 +174,7 @@
             $("#employeeName").val('')
             $("#employeePosition").val('')
             $("#employeeDepto").val('')
+            $("#daysTotal").val('')
 
             $("#waitingIndicator").show();
             $("#btnSearchEmployee").hide();
@@ -188,7 +189,8 @@
                             $("#employeeName").val(employee.EmployeeName)
                             $("#employeePosition").val(employee.EmployeePosition)
                             $("#employeeDepto").val(employee.EmployeeDepto)
-
+                            $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
+                            
                             CorrespondingDays(employeeId);
                         }
                         else if (response.result === "404") {
@@ -223,7 +225,10 @@
             "success": function (response) {
                 console.log(response)
                 if (response.result === "200") {
-                    $("#daysTotal").val(response.message)
+                    const employeeDay = JSON.parse(response.message);
+                    $("#nextAvailableDate").val(new Date(employeeDay.RenovationDate).toLocaleDateString("es-DO"))
+                    $("#dueDate").val(new Date(employeeDay.DueDate).toLocaleDateString("es-DO"))
+                    $("#daysTotal").val(employeeDay.TotalDays)
                 } else {
                     alert(response.message)
                 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using VacacionesRC.App_Start;
+using VacacionesRC.Models;
 
 namespace VacacionesRC.Controllers
 {
@@ -24,19 +25,20 @@ namespace VacacionesRC.Controllers
         [HttpGet]
         public JsonResult GetCorrespondingDays(int employeeId)
         {
-            int days = 0;
+            EmployeeDay employeeDay;
 
             try
             {
-                days = HelperDays.GetDaysForEmployee(employeeId);
+                employeeDay = HelperDays.GetDaysForEmployee(employeeId);
             }
             catch (Exception ex)
             {
                 Helper.SendException(ex);
-                return new JsonResult { Data = new { result = "500", message = 0 }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
 
-            return new JsonResult { Data = new { result = "200", message = days }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
+            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         [HttpPost]
