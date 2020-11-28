@@ -48,7 +48,7 @@
                 </div>
 
                 <div class="form-group col">
-                    <label for="validationDefault01">Próxima fecha renovación de vacaciones</label>
+                    <label for="validationDefault01">Fecha de renovación de vacaciones</label>
                     <input type="text" id="nextAvailableDate" name="nextAvailableDate" value="" class="form-control form-control-sm col-12" readonly />
                 </div>
                 <div class="form-group col">
@@ -120,6 +120,8 @@
                             <label for="validationDefault01">Días Solicitados</label>
                             <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
                         </div>
+
+                        <input type="hidden" id="_returnDate" name="_returnDate" value=""/>
                     </div>
                 </div>
 
@@ -128,9 +130,12 @@
                     
                     <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
                 </div>
+                <div class="12">
+                    <span class="ml-3">Le corresponde reintegrarse a las labores el día <span id="returnDate" class="font-weight-bold"></span> </span>
+                </div>
             </section>
                 
-                <button id="createUser" class="btn btn-sm btn-danger pl-4 pr-4 mt-3" type="submit">
+                <button id="btnSaveForm" class="btn btn-sm btn-danger pl-4 pr-4 mt-3">
                     Guardar
                 </button>
 
@@ -208,6 +213,68 @@
             }
         });
 
+        $("#btnSaveForm").click(function (e) {
+            e.preventDefault();
+
+            const employeeId = $("#employeeId").val()
+            const daysTaken = $("#daysTaken").val()
+            const daysRequested = $("#daysRequested").val()
+            const daysAvailable = $("#daysAvailable").val()
+            
+            const startDateFormatted = GetDateFormat($("#startDate").val())
+            const endDateFormatted = GetDateFormat($("#endDate").val())
+
+            let startDate = new Date(startDateFormatted)
+            let endDate = new Date(endDateFormatted)
+            startDate = startDate.toLocaleDateString()
+            endDate = endDate.toLocaleDateString()
+
+            const returnDate = $("#_returnDate").val()
+
+            //$("#waitingIndicator").show();
+            //$("#btnSearchEmployee").hide();
+            const data = {
+                'EmployeId': employeeId,
+                'DaysTaken': daysTaken,
+                'DaysAvailable': daysAvailable,
+                'DaysRequested': daysRequested,
+                'StartDate': startDate,
+                'EndDate': endDate,
+                'ReturnDate': returnDate
+            }
+
+            if (employeeId) {
+                $.ajax({
+                    url: `/Vacation/Save`,
+                    type: "POST",
+                    data: data
+                }).done(async function (response) {
+                    if (response.result === "200") {
+                        const employee = JSON.parse(response.message);
+                        $("#employeeName").val(employee.EmployeeName)
+                        $("#employeePosition").val(employee.EmployeePosition)
+                        $("#employeeDepto").val(employee.EmployeeDepto)
+                        $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
+
+                        CorrespondingDays(employeeId);
+                    }
+                    else if (response.result === "404") {
+                        alert('El colaborador no fue encontrado.');
+                    }
+                    else {
+                        console.log(response.message);
+                        alert('Hubo un error tratando de encontrar al colaborador.');
+                    }
+
+                    $("#waitingIndicator").hide();
+                    $("#btnSearchEmployee").show();
+
+                }).fail(function (error) {
+                    alert(error);
+                })
+            }
+        });
+
         $("#startDate").on("change", function (evt) {
             validateDate()
         });
@@ -223,12 +290,24 @@
             "url": `/Vacation/GetCorrespondingDays/?employeeId=${employeeId}`,
             "type": "GET",
             "success": function (response) {
-                console.log(response)
                 if (response.result === "200") {
                     const employeeDay = JSON.parse(response.message);
                     $("#nextAvailableDate").val(new Date(employeeDay.RenovationDate).toLocaleDateString("es-DO"))
                     $("#dueDate").val(new Date(employeeDay.DueDate).toLocaleDateString("es-DO"))
                     $("#daysTotal").val(employeeDay.TotalDays)
+
+                    const today = new Date();
+                    const renovationDate = new Date(employeeDay.RenovationDate);
+
+                    if (renovationDate > today) {
+                        console.log('disable fields')
+                        $("#startDate").prop("readonly", true)
+                        $("#endDate").prop("readonly", true)
+                    } else {
+                        console.log('NOT disable fields')
+                        $("#startDate").prop("readonly", false)
+                        $("#endDate").prop("readonly", false)
+                    }
                 } else {
                     alert(response.message)
                 }
@@ -241,28 +320,25 @@
             "url": `/Vacation/RequestedDays?startDate=${startDate}&endDate=${endDate}`,
             "type": "POST",
             "success": async function (response) {
+                
                 if (response.result === "200") {
-                    $("#daysRequested").val(response.message)
+                    $("#daysRequested").val(response.requestedDays)
+                    $("#returnDate").html(new Date(response.returnDate).toLocaleDateString("es-DO"))
                 }
                 else {
                     $("#daysRequested").val("0")
+                    $("#returnDate").html('')
                 }
             }
         });
     }
 
     function validateDate() {
-        console.log($("#startDate").val())
-        console.log($("#endDate").val())
-
         const startDateFormatted = GetDateFormat($("#startDate").val())
         const endDateFormatted = GetDateFormat($("#endDate").val())
 
         const startDate = new Date(startDateFormatted)
         const endDate = new Date(endDateFormatted)
-
-        console.log("formatted startDate:", startDate.toLocaleDateString())
-        console.log("formatted endDate:", endDate.toLocaleDateString())
 
         if (startDate > endDate) {
             $("#message").html("La fecha de inicio no puede ser mayor a la fecha fin")

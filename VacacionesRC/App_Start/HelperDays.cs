@@ -13,6 +13,41 @@ namespace VacacionesRC.App_Start
 
         }
 
+        public static DateTime? GetReturnDate(DateTime endDate)
+        {
+            bool foundAvailableDay = false;
+            var nextDay = endDate.AddDays(1);
+
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    var holidays = db.Holidays.Where(h => h.Date >= endDate);
+
+                    while (foundAvailableDay == false)
+                    {
+                        var holiday = holidays.FirstOrDefault(h => h.Date == nextDay.Date);
+
+                        if (nextDay.DayOfWeek != DayOfWeek.Saturday &&
+                            nextDay.DayOfWeek != DayOfWeek.Sunday &&
+                            holiday == null)
+                        {
+                            foundAvailableDay = true;
+                        }
+
+                        if (!foundAvailableDay)
+                            nextDay = nextDay.AddDays(1);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return nextDay;
+        }
+
         //Get Holidays between these dates
         public static int GetHolidays(DateTime startDate, DateTime endDate)
         {
@@ -67,10 +102,18 @@ namespace VacacionesRC.App_Start
                 {
                     Employee employee = Helper.GetEmployee(employeeId);
                     var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
-                    var renovationDate = anniversaryDate.AddDays(180);
-                    var dueDate = renovationDate.AddDays(180);
+                    var renovationDate = anniversaryDate.AddDays(-180);
+                    var dueDate = anniversaryDate.AddDays(180);
 
-                    employeeDay = new EmployeeDay { TotalDays = 0, RenovationDate = renovationDate, DueDate = dueDate, CurrentYear = DateTime.Now.Year };
+                    //Check if this vacacions already reaches dueDate
+                    if (dueDate <= DateTime.Today.Date)
+                    {
+                        anniversaryDate = anniversaryDate.AddYears(1);
+                        renovationDate = anniversaryDate.AddDays(-180);
+                        dueDate = anniversaryDate.AddDays(180);
+                    }
+
+                    employeeDay = new EmployeeDay { TotalDays = 0, RenovationDate = renovationDate, DueDate = dueDate, CurrentYear = anniversaryDate.Year };
 
                     //For new employee with less than 6 months working in the Company.
                     double daysWorking = (DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays;
@@ -78,24 +121,24 @@ namespace VacacionesRC.App_Start
 
                     //For employee with more than 6 months working in the Company.
                     var employeeDays = db.EmployeeDays
-                                            .Where(e => e.EmployeeId == employeeId)
+                                            .Where(e => e.EmployeeId == employeeId && e.CurrentYear == anniversaryDate.Year)
                                             .OrderByDescending(o => o.CreatedDate)
                                             .FirstOrDefault();
 
                     if (employeeDays == null)
                     {
-                        double elapsedDays = (DateTime.Now.Date - anniversaryDate).TotalDays;
+                        //double elapsedDays = (DateTime.Now.Date - anniversaryDate).TotalDays;
 
                         int days = DaysForThisEmployeeBySeniority(employee);
 
-                        if (elapsedDays >= 180)
+                        if (renovationDate <= DateTime.Today.Date)
                         {
                             employeeDay = new EmployeeDay
                             {
                                 EmployeeId = employeeId,
                                 TakenDays = 0,
                                 TotalDays = days,
-                                CurrentYear = DateTime.Now.Date.Year,
+                                CurrentYear = anniversaryDate.Year,
                                 RenovationDate = renovationDate,
                                 DueDate = dueDate,
                                 CreatedDate = DateTime.Now

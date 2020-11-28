@@ -93,13 +93,15 @@ namespace VacacionesRC.Controllers
 
                 requestedDays -= holydays;
 
-                return Json(new { result = "200", message = requestedDays });
+                var returnDate = HelperDays.GetReturnDate(_endDate);
+
+                return new JsonResult { Data = new { result = "200", requestedDays, returnDate = returnDate.Value.ToShortDateString() }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
             catch (Exception ex)
             {
                 Helper.SendException(ex, "startDate:" + startDate + " -- endDate:" + endDate);
 
-                return Json(new { result = "500", message = ex.Message });
+                return new JsonResult { Data = new { result = "500", requestedDays = ex.Message, returnDate = ""}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
     }

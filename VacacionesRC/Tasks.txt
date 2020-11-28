@@ -3,7 +3,7 @@ Formulario Vacaciones:
 ******1-Conseguir el empleado por codigo
 ******2-Calcular que la fecha inicio no sea mayor que la fecha fin
 ******3-Calcular la cantidad de dias en el rango de fecha (considerando feriados)
-4-Traer cuantos dias tiene disponible
+******4-Traer cuantos dias tiene disponible
 5-Traer cuantos dias ha tomado
 6-Guardar el formulario
 7-Imprimir el formulario
