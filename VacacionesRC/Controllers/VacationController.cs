@@ -19,6 +19,8 @@ namespace VacacionesRC.Controllers
 
         public ActionResult Formulario()
         {
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+
             return View();
         }
 
@@ -102,6 +104,52 @@ namespace VacacionesRC.Controllers
                 Helper.SendException(ex, "startDate:" + startDate + " -- endDate:" + endDate);
 
                 return new JsonResult { Data = new { result = "500", requestedDays = ex.Message, returnDate = ""}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
+
+        [HttpPost]
+        public JsonResult Save(Vacation vacation)
+        {
+            Vacation vacaciontEdit = null;
+
+            try
+            {
+                if (Session["employeeID"] == null) throw new Exception("Por favor intente hacer saliendo y entrando nuevamente al sistema.");
+
+                using (var db = new VacacionesRCEntities())
+                {
+                    if (vacation.Id > 0)
+                        vacaciontEdit = db.Vacations.FirstOrDefault(v => v.Id == vacation.Id);
+
+                    Vacation newVacation = new Vacation
+                    {
+                        IdHash = Guid.NewGuid(),
+                        EmployeeId = vacation.EmployeeId,
+                        DaysTaken = vacation.DaysTaken,
+                        DaysAvailable = vacation.DaysAvailable,
+                        DaysRequested = vacation.DaysRequested,
+                        StartDate = vacation.StartDate,
+                        EndDate = vacation.EndDate,
+                        ReturnDate = vacation.ReturnDate,
+                        Note = vacation.Note,
+                        CreatedDate = DateTime.Now,
+                        CreatedBy = Session["employeeID"].ToString(),
+                        Status = "En proceso"
+                    };
+
+                    db.Vacations.Add(newVacation);
+                    db.SaveChanges();
+
+                    HelperDays.UpdateTakenDays(int.Parse(vacation.EmployeeId), newVacation.DaysRequested);
+                }
+
+                return Json(new { result = "200", message = "success" });
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "employeeId:" + vacation.EmployeeId);
+
+                return Json(new { result = "500", message = ex.Message });
             }
         }
     }

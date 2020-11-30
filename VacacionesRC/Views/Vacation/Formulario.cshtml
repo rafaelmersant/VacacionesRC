@@ -130,12 +130,12 @@
                     
                     <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
                 </div>
-                <div class="12">
+                <div id="returnDateDiv" class="mt-2 mb-2">
                     <span class="ml-3">Le corresponde reintegrarse a las labores el día <span id="returnDate" class="font-weight-bold"></span> </span>
                 </div>
             </section>
                 
-                <button id="btnSaveForm" class="btn btn-sm btn-danger pl-4 pr-4 mt-3">
+                <button id="btnSaveForm" class="btn btn-sm btn-danger pl-5 pr-5 mt-3 ml-1">
                     Guardar
                 </button>
 
@@ -154,6 +154,7 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+        $("#returnDateDiv").hide()
 
         //$(".datepicker").val(new Date().toLocaleDateString())
         $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
@@ -180,6 +181,14 @@
             $("#employeePosition").val('')
             $("#employeeDepto").val('')
             $("#daysTotal").val('')
+            $("#startDate").val('')
+            $("#endDate").val('')
+            $("#daysRequested").val('')
+            $("#note").val('')
+            $("#_returnDate").val('')
+            $("#returnDate").val('')
+
+            $("#returnDateDiv").hide()
 
             $("#waitingIndicator").show();
             $("#btnSearchEmployee").hide();
@@ -226,23 +235,27 @@
 
             let startDate = new Date(startDateFormatted)
             let endDate = new Date(endDateFormatted)
+            let returnDate = new Date($("#_returnDate").val())
+
             startDate = startDate.toLocaleDateString()
             endDate = endDate.toLocaleDateString()
-
-            const returnDate = $("#_returnDate").val()
+            returnDate = returnDate.toLocaleDateString()
+            
+            const note = $("#note").val()
 
             //$("#waitingIndicator").show();
             //$("#btnSearchEmployee").hide();
             const data = {
-                'EmployeId': employeeId,
+                'EmployeeId': employeeId,
                 'DaysTaken': daysTaken,
                 'DaysAvailable': daysAvailable,
                 'DaysRequested': daysRequested,
                 'StartDate': startDate,
                 'EndDate': endDate,
-                'ReturnDate': returnDate
+                'ReturnDate': returnDate,
+                'Note': note
             }
-
+            
             if (employeeId) {
                 $.ajax({
                     url: `/Vacation/Save`,
@@ -250,24 +263,15 @@
                     data: data
                 }).done(async function (response) {
                     if (response.result === "200") {
-                        const employee = JSON.parse(response.message);
-                        $("#employeeName").val(employee.EmployeeName)
-                        $("#employeePosition").val(employee.EmployeePosition)
-                        $("#employeeDepto").val(employee.EmployeeDepto)
-                        $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
-
-                        CorrespondingDays(employeeId);
-                    }
-                    else if (response.result === "404") {
-                        alert('El colaborador no fue encontrado.');
+                        alert("El formulario fue guardado satisfactoriamente!")
                     }
                     else {
                         console.log(response.message);
-                        alert('Hubo un error tratando de encontrar al colaborador.');
+                        alert(response.message);
                     }
 
-                    $("#waitingIndicator").hide();
-                    $("#btnSearchEmployee").show();
+                    //$("#waitingIndicator").hide();
+                    //$("#btnSearchEmployee").show();
 
                 }).fail(function (error) {
                     alert(error);
@@ -294,7 +298,12 @@
                     const employeeDay = JSON.parse(response.message);
                     $("#nextAvailableDate").val(new Date(employeeDay.RenovationDate).toLocaleDateString("es-DO"))
                     $("#dueDate").val(new Date(employeeDay.DueDate).toLocaleDateString("es-DO"))
+
                     $("#daysTotal").val(employeeDay.TotalDays)
+                    $("#daysTaken").val(employeeDay.TakenDays)
+
+                    const daysAvailable = parseInt(employeeDay.TotalDays) - parseInt(employeeDay.TakenDays)
+                    $("#daysAvailable").val(daysAvailable)
 
                     const today = new Date();
                     const renovationDate = new Date(employeeDay.RenovationDate);
@@ -323,14 +332,32 @@
                 
                 if (response.result === "200") {
                     $("#daysRequested").val(response.requestedDays)
+                    $("#_returnDate").val(response.returnDate)
                     $("#returnDate").html(new Date(response.returnDate).toLocaleDateString("es-DO"))
+                    $("#returnDateDiv").show()
+
+                    requestedDaysGreaterThenAvailableDays()
                 }
                 else {
                     $("#daysRequested").val("0")
                     $("#returnDate").html('')
+                    $("#returnDateDiv").hide()
                 }
             }
         });
+    }
+
+    function requestedDaysGreaterThenAvailableDays() {
+        const daysRequested = parseInt($("#daysRequested").val())
+        const daysAvailable = parseInt($("#daysAvailable").val())
+
+        if (daysRequested > daysAvailable) {
+            $("#message").html("La cantidad de días solicitados no puede exceder la cantidad de días disponibles.")
+            $("#btnSaveForm").prop("disable", true)
+        } else {
+            $("#message").html("")
+            $("#btnSaveForm").prop("disable", false)
+        }
     }
 
     function validateDate() {

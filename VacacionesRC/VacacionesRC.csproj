@@ -153,7 +153,9 @@
     <Compile Include="App_Start\Helper.cs" />
     <Compile Include="App_Start\HelperDays.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\HolidayController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SeniorityDayController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\VacationController.cs" />
     <Compile Include="Global.asax.cs">
@@ -376,9 +378,11 @@
     <Content Include="Views\User\RegisterUser.cshtml" />
     <Content Include="Views\User\UsersList.cshtml" />
     <Content Include="Views\Vacation\Formulario.cshtml" />
+    <Content Include="Views\Holiday\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\SeniorityDay\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -127,8 +127,6 @@ namespace VacacionesRC.App_Start
 
                     if (employeeDays == null)
                     {
-                        //double elapsedDays = (DateTime.Now.Date - anniversaryDate).TotalDays;
-
                         int days = DaysForThisEmployeeBySeniority(employee);
 
                         if (renovationDate <= DateTime.Today.Date)
@@ -143,14 +141,10 @@ namespace VacacionesRC.App_Start
                                 DueDate = dueDate,
                                 CreatedDate = DateTime.Now
                             };
-
-                            db.EmployeeDays.Add(employeeDay);
-                            db.SaveChanges();
-                        } 
-                        else
-                        {
-                            return employeeDay;
                         }
+
+                        db.EmployeeDays.Add(employeeDay);
+                        db.SaveChanges();
                     }
                     else
                     {
@@ -164,6 +158,31 @@ namespace VacacionesRC.App_Start
             }
 
             return employeeDay;
+        }
+
+        //Update takenDays
+        public static void UpdateTakenDays(int employeeId, int takenDays)
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    var employeeDays = db.EmployeeDays
+                                            .Where(e => e.EmployeeId == employeeId)
+                                            .OrderByDescending(o => o.CreatedDate)
+                                            .FirstOrDefault();
+
+                    if (employeeDays != null)
+                    {
+                        employeeDays.TakenDays += takenDays;
+                        db.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
         }
     }
 }

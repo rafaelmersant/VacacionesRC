@@ -15,6 +15,7 @@ namespace VacacionesRC.Models
     public partial class Vacation
     {
         public int Id { get; set; }
+        public System.Guid IdHash { get; set; }
         public string EmployeeId { get; set; }
         public string SupervisorId { get; set; }
         public string Status { get; set; }

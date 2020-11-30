@@ -61,7 +61,7 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Date" Type="date" Nullable="false" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
-          <Property Name="CreatedBy" Type="varchar" MaxLength="20" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="LoginHistory">
           <Key>
@@ -85,9 +85,10 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
         </EntityType>
         <EntityType Name="Vacation">
           <Key>
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="IdHash" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdHash" Type="uniqueidentifier" Nullable="false" />
           <Property Name="EmployeeId" Type="char" MaxLength="4" Nullable="false" />
           <Property Name="SupervisorId" Type="char" MaxLength="4" />
           <Property Name="Status" Type="char" MaxLength="10" Nullable="false" />
@@ -129,12 +130,12 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
         <EntityContainer Name="VacacionesRCEntities" annotation:LazyLoadingEnabled="true" >
           <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="LoginHistories" EntityType="VacacionesRCModel.LoginHistory" />
-          <EntitySet Name="Holidays" EntityType="VacacionesRCModel.Holiday" />
           <EntitySet Name="DaysBySeniorities" EntityType="VacacionesRCModel.DaysBySeniority" />
           <EntitySet Name="Departments" EntityType="VacacionesRCModel.Department" />
           <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
           <EntitySet Name="EmployeeDays" EntityType="VacacionesRCModel.EmployeeDay" />
           <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
+          <EntitySet Name="Holidays" EntityType="VacacionesRCModel.Holiday" />
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -155,15 +156,6 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="UserID" Type="Int32" Nullable="false" />
           <Property Name="LastLogin" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="Holiday">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="DaysBySeniority">
           <Key>
@@ -214,9 +206,10 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
         </EntityType>
         <EntityType Name="Vacation">
           <Key>
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="IdHash" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdHash" Type="Guid" Nullable="false" />
           <Property Name="EmployeeId" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
           <Property Name="SupervisorId" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
           <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="false" />
@@ -233,6 +226,15 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="RejectedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="CreatedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Holiday">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -258,16 +260,6 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
               <MappingFragment StoreEntitySet="LoginHistory">
                 <ScalarProperty Name="LastLogin" ColumnName="LastLogin" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Holidays">
-            <EntityTypeMapping TypeName="VacacionesRCModel.Holiday">
-              <MappingFragment StoreEntitySet="Holiday">
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -340,6 +332,17 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="SupervisorId" ColumnName="SupervisorId" />
                 <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Holidays">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Holiday">
+              <MappingFragment StoreEntitySet="Holiday">
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -5,8 +5,13 @@ Formulario Vacaciones:
 ******3-Calcular la cantidad de dias en el rango de fecha (considerando feriados)
 ******4-Traer cuantos dias tiene disponible
 5-Traer cuantos dias ha tomado
-6-Guardar el formulario
-7-Imprimir el formulario
+******6-Guardar el formulario
+7-Editar el formulario
+8-Imprimir el formulario
+
+Validaciones:
+******Validar que no exceda la cantidad de dias disponible al solicitar en el formulario de vacaciones.
+*
 
 Workflow de aprobacion de vacaciones
 CRUD para Dias Feriados
