@@ -33,14 +33,18 @@
                 @*<strong>BS</strong>*@
             </div>
             <ul class="list-unstyled components">
-                <li><a href="/Vacation"><i class="fa fa-calendar"></i>Vacaciones</a></li>
+                <li><a href="/Vacation/"><i class="fa fa-calendar"></i>Vacaciones</a></li>
                 <li><a href="/Vacation/Formulario"><i class="fa fa-newspaper-o"></i>Formulario (Solicitud)</a></li>
-                <li><a href="/User/UsersList"><i class="fa fa-group"></i>Usuarios</a></li>
-                <li><a href="/StudentsPool/Rotation"><i class="fa fa-inbox"></i>Enviar Notificaciones</a></li>
-                <li><a href="/Holiday"><i class="fa fa-inbox"></i>Días Feriados</a></li>
-                <li><a href="/Rules"><i class="fa fa-address-book"></i>Administrar Reglas</a></li>
-            </ul>
 
+                @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                {
+                    <li><a href="/Notificaciones"><i class="fa fa-inbox"></i>Enviar Notificaciones</a></li>
+                    <li><a href="/Holiday"><i class="fa fa-inbox"></i>Días Feriados</a></li>
+                    <li><a href="/User/UsersList"><i class="fa fa-group"></i>Usuarios</a></li>
+                    <li><a href="/Depto"><i class="fa fa-bitbucket"></i>Departamentos</a></li>
+                    <li><a href="/Rules"><i class="fa fa-address-book"></i>Administrar Reglas</a></li>
+                }
+            </ul>
         </nav>
 
         @Scripts.Render("~/Scripts/jquery-3.3.1.min.js")

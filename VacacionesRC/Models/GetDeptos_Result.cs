@@ -10,17 +10,12 @@
 namespace VacacionesRC.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class Employee
+    public partial class GetDeptos_Result
     {
-        public int EmployeeId { get; set; }
+        public int DeptoCode { get; set; }
+        public string DeptoName { get; set; }
+        public Nullable<int> DeptoOwner { get; set; }
         public string EmployeeName { get; set; }
-        public string EmployeePosition { get; set; }
-        public string EmployeeDepto { get; set; }
-        public Nullable<int> EmployeeDeptoId { get; set; }
-        public Nullable<System.DateTime> AdmissionDate { get; set; }
-        public Nullable<System.DateTime> TerminateDate { get; set; }
-        public System.DateTime CreatedDate { get; set; }
     }
 }

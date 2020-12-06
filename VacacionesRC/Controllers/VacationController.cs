@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using VacacionesRC.App_Start;
 using VacacionesRC.Models;
+using VacacionesRC.ViewModels;
 
 namespace VacacionesRC.Controllers
 {
@@ -14,7 +15,121 @@ namespace VacacionesRC.Controllers
         // GET: Vacation
         public ActionResult Index()
         {
-            return View();
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+            
+            using (var db = new VacacionesRCEntities())
+            {
+                List<VacationModel> vacationModels = new List<VacationModel>();
+                                
+                int employeeId = int.Parse(Session["employeeID"].ToString());
+                Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == employeeId);
+
+                Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+
+                //Admin users
+                if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                {
+                    var vacations = db.GetVacacionesByDeptoOwner(0, DateTime.Now.Year).ToList();
+
+                    foreach (var item in vacations)
+                    {
+                        vacationModels.Add(new VacationModel
+                        {
+                            Id = item.Id,
+                            IdHash = item.IdHash,
+                            EmployeeId = item.EmployeeId,
+                            DeptoId = item.DeptoId.Value,
+                            Status = item.Status,
+                            DaysTaken = item.DaysTaken,
+                            DaysAvailable = item.DaysAvailable,
+                            DaysRequested = item.DaysRequested,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            ReturnDate = item.ReturnDate,
+                            Note = item.Note,
+                            AcceptedDate = item.AcceptedDate,
+                            AcceptedBy = item.AcceptedBy,
+                            RejectedDate = item.RejectedDate,
+                            RejectedBy = item.RejectedBy,
+                            CreatedDate = item.CreatedDate,
+                            CreatedBy = item.CreatedBy,
+                            EmployeeName = item.EmployeeName,
+                            DeptoName = item.EmployeeDepto,
+                            EmployeePosition = item.EmployeePosition
+                        });
+                    }
+                }
+
+                //Depto owner
+                if (department != null)
+                {
+                    var vacations = db.GetVacacionesByDeptoOwner(employeeId, DateTime.Now.Year).ToList();
+
+                    foreach (var item in vacations)
+                    {
+                        vacationModels.Add(new VacationModel
+                        {
+                            Id = item.Id,
+                            IdHash = item.IdHash,
+                            EmployeeId = item.EmployeeId,
+                            DeptoId = item.DeptoId.Value,
+                            Status = item.Status,
+                            DaysTaken = item.DaysTaken,
+                            DaysAvailable = item.DaysAvailable,
+                            DaysRequested = item.DaysRequested,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            ReturnDate = item.ReturnDate,
+                            Note = item.Note,
+                            AcceptedDate = item.AcceptedDate,
+                            AcceptedBy = item.AcceptedBy,
+                            RejectedDate = item.RejectedDate,
+                            RejectedBy = item.RejectedBy,
+                            CreatedDate = item.CreatedDate,
+                            CreatedBy = item.CreatedBy,
+                            EmployeeName = item.EmployeeName,
+                            DeptoName = item.EmployeeDepto,
+                            EmployeePosition = item.EmployeePosition
+                        });
+                    }
+                }
+
+                //End user
+                if (Session["role"] != null && Session["role"].ToString() != "Admin" && department == null)
+                {
+                    var vacations = db.Vacations.Where(v => v.EmployeeId == employeeId).OrderByDescending(o => o.CreatedDate).ToList();
+
+                    foreach (var item in vacations)
+                    {
+                        vacationModels.Add(new VacationModel
+                        {
+                            Id = item.Id,
+                            IdHash = item.IdHash,
+                            EmployeeId = item.EmployeeId,
+                            DeptoId = item.DeptoId.Value,
+                            Status = item.Status,
+                            DaysTaken = item.DaysTaken,
+                            DaysAvailable = item.DaysAvailable,
+                            DaysRequested = item.DaysRequested,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            ReturnDate = item.ReturnDate,
+                            Note = item.Note,
+                            AcceptedDate = item.AcceptedDate,
+                            AcceptedBy = item.AcceptedBy,
+                            RejectedDate = item.RejectedDate,
+                            RejectedBy = item.RejectedBy,
+                            CreatedDate = item.CreatedDate,
+                            CreatedBy = item.CreatedBy
+                            //EmployeeName = item.EmployeeName,
+                            //DeptoName = item.EmployeeDepto,
+                            //EmployeePosition = item.EmployeePosition
+                        });
+                    }
+                }
+
+                return View(vacationModels);
+            }
         }
 
         public ActionResult Formulario()
@@ -52,6 +167,23 @@ namespace VacacionesRC.Controllers
             {
                 if (employee != null)
                 {
+                    using(var db = new VacacionesRCEntities())
+                    {
+                        int empId = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
+                        
+                        if (Session["role"] != null && Session["role"].ToString() == "Consulta" && empId != employeeId)
+                            throw new Exception("(403) Usted no esta autorizado para consultar este colaborador.");
+
+                        if (Session["role"] != null && Session["role"].ToString() == "Depto")
+                        {
+                            int ownerId = int.Parse(Session["employeeID"].ToString());
+                            Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == ownerId && d.DeptoCode == employee.EmployeeDeptoId);
+
+                            if (department == null)
+                                throw new Exception("(403) Usted no esta autorizado para consultar este colaborador.");
+                        }
+                    }
+                    
                     var employeeSerialized = JsonConvert.SerializeObject(employee);
                     return Json(new { result = "200", message = employeeSerialized });
                 }
@@ -121,10 +253,13 @@ namespace VacacionesRC.Controllers
                     if (vacation.Id > 0)
                         vacaciontEdit = db.Vacations.FirstOrDefault(v => v.Id == vacation.Id);
 
+                    Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == vacation.EmployeeId);
+
                     Vacation newVacation = new Vacation
                     {
                         IdHash = Guid.NewGuid(),
                         EmployeeId = vacation.EmployeeId,
+                        DeptoId = employee != null ? employee.EmployeeDeptoId : 0,
                         DaysTaken = vacation.DaysTaken,
                         DaysAvailable = vacation.DaysAvailable,
                         DaysRequested = vacation.DaysRequested,
@@ -140,7 +275,7 @@ namespace VacacionesRC.Controllers
                     db.Vacations.Add(newVacation);
                     db.SaveChanges();
 
-                    HelperDays.UpdateTakenDays(int.Parse(vacation.EmployeeId), newVacation.DaysRequested);
+                    HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested);
                 }
 
                 return Json(new { result = "200", message = "success" });
@@ -151,6 +286,84 @@ namespace VacacionesRC.Controllers
 
                 return Json(new { result = "500", message = ex.Message });
             }
+        }
+
+        [HttpPost]
+        public JsonResult RejectRequest(int Id)
+        {
+            try
+            {
+                if (Session["employeeID"] == null)
+                    throw new Exception("(501) Intente salir y entrar del sistema para realizar esta acción.");
+
+                if (Id > 0)
+                {
+                    using (var db = new VacacionesRCEntities())
+                    {
+                        var vacation = db.Vacations.FirstOrDefault(v => v.Id == Id);
+
+                        if (vacation != null)
+                        {
+                            EmployeeDay employeeDay = db.EmployeeDays.Where(d => d.EmployeeId == vacation.EmployeeId).OrderByDescending(o => o.CreatedDate).FirstOrDefault();
+
+                            vacation.RejectedDate = DateTime.Now;
+                            vacation.RejectedBy = Session["employeeID"].ToString();
+                            vacation.Status = "Rechazada";
+
+                            employeeDay.TakenDays -= vacation.DaysRequested;
+
+                            db.SaveChanges();
+                        }
+                    }
+
+                    return Json(new { result = "200", message = "Rejected" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "vacationId:" + Id);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "404", message = "No encontrado" });
+        }
+
+        [HttpPost]
+        public JsonResult AcceptRequest(int Id)
+        {
+            try
+            {
+                if (Session["employeeID"] == null)
+                    throw new Exception("(501) Intente salir y entrar del sistema para realizar esta acción.");
+
+                if (Id > 0)
+                {
+                    using (var db = new VacacionesRCEntities())
+                    {
+                        var vacation = db.Vacations.FirstOrDefault(v => v.Id == Id);
+
+                        if (vacation != null)
+                        {
+                            vacation.AcceptedDate = DateTime.Now;
+                            vacation.AcceptedBy = Session["employeeID"].ToString();
+                            vacation.Status = "Aprobada";
+
+                            db.SaveChanges();
+                        }
+                    }
+
+                    return Json(new { result = "200", message = "Rejected" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "vacationId:" + Id);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "404", message = "No encontrado" });
         }
     }
 }

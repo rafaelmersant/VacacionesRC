@@ -10,9 +10,8 @@
 namespace VacacionesRC.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class Vacation
+    public partial class GetVacacionesByDeptoOwner_Result
     {
         public int Id { get; set; }
         public System.Guid IdHash { get; set; }
@@ -32,5 +31,8 @@ namespace VacacionesRC.Models
         public string RejectedBy { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
+        public string EmployeeName { get; set; }
+        public string EmployeeDepto { get; set; }
+        public string EmployeePosition { get; set; }
     }
 }

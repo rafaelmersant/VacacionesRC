@@ -4,26 +4,27 @@ Formulario Vacaciones:
 ******2-Calcular que la fecha inicio no sea mayor que la fecha fin
 ******3-Calcular la cantidad de dias en el rango de fecha (considerando feriados)
 ******4-Traer cuantos dias tiene disponible
-5-Traer cuantos dias ha tomado
+******5-Traer cuantos dias ha tomado
 ******6-Guardar el formulario
 7-Editar el formulario
 8-Imprimir el formulario
+9-Eliminar la solicitud
 
 Validaciones:
 ******Validar que no exceda la cantidad de dias disponible al solicitar en el formulario de vacaciones.
 *
 
 Workflow de aprobacion de vacaciones
-CRUD para Dias Feriados
-CRUD para Dias correspondientes por antiguedad
+******CRUD para Dias Feriados
+******CRUD para Dias correspondientes por antiguedad (segunda etapa se agregara UI)
 
 Listado de solicitud de vacaciones:
-1-Filtrar por dueño o admin (el dueño solo ve sus solicitudes, el admin puede ver todos los empleados y filtrar)
-2-Aprobar o rechazar solicitudes por parte del dueño del departamento
+******1-Filtrar por dueño o admin (el dueño solo ve sus solicitudes, el admin puede ver todos los empleados y filtrar) y el dueño de Departamento puede ver todas las del departamento
+******2-Aprobar o rechazar solicitudes por parte del dueño del departamento
 
 Listado de Departamentos con sus dueños:
-1-Trear todos los departamentos y quieres pueden aprobar en dichos departamentos
-2-CRUD para flujo de aprobar de los departamentos
+******1-Trear todos los departamentos y quienes pueden aprobar en dichos departamentos
+******2-CRUD para flujo de aprobar de los departamentos (sera por dueño de depto)
 
 Enviar alertas:
 1-Mensaje de alerta y destinatario

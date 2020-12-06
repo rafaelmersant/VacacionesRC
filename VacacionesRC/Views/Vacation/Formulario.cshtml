@@ -31,8 +31,16 @@
                     <div class="row">
                         <div class="col-3 mb-1">
                             <label for="validationDefault01">Código</label>
-                            <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" />
+                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            {
+                                <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" />
+                            }
+                            else
+                            {
+                                <input type="text" id="employeeId" name="employeeId" value="@Session["employeeID"].ToString()" class="form-control form-control-sm numericOnly" readonly />
+                            }
                         </div>
+
                         <div class="col-2">
                             <a class="btn btn-sm btn-info" href="javascript:void(0)" id="btnSearchEmployee" title="Buscar" style="margin-top: 27px">
                                 <i class="fa fa-search"></i>
@@ -88,53 +96,53 @@
             {
                 @Html.AntiForgeryToken()
 
-            <section class="row">
-                <div class="col-8">
-                    <div class="form-row">
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Correspondientes</label>
-                            <input type="text" id="daysTotal" name="daysTotal" value="" class="form-control form-control-sm" autocomplete="off" readonly />
-                        </div>
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Disfrutados</label>
-                            <input type="text" id="daysTaken" name="daysTaken" value="" class="form-control form-control-sm" autocomplete="off" readonly />
-                        </div>
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Disponibles</label>
-                            <input type="text" id="daysAvailable" name="daysAvailable" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                <section class="row">
+                    <div class="col-8">
+                        <div class="form-row">
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Correspondientes</label>
+                                <input type="text" id="daysTotal" name="daysTotal" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Disfrutados</label>
+                                <input type="text" id="daysTaken" name="daysTaken" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Disponibles</label>
+                                <input type="text" id="daysAvailable" name="daysAvailable" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+
                         </div>
 
+                        <div class="form-row">
+                            <div class="col-4">
+                                <label for="validationDefault02">Solicitar <b>Desde</b></label>
+                                <input type="text" id="startDate" name="startDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+                            </div>
+
+                            <div class="col-4">
+                                <label for="validationDefault02">Solicitar <b>Hasta</b></label>
+                                <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+                            </div>
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Solicitados</label>
+                                <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+
+                            <input type="hidden" id="_returnDate" name="_returnDate" value="" />
+                        </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="col-4">
-                            <label for="validationDefault02">Solicitar <b>Desde</b></label>
-                            <input type="text" id="startDate" name="startDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
-                        </div>
+                    <div class="col-4">
+                        <label for="validationDefault02">Observación</label>
 
-                        <div class="col-4">
-                            <label for="validationDefault02">Solicitar <b>Hasta</b></label>
-                            <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
-                        </div>
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Solicitados</label>
-                            <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
-                        </div>
-
-                        <input type="hidden" id="_returnDate" name="_returnDate" value=""/>
+                        <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
                     </div>
-                </div>
+                    <div id="returnDateDiv" class="mt-2 mb-2">
+                        <span class="ml-3">Le corresponde reintegrarse a las labores el día <span id="returnDate" class="font-weight-bold"></span> </span>
+                    </div>
+                </section>
 
-                <div class="col-4">
-                    <label for="validationDefault02">Observación</label>
-                    
-                    <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
-                </div>
-                <div id="returnDateDiv" class="mt-2 mb-2">
-                    <span class="ml-3">Le corresponde reintegrarse a las labores el día <span id="returnDate" class="font-weight-bold"></span> </span>
-                </div>
-            </section>
-                
                 <button id="btnSaveForm" class="btn btn-sm btn-danger pl-5 pr-5 mt-3 ml-1">
                     Guardar
                 </button>
@@ -153,8 +161,16 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
+    $(document).ready(async function () {
+        $("#btnSaveForm").prop("disabled", true)
         $("#returnDateDiv").hide()
+
+        const employeeId = $("#employeeId").val();
+        
+        if (parseInt(employeeId) > 0) {
+            await getEmployeeDetail(employeeId)
+            $("#btnSearchEmployee").prop("disabled", true)
+        }
 
         //$(".datepicker").val(new Date().toLocaleDateString())
         $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
@@ -172,53 +188,21 @@
                 return false;
         });
 
-        $("#btnSearchEmployee").click(function (e) {
+        $("#btnSearchEmployee").click(async function (e) {
             e.preventDefault();
 
             const employeeId = $("#employeeId").val();
 
-            $("#employeeName").val('')
-            $("#employeePosition").val('')
-            $("#employeeDepto").val('')
-            $("#daysTotal").val('')
-            $("#startDate").val('')
-            $("#endDate").val('')
-            $("#daysRequested").val('')
-            $("#note").val('')
-            $("#_returnDate").val('')
-            $("#returnDate").val('')
-
+            $("input").val('')
+            $("#btnSaveForm").prop("disabled", true)
+            
             $("#returnDateDiv").hide()
 
             $("#waitingIndicator").show();
             $("#btnSearchEmployee").hide();
 
             if (employeeId) {
-                $.ajax({
-                    "url": `/Vacation/GetEmployee?employeeId=${employeeId}`,
-                    "type": "POST",
-                    "success": async function (response) {
-                        if (response.result === "200") {
-                            const employee = JSON.parse(response.message);
-                            $("#employeeName").val(employee.EmployeeName)
-                            $("#employeePosition").val(employee.EmployeePosition)
-                            $("#employeeDepto").val(employee.EmployeeDepto)
-                            $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
-                            
-                            CorrespondingDays(employeeId);
-                        }
-                        else if (response.result === "404") {
-                            alert('El colaborador no fue encontrado.');
-                        }
-                        else {
-                            console.log(response.message);
-                            alert('Hubo un error tratando de encontrar al colaborador.');
-                        }
-
-                        $("#waitingIndicator").hide();
-                        $("#btnSearchEmployee").show();
-                    }
-                });
+               await getEmployeeDetail(employeeId)
             }
         });
 
@@ -229,7 +213,8 @@
             const daysTaken = $("#daysTaken").val()
             const daysRequested = $("#daysRequested").val()
             const daysAvailable = $("#daysAvailable").val()
-            
+
+
             const startDateFormatted = GetDateFormat($("#startDate").val())
             const endDateFormatted = GetDateFormat($("#endDate").val())
 
@@ -240,7 +225,7 @@
             startDate = startDate.toLocaleDateString()
             endDate = endDate.toLocaleDateString()
             returnDate = returnDate.toLocaleDateString()
-            
+
             const note = $("#note").val()
 
             //$("#waitingIndicator").show();
@@ -255,7 +240,7 @@
                 'ReturnDate': returnDate,
                 'Note': note
             }
-            
+
             if (employeeId) {
                 $.ajax({
                     url: `/Vacation/Save`,
@@ -264,6 +249,7 @@
                 }).done(async function (response) {
                     if (response.result === "200") {
                         alert("El formulario fue guardado satisfactoriamente!")
+                        window.location = "/Vacation";
                     }
                     else {
                         console.log(response.message);
@@ -324,12 +310,47 @@
         })
     }
 
+    async function getEmployeeDetail(employeeId) {
+        $.ajax({
+            "url": `/Vacation/GetEmployee?employeeId=${employeeId}`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    const employee = JSON.parse(response.message);
+                    $("#employeeId").val(employee.EmployeeId);
+                    $("#employeeName").val(employee.EmployeeName)
+                    $("#employeePosition").val(employee.EmployeePosition)
+                    $("#employeeDepto").val(employee.EmployeeDepto)
+                    $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
+
+                    CorrespondingDays(employeeId);
+                }
+                else if (response.result === "404") {
+                    alert('El colaborador no fue encontrado.');
+                }
+                else {
+                    console.log(response.message);
+                    if (response.message.includes('(403)')) {
+                        alert(response.message);
+                        $("#employeeId").val(@Session["employeeID"])
+                        await getEmployeeDetail(@Session["employeeID"])
+                    }
+                    else
+                        alert('Hubo un error tratando de encontrar al colaborador.');
+                }
+
+                $("#waitingIndicator").hide();
+                $("#btnSearchEmployee").show();
+            }
+        });
+    }
+
     function requestedDays(startDate, endDate) {
         $.ajax({
             "url": `/Vacation/RequestedDays?startDate=${startDate}&endDate=${endDate}`,
             "type": "POST",
             "success": async function (response) {
-                
+
                 if (response.result === "200") {
                     $("#daysRequested").val(response.requestedDays)
                     $("#_returnDate").val(response.returnDate)
@@ -351,12 +372,19 @@
         const daysRequested = parseInt($("#daysRequested").val())
         const daysAvailable = parseInt($("#daysAvailable").val())
 
+        console.log("daysRequested", daysRequested)
+        console.log("daysAvailable", daysAvailable)
+
         if (daysRequested > daysAvailable) {
+            $("#returnDateDiv").hide()
             $("#message").html("La cantidad de días solicitados no puede exceder la cantidad de días disponibles.")
-            $("#btnSaveForm").prop("disable", true)
+            $("#message").addClass("text-danger")
+            $("#btnSaveForm").prop("disabled", true)
         } else {
+            $("#returnDateDiv").show()
             $("#message").html("")
-            $("#btnSaveForm").prop("disable", false)
+            $("#message").removeClass("text-danger")
+            $("#btnSaveForm").prop("disabled", false)
         }
     }
 

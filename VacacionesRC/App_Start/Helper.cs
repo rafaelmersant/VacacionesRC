@@ -143,14 +143,14 @@ namespace VacacionesRC.App_Start
                             admissionDate = new DateTime(year, month, day);
                         }
 
-                        DateTime? departureDate = null;
+                        DateTime? terminateDate = null;
                         if (data.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
                         {
                             int year = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
                             int month = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
                             int day = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
 
-                            departureDate = new DateTime(year, month, day);
+                            terminateDate = new DateTime(year, month, day);
                         }
 
                         employee = new Employee
@@ -159,8 +159,9 @@ namespace VacacionesRC.App_Start
                             EmployeeName = data.Tables[0].Rows[0].ItemArray[1].ToString(),
                             EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString(),
                             EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString(),
+                            EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString()),
                             AdmissionDate = admissionDate,
-                            DepartureDate = departureDate,
+                            TerminateDate = terminateDate,
                             CreatedDate = DateTime.Now
                         };
 
@@ -195,9 +196,9 @@ namespace VacacionesRC.App_Start
             string sQuery = string.Empty;
 
             //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00
-            //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
+            //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
-            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
             " ORDER BY CECICLOPAG DESC";
 
             if (ConfigurationManager.AppSettings["EnvironmentVolante"] == "PROD")

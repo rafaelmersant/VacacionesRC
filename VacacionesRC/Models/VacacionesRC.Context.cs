@@ -12,6 +12,8 @@ namespace VacacionesRC.Models
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class VacacionesRCEntities : DbContext
     {
@@ -28,10 +30,28 @@ namespace VacacionesRC.Models
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<LoginHistory> LoginHistories { get; set; }
         public virtual DbSet<DaysBySeniority> DaysBySeniorities { get; set; }
-        public virtual DbSet<Department> Departments { get; set; }
-        public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeeDay> EmployeeDays { get; set; }
-        public virtual DbSet<Vacation> Vacations { get; set; }
         public virtual DbSet<Holiday> Holidays { get; set; }
+        public virtual DbSet<Vacation> Vacations { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+    
+        public virtual ObjectResult<GetVacacionesByDeptoOwner_Result> GetVacacionesByDeptoOwner(Nullable<int> ownerId, Nullable<int> year)
+        {
+            var ownerIdParameter = ownerId.HasValue ?
+                new ObjectParameter("OwnerId", ownerId) :
+                new ObjectParameter("OwnerId", typeof(int));
+    
+            var yearParameter = year.HasValue ?
+                new ObjectParameter("year", year) :
+                new ObjectParameter("year", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetVacacionesByDeptoOwner_Result>("GetVacacionesByDeptoOwner", ownerIdParameter, yearParameter);
+        }
+    
+        public virtual ObjectResult<GetDeptos_Result> GetDeptos()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDeptos_Result>("GetDeptos");
+        }
     }
 }

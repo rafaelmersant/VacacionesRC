@@ -15,14 +15,11 @@
           <Property Name="endYears" Type="int" Nullable="false" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Department">
           <Key>
-            <PropertyRef Name="DeptoName" />
-            <PropertyRef Name="CreatedDate" />
+            <PropertyRef Name="DeptoCode" />
           </Key>
-          <Property Name="DeptoCode" Type="varchar" MaxLength="50" />
+          <Property Name="DeptoCode" Type="int" Nullable="false" />
           <Property Name="DeptoName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="DeptoOwner" Type="int" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
@@ -35,9 +32,9 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="EmployeeName" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="EmployeePosition" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="EmployeeDepto" Type="varchar" MaxLength="150" />
-          <Property Name="EmployeeSupervisorId" Type="int" />
+          <Property Name="EmployeeDeptoId" Type="int" />
           <Property Name="AdmissionDate" Type="date" />
-          <Property Name="DepartureDate" Type="date" />
+          <Property Name="TerminateDate" Type="date" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="EmployeeDays">
@@ -89,8 +86,8 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="IdHash" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="EmployeeId" Type="char" MaxLength="4" Nullable="false" />
-          <Property Name="SupervisorId" Type="char" MaxLength="4" />
+          <Property Name="EmployeeId" Type="int" Nullable="false" />
+          <Property Name="DeptoId" Type="int" />
           <Property Name="Status" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="DaysTaken" Type="int" Nullable="false" />
           <Property Name="DaysAvailable" Type="int" Nullable="false" />
@@ -106,22 +103,20 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="CreatedBy" Type="char" MaxLength="4" />
         </EntityType>
+        <Function Name="GetDeptos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetVacacionesByDeptoOwner" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="OwnerId" Type="int" Mode="In" />
+          <Parameter Name="year" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="VacacionesRCModelStoreContainer">
           <EntitySet Name="DaysBySeniority" EntityType="Self.DaysBySeniority" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Department" EntityType="Self.Department" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EmployeeDays" EntityType="Self.EmployeeDays" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Holiday" EntityType="Self.Holiday" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LoginHistory" EntityType="Self.LoginHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vacation" EntityType="Self.Vacation" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Department" EntityType="Self.Department" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [Department].[DeptoCode] AS [DeptoCode], 
-    [Department].[DeptoName] AS [DeptoName], 
-    [Department].[DeptoOwner] AS [DeptoOwner], 
-    [Department].[CreatedDate] AS [CreatedDate]
-    FROM [dbo].[Department] AS [Department]</DefiningQuery>
-          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -131,11 +126,16 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="LoginHistories" EntityType="VacacionesRCModel.LoginHistory" />
           <EntitySet Name="DaysBySeniorities" EntityType="VacacionesRCModel.DaysBySeniority" />
-          <EntitySet Name="Departments" EntityType="VacacionesRCModel.Department" />
-          <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
           <EntitySet Name="EmployeeDays" EntityType="VacacionesRCModel.EmployeeDay" />
-          <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
           <EntitySet Name="Holidays" EntityType="VacacionesRCModel.Holiday" />
+          <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
+          <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
+          <FunctionImport Name="GetVacacionesByDeptoOwner" ReturnType="Collection(VacacionesRCModel.GetVacacionesByDeptoOwner_Result)">
+            <Parameter Name="OwnerId" Mode="In" Type="Int32" />
+            <Parameter Name="year" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="Departments" EntityType="VacacionesRCModel.Department" />
+          <FunctionImport Name="GetDeptos" ReturnType="Collection(VacacionesRCModel.GetDeptos_Result)" />
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -167,29 +167,6 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="endYears" Type="Int32" Nullable="false" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
-        <EntityType Name="Department">
-          <Key>
-            <PropertyRef Name="DeptoName" />
-            <PropertyRef Name="CreatedDate" />
-          </Key>
-          <Property Name="DeptoCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="DeptoName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="DeptoOwner" Type="Int32" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="Employee">
-          <Key>
-            <PropertyRef Name="EmployeeId" />
-          </Key>
-          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
-          <Property Name="EmployeeName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="EmployeePosition" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="EmployeeDepto" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="EmployeeSupervisorId" Type="Int32" />
-          <Property Name="AdmissionDate" Type="DateTime" Precision="0" />
-          <Property Name="DepartureDate" Type="DateTime" Precision="0" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
         <EntityType Name="EmployeeDay">
           <Key>
             <PropertyRef Name="EmployeeId" />
@@ -204,14 +181,23 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="DueDate" Type="DateTime" Precision="0" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
+        <EntityType Name="Holiday">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
         <EntityType Name="Vacation">
           <Key>
             <PropertyRef Name="IdHash" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="IdHash" Type="Guid" Nullable="false" />
-          <Property Name="EmployeeId" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
-          <Property Name="SupervisorId" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
+          <Property Name="DeptoId" Type="Int32" />
           <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="DaysTaken" Type="Int32" Nullable="false" />
           <Property Name="DaysAvailable" Type="Int32" Nullable="false" />
@@ -227,15 +213,57 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="CreatedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
         </EntityType>
-        <EntityType Name="Holiday">
+        <EntityType Name="Employee">
           <Key>
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="EmployeeId" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="EmployeeId" Type="Int32" Nullable="false" />
+          <Property Name="EmployeeName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="EmployeePosition" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="EmployeeDepto" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="EmployeeDeptoId" Type="Int32" />
+          <Property Name="AdmissionDate" Type="DateTime" Precision="0" />
+          <Property Name="TerminateDate" Type="DateTime" Precision="0" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
+        <ComplexType Name="GetVacacionesByDeptoOwner_Result">
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="Guid" Name="IdHash" Nullable="false" />
+          <Property Type="Int32" Name="EmployeeId" Nullable="false" />
+          <Property Type="Int32" Name="DeptoId" Nullable="true" />
+          <Property Type="String" Name="Status" Nullable="false" MaxLength="10" />
+          <Property Type="Int32" Name="DaysTaken" Nullable="false" />
+          <Property Type="Int32" Name="DaysAvailable" Nullable="false" />
+          <Property Type="Int32" Name="DaysRequested" Nullable="false" />
+          <Property Type="DateTime" Name="StartDate" Nullable="false" />
+          <Property Type="DateTime" Name="EndDate" Nullable="false" />
+          <Property Type="DateTime" Name="ReturnDate" Nullable="true" />
+          <Property Type="String" Name="Note" Nullable="true" MaxLength="300" />
+          <Property Type="DateTime" Name="AcceptedDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="AcceptedBy" Nullable="true" MaxLength="4" />
+          <Property Type="DateTime" Name="RejectedDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="RejectedBy" Nullable="true" MaxLength="4" />
+          <Property Type="DateTime" Name="CreatedDate" Nullable="false" Precision="23" />
+          <Property Type="String" Name="CreatedBy" Nullable="true" MaxLength="4" />
+          <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
+          <Property Type="String" Name="EmployeeDepto" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="EmployeePosition" Nullable="false" MaxLength="150" />
+        </ComplexType>
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DeptoCode" />
+          </Key>
+          <Property Name="DeptoCode" Type="Int32" Nullable="false" />
+          <Property Name="DeptoName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DeptoOwner" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <ComplexType Name="GetDeptos_Result">
+          <Property Type="Int32" Name="DeptoCode" Nullable="false" />
+          <Property Type="String" Name="DeptoName" Nullable="false" MaxLength="100" />
+          <Property Type="Int32" Name="DeptoOwner" Nullable="true" />
+          <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -275,30 +303,6 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Departments">
-            <EntityTypeMapping TypeName="VacacionesRCModel.Department">
-              <MappingFragment StoreEntitySet="Department">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="DeptoOwner" ColumnName="DeptoOwner" />
-                <ScalarProperty Name="DeptoName" ColumnName="DeptoName" />
-                <ScalarProperty Name="DeptoCode" ColumnName="DeptoCode" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Employees">
-            <EntityTypeMapping TypeName="VacacionesRCModel.Employee">
-              <MappingFragment StoreEntitySet="Employee">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="DepartureDate" ColumnName="DepartureDate" />
-                <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
-                <ScalarProperty Name="EmployeeSupervisorId" ColumnName="EmployeeSupervisorId" />
-                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
-                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
-                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
-                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="EmployeeDays">
             <EntityTypeMapping TypeName="VacacionesRCModel.EmployeeDay">
               <MappingFragment StoreEntitySet="EmployeeDays">
@@ -309,6 +313,16 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
                 <ScalarProperty Name="TotalDays" ColumnName="TotalDays" />
                 <ScalarProperty Name="CurrentYear" ColumnName="CurrentYear" />
                 <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Holidays">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Holiday">
+              <MappingFragment StoreEntitySet="Holiday">
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -330,23 +344,74 @@ warning 6002: The table/view 'VacacionesRC.dbo.Department' does not have a prima
                 <ScalarProperty Name="DaysAvailable" ColumnName="DaysAvailable" />
                 <ScalarProperty Name="DaysTaken" ColumnName="DaysTaken" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="SupervisorId" ColumnName="SupervisorId" />
+                <ScalarProperty Name="DeptoId" ColumnName="DeptoId" />
                 <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
                 <ScalarProperty Name="IdHash" ColumnName="IdHash" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Holidays">
-            <EntityTypeMapping TypeName="VacacionesRCModel.Holiday">
-              <MappingFragment StoreEntitySet="Holiday">
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <EntitySetMapping Name="Employees">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Employee">
+              <MappingFragment StoreEntitySet="Employee">
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TerminateDate" ColumnName="TerminateDate" />
+                <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
+                <ScalarProperty Name="EmployeeDeptoId" ColumnName="EmployeeDeptoId" />
+                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetVacacionesByDeptoOwner" FunctionName="VacacionesRCModel.Store.GetVacacionesByDeptoOwner">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VacacionesRCModel.GetVacacionesByDeptoOwner_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="DeptoId" ColumnName="DeptoId" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="DaysTaken" ColumnName="DaysTaken" />
+                <ScalarProperty Name="DaysAvailable" ColumnName="DaysAvailable" />
+                <ScalarProperty Name="DaysRequested" ColumnName="DaysRequested" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="ReturnDate" ColumnName="ReturnDate" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="AcceptedDate" ColumnName="AcceptedDate" />
+                <ScalarProperty Name="AcceptedBy" ColumnName="AcceptedBy" />
+                <ScalarProperty Name="RejectedDate" ColumnName="RejectedDate" />
+                <ScalarProperty Name="RejectedBy" ColumnName="RejectedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="Departments">
+            <EntityTypeMapping TypeName="VacacionesRCModel.Department">
+              <MappingFragment StoreEntitySet="Department">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="DeptoOwner" ColumnName="DeptoOwner" />
+                <ScalarProperty Name="DeptoName" ColumnName="DeptoName" />
+                <ScalarProperty Name="DeptoCode" ColumnName="DeptoCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetDeptos" FunctionName="VacacionesRCModel.Store.GetDeptos">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VacacionesRCModel.GetDeptos_Result">
+                <ScalarProperty Name="DeptoCode" ColumnName="DeptoCode" />
+                <ScalarProperty Name="DeptoName" ColumnName="DeptoName" />
+                <ScalarProperty Name="DeptoOwner" ColumnName="DeptoOwner" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

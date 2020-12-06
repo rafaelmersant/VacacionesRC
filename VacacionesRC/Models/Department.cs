@@ -14,7 +14,7 @@ namespace VacacionesRC.Models
     
     public partial class Department
     {
-        public string DeptoCode { get; set; }
+        public int DeptoCode { get; set; }
         public string DeptoName { get; set; }
         public Nullable<int> DeptoOwner { get; set; }
         public System.DateTime CreatedDate { get; set; }
