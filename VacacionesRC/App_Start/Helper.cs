@@ -232,5 +232,34 @@ namespace VacacionesRC.App_Start
 
             return dsData;
         }
+
+        public static string ShowVacationForm(string FechaSolicitud, string Codigo, string Nombre, 
+                                       string FechaIngreso, string Puesto, string Departamento, 
+                                       string DiasCorrespondientes, string DiasRestantes, string DiasSolicitados,
+                                       string FechaDesde, string FechaHasta, string FechaRetorno, string Observacion)
+        {
+            string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
+            formTemplate = System.IO.Path.Combine(formTemplate, "FormularioVacaciones.html");
+
+            string content = System.IO.File.ReadAllText(formTemplate);
+
+            content = content.Replace("##FechaSolicitud##", FechaSolicitud);
+            content = content.Replace("##Codigo##", Codigo);
+            content = content.Replace("##Nombre##", Nombre);
+            content = content.Replace("##FechaIngreso##", FechaIngreso);
+
+            content = content.Replace("##Puesto##", Puesto);
+            content = content.Replace("##Departamento##", Departamento);
+            content = content.Replace("##DiasCorrespondientes##", DiasCorrespondientes);
+            content = content.Replace("##DiasRestantes##", DiasRestantes);
+            content = content.Replace("##DiasSolicitados##", DiasSolicitados);
+            content = content.Replace("##FechaDesde##", FechaDesde);
+            content = content.Replace("##FechaHasta##", FechaHasta);
+            content = content.Replace("##FechaRetorno##", FechaRetorno);
+            content = content.Replace("##Observacion##", Observacion);
+
+            return content;
+        }
     }
+
 }

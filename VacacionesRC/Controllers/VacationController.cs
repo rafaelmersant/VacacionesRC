@@ -415,5 +415,35 @@ namespace VacacionesRC.Controllers
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
+
+        [HttpPost]
+        public JsonResult PrintForm(Guid IdHash, string FechaSolicitud, string Codigo, string Nombre,
+                                       string FechaIngreso, string Puesto, string Departamento,
+                                       string DiasCorrespondientes, string DiasRestantes, string DiasSolicitados,
+                                       string FechaDesde, string FechaHasta, string FechaRetorno, string Observacion)
+        {
+            try
+            {
+                using(var db = new VacacionesRCEntities())
+                {
+                    Vacation vacation = db.Vacations.FirstOrDefault(v => v.IdHash == IdHash);
+                    if (vacation != null)
+                    {
+                        FechaSolicitud = String.Format("{0}", vacation.CreatedDate.ToString("dd/MM/yyyy"));
+                        FechaRetorno = String.Format("{0}", vacation.ReturnDate.Value.ToString("dd/MM/yyyy"));
+                    }
+                        
+                    string content = Helper.ShowVacationForm(FechaSolicitud, Codigo, Nombre, FechaIngreso, Puesto, Departamento,
+                    DiasCorrespondientes, DiasRestantes, DiasSolicitados, FechaDesde, FechaHasta, FechaRetorno, Observacion);
+
+                    return new JsonResult { Data = new { result = "200", message = content }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
     }
 }

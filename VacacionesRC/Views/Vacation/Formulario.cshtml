@@ -158,7 +158,7 @@
                         </button>
                     </div>
                 </div>
-                
+
 
                 <span id="message" class="d-block pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
             }
@@ -166,7 +166,10 @@
     </section>
     <input type="hidden" name="daysTakenH" id="daysTakenH" value="" />
     <input type="hidden" name="daysAvailableH" id="daysAvailableH" value="" />
+
 </div>
+
+<div id="printModal" title="Imprimir Formulario de Vacaciones"></div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
@@ -186,7 +189,7 @@
         const url = window.location.pathname
         const id = url.substring(url.lastIndexOf('/') + 1);
         const employeeId = $("#employeeId").val();
-        
+
         if (parseInt(employeeId) > 0 && (!id || id == "Formulario")) {
             await getEmployeeDetail(employeeId)
             $("#btnSearchEmployee").addClass("disabled")
@@ -223,12 +226,65 @@
 
             $("input").val('')
             $("#btnSaveForm").prop("disabled", true)
-            
+
             $("#returnDateDiv").hide()
 
             if (employeeId) {
                await getEmployeeDetail(employeeId)
             }
+        });
+
+        $("#btnPrint").click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let idHash = '';
+            const url = window.location.pathname
+            const id = url.substring(url.lastIndexOf('/') + 1);
+            if (id && id !== "Formulario")
+                idHash = id;
+
+            const data = {
+                'IdHash': idHash,
+                'FechaSolicitud': "",
+                'Codigo': $("#employeeId").val(),
+                'Nombre': $("#employeeName").val(),
+                'FechaIngreso': $("#employeeAdmissionDate").val(),
+                'Puesto': $("#employeePosition").val(),
+                'Departamento': $("#employeeDepto").val(),
+                'DiasCorrespondientes': $("#daysTotal").val(),
+                'DiasRestantes': $("#daysAvailable").val(),
+                'DiasSolicitados': $("#daysRequested").val(),
+                'FechaDesde': $("#startDate").val(),
+                'FechaHasta': $("#endDate").val(),
+                'FechaRetorno': $("#returnDate").val(),
+                'Observacion': $("#note").val()
+            }
+            
+            $.ajax({
+                url: `/Vacation/PrintForm`,
+                type: "POST",
+                data: data
+            }).done(async function (response) {
+                if (response.result === "200") {
+                    $("#printModal").hide()
+                    $("#printModal").html(response.message)
+
+                    const divToPrint = document.getElementById('printModal');
+                    const newWin = window.open('', 'Print-Window');
+                    newWin.document.open();
+                    newWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+                    newWin.document.close();
+
+                    setTimeout(function () { newWin.close(); }, 5);
+                }
+                else {
+                    console.log(response.message);
+                    alert(response.message);
+                }
+            }).fail(function (error) {
+                alert(error);
+            })
         });
 
         $("#btnSaveForm").click(function (e) {
@@ -238,7 +294,7 @@
             const daysTaken = $("#daysTaken").val()
             const daysRequested = $("#daysRequested").val()
             const daysAvailable = $("#daysAvailable").val()
-            
+
             const startDateFormatted = GetDateFormat($("#startDate").val())
             const endDateFormatted = GetDateFormat($("#endDate").val())
 
