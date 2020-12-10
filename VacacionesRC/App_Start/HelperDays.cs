@@ -102,15 +102,15 @@ namespace VacacionesRC.App_Start
                 {
                     Employee employee = Helper.GetEmployee(employeeId);
                     var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
-                    var renovationDate = anniversaryDate.AddDays(-180);
-                    var dueDate = anniversaryDate.AddDays(180);
+                    var renovationDate = anniversaryDate.AddMonths(-6);
+                    var dueDate = anniversaryDate.AddMonths(6);
 
                     //Check if this vacacions already reaches dueDate
                     if (dueDate <= DateTime.Today.Date)
                     {
                         anniversaryDate = anniversaryDate.AddYears(1);
-                        renovationDate = anniversaryDate.AddDays(-180);
-                        dueDate = anniversaryDate.AddDays(180);
+                        renovationDate = anniversaryDate.AddMonths(-6);
+                        dueDate = anniversaryDate.AddMonths(6);
                     }
 
                     employeeDay = new EmployeeDay { TotalDays = 0, RenovationDate = renovationDate, DueDate = dueDate, CurrentYear = anniversaryDate.Year };
@@ -161,7 +161,7 @@ namespace VacacionesRC.App_Start
         }
 
         //Update takenDays
-        public static void UpdateTakenDays(int employeeId, int takenDays)
+        public static void UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0)
         {
             try
             {
@@ -174,7 +174,7 @@ namespace VacacionesRC.App_Start
 
                     if (employeeDays != null)
                     {
-                        employeeDays.TakenDays += takenDays;
+                        employeeDays.TakenDays += takenDays - oldDays;
                         db.SaveChanges();
                     }
                 }

@@ -38,11 +38,12 @@
 
                 @if (Session["role"] != null && Session["role"].ToString() == "Admin")
                 {
-                    <li><a href="/Notificaciones"><i class="fa fa-inbox"></i>Enviar Notificaciones</a></li>
-                    <li><a href="/Holiday"><i class="fa fa-inbox"></i>Días Feriados</a></li>
+                    <li><a href="/Notification"><i class="fa fa-inbox"></i>Enviar Notificaciones</a></li>
+                    <li><a href="/Holiday"><i class="fa fa-dashboard"></i>Días Feriados</a></li>
                     <li><a href="/User/UsersList"><i class="fa fa-group"></i>Usuarios</a></li>
-                    <li><a href="/Depto"><i class="fa fa-bitbucket"></i>Departamentos</a></li>
-                    <li><a href="/Rules"><i class="fa fa-address-book"></i>Administrar Reglas</a></li>
+                    <li><a href="/Depto"><i class="fa fa-slideshare"></i>Departamentos</a></li>
+                    <li><a href="/Reportes"><i class="fa fa-folder"></i>Reportes</a></li>
+                    <li><a href="/Reglas"><i class="fa fa-address-book"></i>Administrar Reglas</a></li>
                 }
             </ul>
         </nav>

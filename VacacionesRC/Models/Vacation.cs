@@ -30,7 +30,11 @@ namespace VacacionesRC.Models
         public string AcceptedBy { get; set; }
         public Nullable<System.DateTime> RejectedDate { get; set; }
         public string RejectedBy { get; set; }
+        public Nullable<System.DateTime> AcceptedRRHHDate { get; set; }
+        public string AcceptedRRHHBy { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
+        public Nullable<System.DateTime> ModifiedDate { get; set; }
+        public string ModifiedBy { get; set; }
     }
 }

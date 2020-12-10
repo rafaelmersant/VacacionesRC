@@ -21,6 +21,9 @@
         <div class="bg-secondary text-light panel-custom border">
             <h6 class="panel-title">
                 Información del Colaborador
+                <span class="btn-group pull-right">
+                    <a href="@Url.Action("Formulario","Vacation", new { id = ""})" class="btn btn-danger btn-sm" style="margin-top: -3px">Nueva Solicitud</a>
+                </span>
             </h6>
         </div>
 
@@ -143,14 +146,26 @@
                     </div>
                 </section>
 
-                <button id="btnSaveForm" class="btn btn-sm btn-danger pl-5 pr-5 mt-3 ml-1">
-                    Guardar
-                </button>
+                <div>
+                    <div class="d-inline">
+                        <button id="btnSaveForm" class="btn btn-sm btn-danger pl-5 pr-5 mt-3 ml-1">
+                            Guardar
+                        </button>
+                    </div>
+                    <div class="d-inline">
+                        <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1">
+                            Imprimir
+                        </button>
+                    </div>
+                </div>
+                
 
                 <span id="message" class="d-block pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
             }
         </div>
     </section>
+    <input type="hidden" name="daysTakenH" id="daysTakenH" value="" />
+    <input type="hidden" name="daysAvailableH" id="daysAvailableH" value="" />
 </div>
 
 @section Scripts {
@@ -162,15 +177,23 @@
 <script type="text/javascript">
 
     $(document).ready(async function () {
+
+        $("#btnSearchEmployee").removeClass("disabled")
         $("#btnSaveForm").prop("disabled", true)
         $("#returnDateDiv").hide()
+        $("#btnPrint").hide()
 
+        const url = window.location.pathname
+        const id = url.substring(url.lastIndexOf('/') + 1);
         const employeeId = $("#employeeId").val();
         
-        if (parseInt(employeeId) > 0) {
+        if (parseInt(employeeId) > 0 && (!id || id == "Formulario")) {
             await getEmployeeDetail(employeeId)
-            $("#btnSearchEmployee").prop("disabled", true)
+            $("#btnSearchEmployee").addClass("disabled")
         }
+
+        //If idHash is given then try to edit the form
+        await editForm()
 
         //$(".datepicker").val(new Date().toLocaleDateString())
         $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
@@ -188,6 +211,11 @@
                 return false;
         });
 
+        $("#note").keypress(function (evt) {
+            if (this.value.length > 299)
+                return false;
+        });
+
         $("#btnSearchEmployee").click(async function (e) {
             e.preventDefault();
 
@@ -197,9 +225,6 @@
             $("#btnSaveForm").prop("disabled", true)
             
             $("#returnDateDiv").hide()
-
-            $("#waitingIndicator").show();
-            $("#btnSearchEmployee").hide();
 
             if (employeeId) {
                await getEmployeeDetail(employeeId)
@@ -213,8 +238,7 @@
             const daysTaken = $("#daysTaken").val()
             const daysRequested = $("#daysRequested").val()
             const daysAvailable = $("#daysAvailable").val()
-
-
+            
             const startDateFormatted = GetDateFormat($("#startDate").val())
             const endDateFormatted = GetDateFormat($("#endDate").val())
 
@@ -227,10 +251,16 @@
             returnDate = returnDate.toLocaleDateString()
 
             const note = $("#note").val()
+            let idHash = '';
+            const url = window.location.pathname
+            const id = url.substring(url.lastIndexOf('/') + 1);
+            if (id && id !== "Formulario")
+                idHash = id;
 
             //$("#waitingIndicator").show();
             //$("#btnSearchEmployee").hide();
             const data = {
+                'IdHash': idHash,
                 'EmployeeId': employeeId,
                 'DaysTaken': daysTaken,
                 'DaysAvailable': daysAvailable,
@@ -275,12 +305,18 @@
 
     });
 
-    const CorrespondingDays = (employeeId) => {
+    const CorrespondingDays = async (employeeId) => {
+
+        $("#waitingIndicator").show();
+        $("#btnSearchEmployee").hide();
+
         $.ajax({
             "url": `/Vacation/GetCorrespondingDays/?employeeId=${employeeId}`,
             "type": "GET",
-            "success": function (response) {
+            "success": async function (response) {
                 if (response.result === "200") {
+                    console.log('CorrespondingDays', response)
+
                     const employeeDay = JSON.parse(response.message);
                     $("#nextAvailableDate").val(new Date(employeeDay.RenovationDate).toLocaleDateString("es-DO"))
                     $("#dueDate").val(new Date(employeeDay.DueDate).toLocaleDateString("es-DO"))
@@ -294,23 +330,42 @@
                     const today = new Date();
                     const renovationDate = new Date(employeeDay.RenovationDate);
 
-                    if (renovationDate > today) {
-                        console.log('disable fields')
-                        $("#startDate").prop("readonly", true)
-                        $("#endDate").prop("readonly", true)
-                    } else {
-                        console.log('NOT disable fields')
-                        $("#startDate").prop("readonly", false)
-                        $("#endDate").prop("readonly", false)
+                    //if (renovationDate > today) {
+                    //    console.log('disable fields')
+                    //    $("#startDate").prop("readonly", true)
+                    //    $("#endDate").prop("readonly", true)
+                    //} else {
+                    //    console.log('NOT disable fields')
+                    //    $("#startDate").prop("readonly", false)
+                    //    $("#endDate").prop("readonly", false)
+                    //}
+
+                    //Check Editing
+                    let _daysTaken = parseInt($("#daysTakenH").val())
+                    let _daysAvailable = parseInt($("#daysAvailableH").val())
+
+                    if (!isNaN(_daysTaken)) {
+                        _daysTaken = employeeDay.TakenDays - _daysTaken
+                        _daysAvailable = daysAvailable + employeeDay.TakenDays
+
+                        $("#daysTaken").val(_daysTaken)
+                        $("#daysAvailable").val(_daysAvailable)
                     }
                 } else {
                     alert(response.message)
                 }
+
+                $("#waitingIndicator").hide();
+                $("#btnSearchEmployee").show();
             }
         })
     }
 
     async function getEmployeeDetail(employeeId) {
+
+        $("#waitingIndicator").show();
+        $("#btnSearchEmployee").hide();
+
         $.ajax({
             "url": `/Vacation/GetEmployee?employeeId=${employeeId}`,
             "type": "POST",
@@ -323,7 +378,7 @@
                     $("#employeeDepto").val(employee.EmployeeDepto)
                     $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
 
-                    CorrespondingDays(employeeId);
+                    await CorrespondingDays(employeeId);
                 }
                 else if (response.result === "404") {
                     alert('El colaborador no fue encontrado.');
@@ -343,6 +398,63 @@
                 $("#btnSearchEmployee").show();
             }
         });
+    }
+
+     async function getVacationDetail(idHash) {
+        $.ajax({
+            "url": `/Vacation/GetVacation?idHash=${idHash}`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    const form = JSON.parse(response.message);
+                    console.log(form)
+                    await getEmployeeDetail(form.EmployeeId)
+
+                    $("#daysTakenH").val(form.DaysRequested)
+                    $("#daysAvailableH").val(form.DaysAvailable)
+
+                    $("#startDate").val(new Date(form.StartDate).toLocaleDateString("es-DO"))
+                    $("#endDate").val(new Date(form.EndDate).toLocaleDateString("es-DO"))
+                    $("#daysRequested").val(form.DaysRequested)
+                    $("#note").val(form.Note)
+
+                    if ((form.AcceptedDate !== null || form.RejectedDate !== null)
+                        || parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString()) {
+
+                        if (form.AcceptedDate !== null)
+                            $("#btnPrint").show()
+
+                        $("#startDate").prop("disabled", true)
+                        $("#endDate").prop("disabled", true)
+                        $("#note").prop("readonly", true)
+                        $("#employeeId").prop("readonly", true)
+                        $("#btnSaveForm").prop("disabled", true)
+                        $("#btnSearchEmployee").addClass("disabled")
+                    }
+                }
+                else if (response.result === "404") {
+                    alert('El formulario no fue encontrado.');
+                }
+                else {
+                    console.log(response.message);
+                    alert('Hubo un error tratando de encontrar al colaborador.');
+                }
+
+                //$("#waitingIndicator").hide();
+                //$("#btnSearchEmployee").show();
+            }
+        });
+    }
+
+    async function editForm() {
+        const url = window.location.pathname
+        const id = url.substring(url.lastIndexOf('/') + 1);
+
+        if (id && id !== "Formulario") {
+            await getVacationDetail(id)
+
+            $("#btnSaveForm").prop("disabled", false)
+        }
     }
 
     function requestedDays(startDate, endDate) {

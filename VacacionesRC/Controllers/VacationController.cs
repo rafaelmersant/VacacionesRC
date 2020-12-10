@@ -132,7 +132,7 @@ namespace VacacionesRC.Controllers
             }
         }
 
-        public ActionResult Formulario()
+        public ActionResult Formulario(Guid? id)
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
 
@@ -242,40 +242,60 @@ namespace VacacionesRC.Controllers
         [HttpPost]
         public JsonResult Save(Vacation vacation)
         {
-            Vacation vacaciontEdit = null;
-
             try
             {
                 if (Session["employeeID"] == null) throw new Exception("Por favor intente hacer saliendo y entrando nuevamente al sistema.");
 
                 using (var db = new VacacionesRCEntities())
                 {
-                    if (vacation.Id > 0)
-                        vacaciontEdit = db.Vacations.FirstOrDefault(v => v.Id == vacation.Id);
+                    Vacation vacationEdit = db.Vacations.FirstOrDefault(v => v.IdHash == vacation.IdHash);
 
-                    Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == vacation.EmployeeId);
-
-                    Vacation newVacation = new Vacation
+                    if (vacationEdit != null)
                     {
-                        IdHash = Guid.NewGuid(),
-                        EmployeeId = vacation.EmployeeId,
-                        DeptoId = employee != null ? employee.EmployeeDeptoId : 0,
-                        DaysTaken = vacation.DaysTaken,
-                        DaysAvailable = vacation.DaysAvailable,
-                        DaysRequested = vacation.DaysRequested,
-                        StartDate = vacation.StartDate,
-                        EndDate = vacation.EndDate,
-                        ReturnDate = vacation.ReturnDate,
-                        Note = vacation.Note,
-                        CreatedDate = DateTime.Now,
-                        CreatedBy = Session["employeeID"].ToString(),
-                        Status = "En proceso"
-                    };
+                        int oldTakenDays = vacationEdit.DaysRequested;
 
-                    db.Vacations.Add(newVacation);
-                    db.SaveChanges();
+                        Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == vacation.EmployeeId);
 
-                    HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested);
+                        vacationEdit.StartDate = vacation.StartDate;
+                        vacationEdit.EndDate = vacation.EndDate;
+                        vacationEdit.DeptoId = employee != null ? employee.EmployeeDeptoId : 0;
+                        vacationEdit.DaysTaken = vacation.DaysTaken;
+                        vacationEdit.DaysAvailable = vacation.DaysAvailable - vacation.DaysRequested;
+                        vacationEdit.DaysRequested = vacation.DaysRequested;
+                        vacationEdit.ReturnDate = vacation.ReturnDate;
+                        vacationEdit.Note = vacation.Note;
+                        vacationEdit.ModifiedDate = DateTime.Now;
+                        vacationEdit.ModifiedBy = Session["employeeID"].ToString();
+
+                        db.SaveChanges();
+                        HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays);
+                    }
+                    else
+                    {
+                        Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == vacation.EmployeeId);
+
+                        Vacation newVacation = new Vacation
+                        {
+                            IdHash = Guid.NewGuid(),
+                            EmployeeId = vacation.EmployeeId,
+                            DeptoId = employee != null ? employee.EmployeeDeptoId : 0,
+                            DaysTaken = vacation.DaysTaken,
+                            DaysAvailable = vacation.DaysAvailable - vacation.DaysRequested,
+                            DaysRequested = vacation.DaysRequested,
+                            StartDate = vacation.StartDate,
+                            EndDate = vacation.EndDate,
+                            ReturnDate = vacation.ReturnDate,
+                            Note = vacation.Note,
+                            CreatedDate = DateTime.Now,
+                            CreatedBy = Session["employeeID"].ToString(),
+                            Status = "En proceso"
+                        };
+
+                        db.Vacations.Add(newVacation);
+                        db.SaveChanges();
+
+                        HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested);
+                    }
                 }
 
                 return Json(new { result = "200", message = "success" });
@@ -364,6 +384,36 @@ namespace VacacionesRC.Controllers
             }
 
             return Json(new { result = "404", message = "No encontrado" });
+        }
+
+        [HttpPost]
+        public JsonResult GetVacation(string idHash)
+        {
+            Vacation vacation = null;
+
+            try
+            {
+                using(var db = new VacacionesRCEntities())
+                {
+                    Guid IdHash = Guid.Parse(idHash);
+                    vacation = db.Vacations.FirstOrDefault(v => v.IdHash == IdHash);
+
+                    if (vacation != null)
+                    {
+                        var vacationSerialized = JsonConvert.SerializeObject(vacation);
+                        return new JsonResult { Data = new { result = "200", message = vacationSerialized }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    }
+                    else
+                    {
+                        return new JsonResult { Data = new { result = "404", message = "" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
         }
     }
 }

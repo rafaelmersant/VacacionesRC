@@ -5,6 +5,12 @@
     var statusColor = "";
 }
 
+<style type="text/css">
+    tr.tr-hover-class:hover {
+        background: lightgray !important;
+    }
+</style>
+
 <div class="container-fluid">
     <section class="text-dark border-custom border">
         <div class="bg-secondary text-light panel-custom border">
@@ -43,6 +49,9 @@
                             @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
                             {
                                 <th>
+                                    Código
+                                </th>
+                                <th>
                                     Nombre
                                 </th>
                                 <th>
@@ -70,9 +79,11 @@
 
                             @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
                             {
-                                <th class="text-center" style="width: 20px">Rechazar</th>
-                                <th class="text-center" style="width: 20px">Aprobar</th>
+                                <th class="text-center" style="width: 15px">Rechazar</th>
+                                <th class="text-center" style="width: 15px">Aprobar</th>
                             }
+
+                            @*<th class="text-center" style="width: 20px">Editar</th>*@
                         </tr>
                     </thead>
                     <tbody>
@@ -88,55 +99,93 @@
                             }
                             if (item.Status == "En proceso")
                             {
-                                statusColor = "text-warning";
+                                statusColor = "text-dark";
                             }
 
-                            <tr>
-                                <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
+                        <tr class="tr-hover-class" onclick="location.href = '@Url.Action("Formulario", new { id = @item.IdHash })'" style="cursor: pointer" title="Click para ver detalle">
+                            <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
 
-                                @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            {
+                                <td>@item.EmployeeId</td>
+                                <td>@item.EmployeeName</td>
+                                <td>@item.EmployeePosition</td>
+                                <td>@item.DeptoName</td>
+                            }
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
+                            <td class="text-center">@item.DaysRequested</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
+                            <td class="text-center @(statusColor)"><b>@item.Status</b></td>
+
+                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            {
+                                if ((Session["employeeId"].ToString() == item.EmployeeId.ToString() && Session["role"].ToString() != "Admin") || (item.RejectedDate != null || item.AcceptedDate != null))
                                 {
-                                    <td>@item.EmployeeName</td>
-                                    <td>@item.EmployeePosition</td>
-                                    <td>@item.DeptoName</td>
+                                    <td align="center">
+                                        <button class="btn btn-sm btn-secondary" disabled>
+                                            <span class="fa fa-remove"></span>
+                                        </button>
+                                    </td>
+                                    <td align="center">
+                                        <button class="btn btn-sm btn-secondary" disabled>
+                                            <span class="fa fa-check"></span>
+                                        </button>
+                                    </td>
+                                    @*<td align="center">
+                                        <button class="btn btn-sm btn-secondary" disabled>
+                                            <span class="fa fa-edit"></span>
+                                        </button>
+                                    </td>*@
                                 }
-                                <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
-                                <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
-                                <td class="text-center">@item.DaysRequested</td>
-                                <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
-                                <td class="text-center @(statusColor)"><b>@item.Status</b></td>
-
-                                @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                                else
                                 {
-                                    if ((Session["employeeId"].ToString() == item.EmployeeId.ToString() && Session["role"].ToString() != "Admin") || (item.RejectedDate != null || item.AcceptedDate != null))
+                                    <td align="center">
+                                        <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="rejectRequest(@item.Id)" title="Rechazar">
+                                            <i class="fa fa-remove"></i>
+                                        </a>
+                                    </td>
+                                    <td align="center">
+                                        <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="acceptRequest(@item.Id)" title="Aprobar">
+                                            <i class="fa fa-check"></i>
+                                        </a>
+                                    </td>
+                                    @*if (Session["employeeId"].ToString() == item.EmployeeId.ToString() || Session["role"].ToString() == "Admin")
                                     {
                                         <td align="center">
-                                            <button class="btn btn-sm btn-secondary" disabled>
-                                                <span class="fa fa-remove"></span>
-                                            </button>
-                                        </td>
-                                        <td align="center">
-                                            <button class="btn btn-sm btn-secondary" disabled>
-                                                <span class="fa fa-edit"></span>
-                                            </button>
+                                            <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
                                         </td>
                                     }
                                     else
                                     {
                                         <td align="center">
-                                            <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="rejectRequest(@item.Id)" title="Rechazar">
-                                                <i class="fa fa-remove"></i>
-                                            </a>
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                <span class="fa fa-edit"></span>
+                                            </button>
                                         </td>
-                                        <td align="center">
-                                            <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="acceptRequest(@item.Id)" title="Aprobar">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                        </td>
-                                    }
+                                    }*@
                                 }
+                            }
+                            @*else if (Session["employeeId"].ToString() == item.EmployeeId.ToString() && !(item.RejectedDate != null || item.AcceptedDate != null))
+                            {
+                                <td align="center">
+                                    <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td align="center">
+                                    <button class="btn btn-sm btn-secondary" disabled>
+                                        <span class="fa fa-edit"></span>
+                                    </button>
+                                </td>
+                            }*@
 
-                            </tr>
+                        </tr>
                         }
                     </tbody>
                 </table>

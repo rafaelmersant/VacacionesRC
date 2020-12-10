@@ -156,6 +156,9 @@
     <Compile Include="Controllers\DeptoController.cs" />
     <Compile Include="Controllers\HolidayController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
+    <Compile Include="Controllers\ReglasController.cs" />
+    <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\SeniorityDayController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\VacationController.cs" />
@@ -184,6 +187,9 @@
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\LoginHistory.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Notification.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\User.cs">
@@ -271,6 +277,7 @@
     <Content Include="Models\VacacionesRC.edmx.diagram">
       <DependentUpon>VacacionesRC.edmx</DependentUpon>
     </Content>
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -354,6 +361,7 @@
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
     <Content Include="Tasks.txt" />
+    <Content Include="Templates\constanciaVacaciones.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -389,6 +397,9 @@
     <Content Include="Views\Holiday\Index.cshtml" />
     <Content Include="Views\Vacation\Index.cshtml" />
     <Content Include="Views\Depto\Index.cshtml" />
+    <Content Include="Views\Notification\Index.cshtml" />
+    <Content Include="Views\Reglas\Index.cshtml" />
+    <Content Include="Views\Reportes\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

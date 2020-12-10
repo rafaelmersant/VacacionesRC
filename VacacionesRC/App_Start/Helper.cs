@@ -14,30 +14,31 @@ namespace VacacionesRC.App_Start
 {
     public class Helper
     {
-        public static void SendRawEmail(string emailto, string emailfrom, string firstname, string lastname, string subject, string body)
+        public static void SendRawEmail(string emailto, string subject, string body)
         {
-            var mail = new MailMessage();
-            var smtp = new SmtpClient();
-
-            mail.From = new MailAddress(emailfrom, firstname + " " + lastname);
-
-            if (emailto.Contains(";"))
+            SmtpClient smtp = new SmtpClient
             {
-                var emails = emailto.Split(';');
-                foreach (var email in emails)
-                    mail.To.Add(email);
-            }
-            else
-                mail.To.Add(emailto);
+                Host = ConfigurationManager.AppSettings["smtpClient"],
+                Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
+                UseDefaultCredentials = false,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
+                EnableSsl = true,
+            };
 
-            mail.Subject = subject;
+            MailMessage message = new MailMessage();
+            message.IsBodyHtml = true;
+            message.Body = body;
+            message.Subject = subject;
+            message.To.Add(new MailAddress(emailto));
 
-            mail.Body = body;
-            mail.IsBodyHtml = true;
+            string address = ConfigurationManager.AppSettings["EMail"];
+            string displayName = ConfigurationManager.AppSettings["EMailName"];
+            message.From = new MailAddress(address, displayName);
 
             try
             {
-                smtp.Send(mail);
+                smtp.Send(message);
             }
             catch (Exception ex)
             {

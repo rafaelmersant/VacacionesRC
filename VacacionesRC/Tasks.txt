@@ -6,13 +6,16 @@ Formulario Vacaciones:
 ******4-Traer cuantos dias tiene disponible
 ******5-Traer cuantos dias ha tomado
 ******6-Guardar el formulario
-7-Editar el formulario
+******7-Editar el formulario
 8-Imprimir el formulario
 9-Eliminar la solicitud
+10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
+
+
+CONSTANCIA DE VACACIONES
 
 Validaciones:
 ******Validar que no exceda la cantidad de dias disponible al solicitar en el formulario de vacaciones.
-*
 
 Workflow de aprobacion de vacaciones
 ******CRUD para Dias Feriados
@@ -27,9 +30,9 @@ Listado de Departamentos con sus dueños:
 ******2-CRUD para flujo de aprobar de los departamentos (sera por dueño de depto)
 
 Enviar alertas:
-1-Mensaje de alerta y destinatario
-2-Poder enviar alerta
-3-Tener el listado de alertas enviadas
+******1-Mensaje de alerta y destinatario
+******2-Poder enviar alerta
+******3-Tener el listado de alertas enviadas
 
 Dashboard de Vacaciones:
 1-Mostrar los dias tomados
