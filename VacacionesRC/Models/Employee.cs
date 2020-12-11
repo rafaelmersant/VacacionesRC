@@ -24,6 +24,8 @@ namespace VacacionesRC.Models
         public string Email { get; set; }
         public Nullable<decimal> Salary { get; set; }
         public string Location { get; set; }
+        public string BankAccount { get; set; }
+        public string Identification { get; set; }
         public System.DateTime CreatedDate { get; set; }
     }
 }

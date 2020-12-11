@@ -445,5 +445,66 @@ namespace VacacionesRC.Controllers
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
+
+        [HttpPost]
+        public JsonResult PrintConstancia(Guid IdHash, int Codigo, string Nombre, string FechaSolicitud,
+                                      string FechaIngreso, string Puesto, string Departamento, string FechaDesde, string FechaHasta)
+        {
+            try
+            {
+                string Cedula = "";
+                string TiempoTrabajando = "";
+                string SalarioMensual = "";
+                string Localidad = "";
+                string CuentaBanco = "";
+                string MontoPagado = "";
+                string FirmadoPor = "Aurelio Ivan Cruz Ortiz";
+                string DiasPagados = "14";
+
+                using (var db = new VacacionesRCEntities())
+                {
+                    Vacation vacation = db.Vacations.FirstOrDefault(v => v.IdHash == IdHash);
+                    if (vacation != null)
+                    {
+                        FechaSolicitud = String.Format("{0}", vacation.CreatedDate.ToString("dd/MM/yyyy"));
+                    }
+
+                    Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == Codigo);
+                    if (employee != null)
+                    {
+                        Cedula = employee.Identification;
+                        SalarioMensual = "RD" + string.Format("{0:c}", employee.Salary);
+                        Localidad = employee.Location;
+                        CuentaBanco = employee.BankAccount;
+
+                        decimal montoPagado = employee.Salary.Value / 23.83M;
+                        montoPagado = montoPagado * 14;
+                        MontoPagado = "RD" + string.Format("{0:c}", montoPagado);
+
+                        //Elapsed Time
+                        //int years, months, days, hours, minutes, seconds, milliseconds;
+                        Helper.GetElapsedTime(employee.AdmissionDate.Value, DateTime.Today, out int years, out int months, out int days, out int hours, out int minutes, out int seconds, out int milliseconds);
+
+                        if (years > 0)
+                            TiempoTrabajando += years + " años ";
+                        if (months > 0)
+                            TiempoTrabajando += months + " meses ";
+                        if (months == 0 && days > 0)
+                            TiempoTrabajando += " y " + days + " días";
+                    }
+
+                    string content = Helper.ShowConstancia(FechaSolicitud, Codigo.ToString(), Nombre, FechaIngreso, Puesto, Departamento,
+                                                            FechaDesde, FechaHasta, Cedula, TiempoTrabajando, SalarioMensual, Localidad, 
+                                                            CuentaBanco, MontoPagado, FirmadoPor, DiasPagados);
+
+                    return new JsonResult { Data = new { result = "200", message = content }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
     }
 }

@@ -190,6 +190,7 @@
         $("#btnSaveForm").prop("disabled", true)
         $("#returnDateDiv").hide()
         $("#btnPrint").hide()
+        $("#btnPrintConst").hide()
 
         const url = window.location.pathname
         const id = url.substring(url.lastIndexOf('/') + 1);
@@ -268,6 +269,54 @@
             
             $.ajax({
                 url: `/Vacation/PrintForm`,
+                type: "POST",
+                data: data
+            }).done(async function (response) {
+                if (response.result === "200") {
+                    $("#printModal").hide()
+                    $("#printModal").html(response.message)
+
+                    const divToPrint = document.getElementById('printModal');
+                    const newWin = window.open('', 'Print-Window');
+                    newWin.document.open();
+                    newWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+                    newWin.document.close();
+
+                    setTimeout(function () { newWin.close(); }, 5);
+                }
+                else {
+                    console.log(response.message);
+                    alert(response.message);
+                }
+            }).fail(function (error) {
+                alert(error);
+            })
+        });
+
+        $("#btnPrintConst").click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let idHash = '';
+            const url = window.location.pathname
+            const id = url.substring(url.lastIndexOf('/') + 1);
+            if (id && id !== "Formulario")
+                idHash = id;
+
+            const data = {
+                'IdHash': idHash,
+                'FechaSolicitud': "",
+                'Codigo': $("#employeeId").val(),
+                'Nombre': $("#employeeName").val(),
+                'FechaIngreso': $("#employeeAdmissionDate").val(),
+                'Puesto': $("#employeePosition").val(),
+                'Departamento': $("#employeeDepto").val(),
+                'FechaDesde': $("#startDate").val(),
+                'FechaHasta': $("#endDate").val()
+            }
+
+            $.ajax({
+                url: `/Vacation/PrintConstancia`,
                 type: "POST",
                 data: data
             }).done(async function (response) {
@@ -485,8 +534,10 @@
                     if ((form.AcceptedDate !== null || form.RejectedDate !== null)
                         || (parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString() && @Session["role"].ToString() !== "Admin")) {
 
-                        if (form.AcceptedDate !== null)
+                        if (form.AcceptedDate !== null) {
                             $("#btnPrint").show()
+                            $("#btnPrintConst").show()
+                        }
 
                         $("#startDate").prop("disabled", true)
                         $("#endDate").prop("disabled", true)

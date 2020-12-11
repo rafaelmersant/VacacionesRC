@@ -164,6 +164,8 @@ namespace VacacionesRC.App_Start
                             Email = data.Tables[0].Rows[0].ItemArray[7].ToString(),
                             Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()),
                             Location = data.Tables[0].Rows[0].ItemArray[9].ToString(),
+                            BankAccount = data.Tables[0].Rows[0].ItemArray[10].ToString(),
+                            Identification = data.Tables[0].Rows[0].ItemArray[11].ToString(),
                             AdmissionDate = admissionDate,
                             TerminateDate = terminateDate,
                             CreatedDate = DateTime.Now
@@ -202,7 +204,8 @@ namespace VacacionesRC.App_Start
             //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00
             //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
-            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, xCEEMAIL, CEVALTRANS, xCELOCATION  FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, " +
+                "xCEEMAIL, CEVALTRANS, xCELOCATION, CECUEBANCO, CENUMCEDUL FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
             " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
 
             if (ConfigurationManager.AppSettings["EnvironmentVolante"] == "PROD")
@@ -236,6 +239,57 @@ namespace VacacionesRC.App_Start
             return dsData;
         }
 
+        public static void GetElapsedTime(DateTime from_date, DateTime to_date,
+        out int years, out int months, out int days, out int hours,
+        out int minutes, out int seconds, out int milliseconds)
+        {
+            // If from_date > to_date, switch them around.
+            if (from_date > to_date)
+            {
+                GetElapsedTime(to_date, from_date,
+                    out years, out months, out days, out hours,
+                    out minutes, out seconds, out milliseconds);
+                years = -years;
+                months = -months;
+                days = -days;
+                hours = -hours;
+                minutes = -minutes;
+                seconds = -seconds;
+                milliseconds = -milliseconds;
+            }
+            else
+            {
+                // Handle the years.
+                years = to_date.Year - from_date.Year;
+
+                // See if we went too far.
+                DateTime test_date = from_date.AddMonths(12 * years);
+                if (test_date > to_date)
+                {
+                    years--;
+                    test_date = from_date.AddMonths(12 * years);
+                }
+                // Add months until we go too far.
+                months = 0;
+                while (test_date <= to_date)
+                {
+                    months++;
+                    test_date = from_date.AddMonths(12 * years + months);
+                }
+                months--;
+
+                // Subtract to see how many more days,
+                // hours, minutes, etc. we need.
+                from_date = from_date.AddMonths(12 * years + months);
+                TimeSpan remainder = to_date - from_date;
+                days = remainder.Days;
+                hours = remainder.Hours;
+                minutes = remainder.Minutes;
+                seconds = remainder.Seconds;
+                milliseconds = remainder.Milliseconds;
+            }
+        }
+
         public static string ShowVacationForm(string FechaSolicitud, string Codigo, string Nombre, 
                                        string FechaIngreso, string Puesto, string Departamento, 
                                        string DiasCorrespondientes, string DiasRestantes, string DiasSolicitados,
@@ -260,6 +314,35 @@ namespace VacacionesRC.App_Start
             content = content.Replace("##FechaHasta##", FechaHasta);
             content = content.Replace("##FechaRetorno##", FechaRetorno);
             content = content.Replace("##Observacion##", Observacion);
+
+            return content;
+        }
+
+        public static string ShowConstancia(string FechaSolicitud, string Codigo, string Nombre, string FechaIngreso, string Puesto, string Departamento,
+                                            string FechaDesde, string FechaHasta, string Cedula, string TiempoTrabajando, string SalarioMensual, string Localidad,
+                                            string CuentaBanco, string MontoPagado, string FirmadoPor, string DiasPagados)
+        {
+            string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
+            formTemplate = System.IO.Path.Combine(formTemplate, "ConstanciaVacaciones.html");
+
+            string content = System.IO.File.ReadAllText(formTemplate);
+
+            content = content.Replace("##NombreColaborador##", Nombre);
+            content = content.Replace("##CedulaColaborador##", Cedula);
+            content = content.Replace("##FechaIngreso##", FechaIngreso);
+            content = content.Replace("##PuestoColaborador##", Puesto);
+
+            content = content.Replace("##DeptoColaborador##", Departamento);
+            content = content.Replace("##Fecha##", FechaSolicitud);
+            content = content.Replace("##TiempoTrabajando##", TiempoTrabajando);
+            content = content.Replace("##SalarioMensual##", SalarioMensual);
+            content = content.Replace("##Localidad##", Localidad);
+            content = content.Replace("##FechaDesde##", FechaDesde);
+            content = content.Replace("##FechaHasta##", FechaHasta);
+            content = content.Replace("##CuentaBanco##", CuentaBanco);
+            content = content.Replace("##MontoPagado##", MontoPagado);
+            content = content.Replace("##DiasPagados##", DiasPagados);
+            content = content.Replace("##FirmadoPor##", FirmadoPor);
 
             return content;
         }

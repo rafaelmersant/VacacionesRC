@@ -38,6 +38,8 @@
           <Property Name="Email" Type="varchar" MaxLength="80" />
           <Property Name="Salary" Type="decimal" Precision="18" Scale="2" />
           <Property Name="Location" Type="varchar" MaxLength="20" />
+          <Property Name="BankAccount" Type="varchar" MaxLength="20" />
+          <Property Name="Identification" Type="varchar" MaxLength="15" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="EmployeeDays">
@@ -302,6 +304,8 @@
           <Property Name="Email" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
           <Property Name="Salary" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="Location" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="BankAccount" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Identification" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
       </Schema>
@@ -459,6 +463,8 @@
             <EntityTypeMapping TypeName="VacacionesRCModel.Employee">
               <MappingFragment StoreEntitySet="Employee">
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Identification" ColumnName="Identification" />
+                <ScalarProperty Name="BankAccount" ColumnName="BankAccount" />
                 <ScalarProperty Name="Location" ColumnName="Location" />
                 <ScalarProperty Name="Salary" ColumnName="Salary" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
