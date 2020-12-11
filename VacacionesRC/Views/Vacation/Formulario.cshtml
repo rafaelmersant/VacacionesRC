@@ -12,8 +12,14 @@
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-<div class="text-center mb-4">
+<div class="text-center mb-1" style="position: relative">
     <h5>Formulario para Solicitud de Vacaciones</h5>
+
+    <div class="text-right" id="formHeaderInfo" style="right: 20px; top:10px; position: absolute">
+        <span>Fecha: <span id="requestedDate" class="font-weight-bold"></span> </span>
+        <span class="ml-3">Estatus: <span id="requestStatus" class="font-weight-bold"></span></span>
+    </div>
+
 </div>
 
 <div class="container-fluid">
@@ -36,7 +42,7 @@
                             <label for="validationDefault01">Código</label>
                             @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
                             {
-                                <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" style="min-width: 65px !important"/>
+                                <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" style="min-width: 65px !important" />
                             }
                             else
                             {
@@ -153,6 +159,16 @@
                         </button>
                     </div>
                     <div class="d-inline">
+                        <button id="btnReject" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar">
+                            <span class="fa fa-remove"></span> Rechazar
+                        </button>
+                    </div>
+                    <div class="d-inline">
+                        <button id="btnAccept" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar">
+                            <span class="fa fa-check"></span> Aprobar
+                        </button>
+                    </div>
+                    <div class="d-inline">
                         <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1">
                             <span class="fa fa-print"></span> Imprimir Solicitud
                         </button>
@@ -169,6 +185,7 @@
             }
         </div>
     </section>
+    <input type="hidden" name="vacationId" id="vacationId" value="" />
     <input type="hidden" name="daysTakenH" id="daysTakenH" value="" />
     <input type="hidden" name="daysAvailableH" id="daysAvailableH" value="" />
 
@@ -182,7 +199,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 }
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
     $(document).ready(async function () {
 
@@ -191,6 +208,9 @@
         $("#returnDateDiv").hide()
         $("#btnPrint").hide()
         $("#btnPrintConst").hide()
+        $("#formHeaderInfo").hide()
+        $("#btnReject").hide()
+        $("#btnAccept").hide()
 
         const url = window.location.pathname
         const id = url.substring(url.lastIndexOf('/') + 1);
@@ -266,7 +286,7 @@
                 'FechaRetorno': $("#returnDate").val(),
                 'Observacion': $("#note").val()
             }
-            
+
             $.ajax({
                 url: `/Vacation/PrintForm`,
                 type: "POST",
@@ -520,6 +540,7 @@
                     console.log(form)
                     await getEmployeeDetail(form.EmployeeId)
 
+                    $("#vacationId").val(form.Id);
                     $("#daysTakenH").val(form.DaysRequested)
                     $("#daysAvailableH").val(form.DaysAvailable)
 
@@ -528,11 +549,24 @@
                     $("#daysRequested").val(form.DaysRequested)
                     $("#note").val(form.Note)
 
+                    $("#formHeaderInfo").show()
+                    $("#requestedDate").html(new Date(form.CreatedDate).toLocaleDateString("es-DO"))
+                    $("#requestStatus").html(form.Status)
+
+                    if (form.Status.includes('En proceso'))
+                        $("#requestStatus").addClass("text-dark")
+
+                    if (form.Status.includes('Aprobada'))
+                        $("#requestStatus").addClass("text-success")
+
+                    if (form.Status.includes('Rechazada'))
+                        $("#requestStatus").addClass("text-danger")
+
                     $("#employeeId").prop("readonly", true)
                     $("#btnSearchEmployee").addClass("disabled")
 
                     if ((form.AcceptedDate !== null || form.RejectedDate !== null)
-                        || (parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString() && @Session["role"].ToString() !== "Admin")) {
+                        || (parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString() && '@Session["role"].ToString()' !== "Admin")) {
 
                         if (form.AcceptedDate !== null) {
                             $("#btnPrint").show()
@@ -543,7 +577,16 @@
                         $("#endDate").prop("disabled", true)
                         $("#note").prop("readonly", true)
                         $("#btnSaveForm").prop("disabled", true)
-                    } 
+                    }
+
+                    console.log('TESTING', form.AcceptedDate === null, form.RejectedDate === null)
+                    if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString()) {
+                        $("#btnReject").show()
+                        $("#btnAccept").show()
+                    } else {
+                        $("#btnReject").hide()
+                        $("#btnAccept").hide()
+                    }
                 }
                 else if (response.result === "404") {
                     alert('El formulario no fue encontrado.');
@@ -632,6 +675,52 @@
         }
     }
 
+    function rejectRequest() {
+        const id = $("#vacationId").val();
+
+        if (confirm(`Seguro que desea RECHAZAR esta solicitud de vacaciones?`)) {
+            $.ajax({
+                "url": "/Vacation/RejectRequest?id=" + id,
+                "type": "POST",
+                "success": function (response) {
+                    if (response.result === "200") {
+                        window.location.reload(true);
+                    } else {
+                        console.log(response.message);
+                        if (response.message.includes("501")) {
+                            alert(response.message)
+                        } else {
+                            alert('Hubo un error tratando de rechazar la solicitud de vacaciones.');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function acceptRequest() {
+        const id = $("#vacationId").val();
+
+        if (confirm(`Seguro que desea APROBAR esta solicitud de vacaciones?`)) {
+            $.ajax({
+                "url": "/Vacation/AcceptRequest?id=" + id,
+                "type": "POST",
+                "success": function (response) {
+                    if (response.result === "200") {
+                        window.location.reload(true);
+                    } else {
+                        console.log(response.message);
+                        if (response.message.includes("501")) {
+                            alert(response.message)
+                        } else {
+                            alert('Hubo un error tratando de aprobar la solicitud de vacaciones.');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
     function GetDateFormat(date) {
         const parts = date.split("/");
         const dt = new Date(parseInt(parts[2], 10),
@@ -641,4 +730,4 @@
         return dt.toLocaleDateString();
     }
 
-</script>
+    </script>

@@ -61,6 +61,9 @@
                                     Departamento
                                 </th>
                             }
+                            <th class="text-center" style="width: 10px">
+                                Año
+                            </th>
                             <th style="width: 50px">
                                 Fecha Inicio
                             </th>
@@ -112,6 +115,7 @@
                                 <td>@item.EmployeePosition</td>
                                 <td>@item.DeptoName</td>
                             }
+                            <td>@item.Year</td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
                             <td class="text-center">@item.DaysRequested</td>
@@ -133,10 +137,10 @@
                                         </button>
                                     </td>
                                     @*<td align="center">
-                                        <button class="btn btn-sm btn-secondary" disabled>
-                                            <span class="fa fa-edit"></span>
-                                        </button>
-                                    </td>*@
+                    <button class="btn btn-sm btn-secondary" disabled>
+                        <span class="fa fa-edit"></span>
+                    </button>
+                </td>*@
                                 }
                                 else
                                 {
@@ -151,39 +155,39 @@
                                         </a>
                                     </td>
                                     @*if (Session["employeeId"].ToString() == item.EmployeeId.ToString() || Session["role"].ToString() == "Admin")
-                                    {
-                                        <td align="center">
-                                            <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                        </td>
-                                    }
-                                    else
-                                    {
-                                        <td align="center">
-                                            <button class="btn btn-sm btn-secondary" disabled>
-                                                <span class="fa fa-edit"></span>
-                                            </button>
-                                        </td>
-                                    }*@
+                {
+                    <td align="center">
+                        <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                    </td>
+                }
+                else
+                {
+                    <td align="center">
+                        <button class="btn btn-sm btn-secondary" disabled>
+                            <span class="fa fa-edit"></span>
+                        </button>
+                    </td>
+                }*@
                                 }
                             }
                             @*else if (Session["employeeId"].ToString() == item.EmployeeId.ToString() && !(item.RejectedDate != null || item.AcceptedDate != null))
-                            {
-                                <td align="center">
-                                    <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                </td>
-                            }
-                            else
-                            {
-                                <td align="center">
-                                    <button class="btn btn-sm btn-secondary" disabled>
-                                        <span class="fa fa-edit"></span>
-                                    </button>
-                                </td>
-                            }*@
+        {
+            <td align="center">
+                <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
+                    <i class="fa fa-edit"></i>
+                </a>
+            </td>
+        }
+        else
+        {
+            <td align="center">
+                <button class="btn btn-sm btn-secondary" disabled>
+                    <span class="fa fa-edit"></span>
+                </button>
+            </td>
+        }*@
 
                         </tr>
                         }

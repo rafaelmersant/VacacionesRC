@@ -55,7 +55,9 @@ namespace VacacionesRC.Controllers
                             CreatedBy = item.CreatedBy,
                             EmployeeName = item.EmployeeName,
                             DeptoName = item.EmployeeDepto,
-                            EmployeePosition = item.EmployeePosition
+                            EmployeePosition = item.EmployeePosition,
+                            Year = item.Year
+                            
                         });
                     }
                 }
@@ -291,10 +293,24 @@ namespace VacacionesRC.Controllers
                             Status = "En proceso"
                         };
 
+                        try
+                        {
+                            var employeeDay = HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested);
+                            if (employeeDay != null)
+                            {
+                                newVacation.Year = employeeDay.CurrentYear;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Helper.SendException(ex);
+                        }
+
                         db.Vacations.Add(newVacation);
                         db.SaveChanges();
 
-                        HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested);
+                        //Send notification to depto owner
+
                     }
                 }
 
@@ -458,8 +474,8 @@ namespace VacacionesRC.Controllers
                 string Localidad = "";
                 string CuentaBanco = "";
                 string MontoPagado = "";
-                string FirmadoPor = "Aurelio Ivan Cruz Ortiz";
-                string DiasPagados = "14";
+                string FirmadoPor = "";
+                string DiasPagados = "";
 
                 using (var db = new VacacionesRCEntities())
                 {
@@ -472,13 +488,17 @@ namespace VacacionesRC.Controllers
                     Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == Codigo);
                     if (employee != null)
                     {
+                        var rules = db.Rules.ToList();
+                        DiasPagados = rules.FirstOrDefault(r => r.Id == 1).Value;
+                        FirmadoPor = rules.FirstOrDefault(r => r.Id == 2).Value;
+
                         Cedula = employee.Identification;
                         SalarioMensual = "RD" + string.Format("{0:c}", employee.Salary);
                         Localidad = employee.Location;
                         CuentaBanco = employee.BankAccount;
 
                         decimal montoPagado = employee.Salary.Value / 23.83M;
-                        montoPagado = montoPagado * 14;
+                        montoPagado = montoPagado * int.Parse(DiasPagados);
                         MontoPagado = "RD" + string.Format("{0:c}", montoPagado);
 
                         //Elapsed Time

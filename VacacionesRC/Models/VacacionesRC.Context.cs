@@ -34,8 +34,14 @@ namespace VacacionesRC.Models
         public virtual DbSet<Holiday> Holidays { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<Vacation> Vacations { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<Rule> Rules { get; set; }
+        public virtual DbSet<Vacation> Vacations { get; set; }
+    
+        public virtual ObjectResult<GetDeptos_Result> GetDeptos()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDeptos_Result>("GetDeptos");
+        }
     
         public virtual ObjectResult<GetVacacionesByDeptoOwner_Result> GetVacacionesByDeptoOwner(Nullable<int> ownerId, Nullable<int> year)
         {
@@ -48,11 +54,6 @@ namespace VacacionesRC.Models
                 new ObjectParameter("year", typeof(int));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetVacacionesByDeptoOwner_Result>("GetVacacionesByDeptoOwner", ownerIdParameter, yearParameter);
-        }
-    
-        public virtual ObjectResult<GetDeptos_Result> GetDeptos()
-        {
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDeptos_Result>("GetDeptos");
         }
     }
 }

@@ -26,6 +26,7 @@ namespace VacacionesRC.Models
         public System.DateTime EndDate { get; set; }
         public Nullable<System.DateTime> ReturnDate { get; set; }
         public string Note { get; set; }
+        public int Year { get; set; }
         public Nullable<System.DateTime> AcceptedDate { get; set; }
         public string AcceptedBy { get; set; }
         public Nullable<System.DateTime> RejectedDate { get; set; }

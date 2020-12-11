@@ -161,7 +161,7 @@ namespace VacacionesRC.App_Start
         }
 
         //Update takenDays
-        public static void UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0)
+        public static EmployeeDay UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0)
         {
             try
             {
@@ -177,12 +177,16 @@ namespace VacacionesRC.App_Start
                         employeeDays.TakenDays += takenDays - oldDays;
                         db.SaveChanges();
                     }
+
+                    return employeeDays;
                 }
             }
             catch (Exception ex)
             {
                 Helper.SendException(ex);
             }
+
+            return null;
         }
     }
 }

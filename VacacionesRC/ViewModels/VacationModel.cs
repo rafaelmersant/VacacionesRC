@@ -28,6 +28,7 @@ namespace VacacionesRC.ViewModels
         public string RejectedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
+        public int Year { get; set; }
     }
 
     public class DeptoModel

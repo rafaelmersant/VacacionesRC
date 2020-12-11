@@ -8,13 +8,13 @@ Formulario Vacaciones:
 ******6-Guardar el formulario
 ******7-Editar el formulario
 ******8-Imprimir el formulario
-9-Eliminar la solicitud
+******9-Eliminar la solicitud
 10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
-11-Imprimir CONSTANCIA DE VACACIONES desde RRHH
+******11-Imprimir CONSTANCIA DE VACACIONES desde RRHH
 12-Permitir editar el dueño de Departamento
 13-
 
-REVISAR SI EL ADMIN PUEDE EDITAR EL FORMULARIO DE ALGUIEN MAS
+******REVISAR SI EL ADMIN PUEDE EDITAR EL FORMULARIO DE ALGUIEN MAS
 
 Validaciones:
 ******Validar que no exceda la cantidad de dias disponible al solicitar en el formulario de vacaciones.
@@ -44,3 +44,4 @@ Dashboard de Vacaciones:
 Pantalla para definir regla de dias disponibles
 1-Cantidad de dias disponibles por antiguedad
 2-Poder agregar por antiguedad (rango) que cantidad de dias disponibles
+******3-Actualizar empleado desde AS400

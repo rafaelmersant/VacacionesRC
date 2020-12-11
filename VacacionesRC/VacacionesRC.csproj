@@ -192,6 +192,9 @@
     <Compile Include="Models\Notification.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Rule.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\User.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
