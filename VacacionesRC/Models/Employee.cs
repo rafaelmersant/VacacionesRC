@@ -21,6 +21,9 @@ namespace VacacionesRC.Models
         public Nullable<int> EmployeeDeptoId { get; set; }
         public Nullable<System.DateTime> AdmissionDate { get; set; }
         public Nullable<System.DateTime> TerminateDate { get; set; }
+        public string Email { get; set; }
+        public Nullable<decimal> Salary { get; set; }
+        public string Location { get; set; }
         public System.DateTime CreatedDate { get; set; }
     }
 }

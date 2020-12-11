@@ -161,6 +161,9 @@ namespace VacacionesRC.App_Start
                             EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString(),
                             EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString(),
                             EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString()),
+                            Email = data.Tables[0].Rows[0].ItemArray[7].ToString(),
+                            Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()),
+                            Location = data.Tables[0].Rows[0].ItemArray[9].ToString(),
                             AdmissionDate = admissionDate,
                             TerminateDate = terminateDate,
                             CreatedDate = DateTime.Now
@@ -199,8 +202,8 @@ namespace VacacionesRC.App_Start
             //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00
             //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
-            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
-            " ORDER BY CECICLOPAG DESC";
+            sQuery = "SELECT TOP 1 CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, xCEEMAIL, CEVALTRANS, xCELOCATION  FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+            " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
 
             if (ConfigurationManager.AppSettings["EnvironmentVolante"] == "PROD")
                 sQuery = sQuery.Replace("[", "").Replace("]", "");

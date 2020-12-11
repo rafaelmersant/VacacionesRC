@@ -7,12 +7,14 @@ Formulario Vacaciones:
 ******5-Traer cuantos dias ha tomado
 ******6-Guardar el formulario
 ******7-Editar el formulario
-8-Imprimir el formulario
+******8-Imprimir el formulario
 9-Eliminar la solicitud
 10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
+11-Imprimir CONSTANCIA DE VACACIONES desde RRHH
+12-Permitir editar el dueño de Departamento
+13-
 
-
-CONSTANCIA DE VACACIONES
+REVISAR SI EL ADMIN PUEDE EDITAR EL FORMULARIO DE ALGUIEN MAS
 
 Validaciones:
 ******Validar que no exceda la cantidad de dias disponible al solicitar en el formulario de vacaciones.

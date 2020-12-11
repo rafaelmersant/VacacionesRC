@@ -32,10 +32,10 @@ namespace VacacionesRC.Models
         public virtual DbSet<DaysBySeniority> DaysBySeniorities { get; set; }
         public virtual DbSet<EmployeeDay> EmployeeDays { get; set; }
         public virtual DbSet<Holiday> Holidays { get; set; }
-        public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Vacation> Vacations { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
     
         public virtual ObjectResult<GetVacacionesByDeptoOwner_Result> GetVacacionesByDeptoOwner(Nullable<int> ownerId, Nullable<int> year)
         {

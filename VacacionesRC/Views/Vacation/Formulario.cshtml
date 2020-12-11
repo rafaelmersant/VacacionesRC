@@ -36,7 +36,7 @@
                             <label for="validationDefault01">Código</label>
                             @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
                             {
-                                <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" />
+                                <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" style="min-width: 65px !important"/>
                             }
                             else
                             {
@@ -149,12 +149,17 @@
                 <div>
                     <div class="d-inline">
                         <button id="btnSaveForm" class="btn btn-sm btn-danger pl-5 pr-5 mt-3 ml-1">
-                            Guardar
+                            <span class="fa fa-save"></span> Guardar Solicitud
                         </button>
                     </div>
                     <div class="d-inline">
                         <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1">
-                            Imprimir
+                            <span class="fa fa-print"></span> Imprimir Solicitud
+                        </button>
+                    </div>
+                    <div class="d-inline">
+                        <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1">
+                            <span class="fa fa-print"></span> Imprimir Constancia
                         </button>
                     </div>
                 </div>
@@ -474,8 +479,11 @@
                     $("#daysRequested").val(form.DaysRequested)
                     $("#note").val(form.Note)
 
+                    $("#employeeId").prop("readonly", true)
+                    $("#btnSearchEmployee").addClass("disabled")
+
                     if ((form.AcceptedDate !== null || form.RejectedDate !== null)
-                        || parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString()) {
+                        || (parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString() && @Session["role"].ToString() !== "Admin")) {
 
                         if (form.AcceptedDate !== null)
                             $("#btnPrint").show()
@@ -483,10 +491,8 @@
                         $("#startDate").prop("disabled", true)
                         $("#endDate").prop("disabled", true)
                         $("#note").prop("readonly", true)
-                        $("#employeeId").prop("readonly", true)
                         $("#btnSaveForm").prop("disabled", true)
-                        $("#btnSearchEmployee").addClass("disabled")
-                    }
+                    } 
                 }
                 else if (response.result === "404") {
                     alert('El formulario no fue encontrado.');
