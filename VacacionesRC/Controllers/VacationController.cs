@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -310,7 +311,26 @@ namespace VacacionesRC.Controllers
                         db.SaveChanges();
 
                         //Send notification to depto owner
+                        try
+                        {
+                            Department department = db.Departments.FirstOrDefault(d => d.DeptoCode == newVacation.DeptoId);
+                            if (department != null)
+                            {
+                                Employee ownerDepto = db.Employees.FirstOrDefault(o => o.EmployeeId == department.DeptoOwner);
+                                if (ownerDepto != null)
+                                {
+                                    string redirectTo = ConfigurationManager.AppSettings["RedirectTo"].Replace("##vacationForm##", newVacation.IdHash.ToString());
 
+                                    Helper.SendEmailVacationNotification(ownerDepto.Email, employee.EmployeeName,
+                                        employee.EmployeePosition, newVacation.StartDate.ToString("dd/MM/yyyy"), 
+                                        newVacation.EndDate.ToString("dd/MM/yyyy"), newVacation.ReturnDate.Value.ToString("dd/MM/yyyy"), redirectTo);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Helper.SendException(ex);
+                        }
                     }
                 }
 

@@ -11,22 +11,20 @@ html , body{
  
  }
 
-hr{
-    margin-top:10px;
-    margin-bottom:10px;
+hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 
-    .form-group .btn-group{
-        display:inherit ;
-    }
-    .center{
-        text-align:center;
-    }
-.button-color {
-    background-color: #8fc800;
-    color: white;
+.form-group .btn-group {
+    display: inherit;
 }
+
+.center {
+    text-align: center;
+}
+
 .money {
   background-color:darkgreen;
   font-weight:bold;

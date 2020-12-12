@@ -19,6 +19,14 @@ namespace VacacionesRC.Controllers
 
         public ActionResult Login()
         {
+            if (Session["employeeId"] != null)
+            {
+                if (Request.QueryString["form"] != null)
+                {
+                    return RedirectToAction("Formulario", "Vacation", new { id = Request.QueryString["form"] });
+                }
+            }
+
             return View();
         }
 
@@ -59,7 +67,14 @@ namespace VacacionesRC.Controllers
                         });
                         db.SaveChanges();
 
-                        return RedirectToAction("Index", "Home");
+                        if (Request.QueryString["form"] != null)
+                        {
+                           return RedirectToAction("Formulario", "Vacation", new { id = Request.QueryString["form"] });
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
                     }
                     else
                     {

@@ -345,6 +345,58 @@ namespace VacacionesRC.App_Start
 
             return content;
         }
+
+        public static void SendEmailVacationNotification(string EmailResponsableDepto, string NombreColaborador, string PuestoColaborador, 
+                                                         string FechaInicio, string FechaHasta, string FechaRetorno, string RedirectURL)
+        {
+            try
+            {
+                SmtpClient smtp = new SmtpClient
+                {
+                    Host = ConfigurationManager.AppSettings["smtpClient"],
+                    Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
+                    UseDefaultCredentials = false,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
+                    EnableSsl = true,
+                };
+
+                string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
+                formTemplate = System.IO.Path.Combine(formTemplate, "NotificacionSolicitud.html");
+
+                string content = System.IO.File.ReadAllText(formTemplate);
+
+                content = content.Replace("##NombreColaborador##", NombreColaborador);
+                content = content.Replace("##PuestoColaborador##", PuestoColaborador);
+                content = content.Replace("##FechaInicio##", FechaInicio);
+                content = content.Replace("##FechaHasta##", FechaHasta);
+                content = content.Replace("##FechaRetorno##", FechaRetorno);
+                content = content.Replace("##RedirectTo##", RedirectURL);
+
+                MailMessage message = new MailMessage();
+
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(content, null, "text/html");
+                LinkedResource theEmailImage = new LinkedResource(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content/Images/", "RCLogo.PNG"));
+                theEmailImage.ContentId = "logoID";
+                htmlView.LinkedResources.Add(theEmailImage);
+
+                message.AlternateViews.Add(htmlView);
+                message.IsBodyHtml = true;
+                //message.Body = content;
+                message.Subject = "Nueva Solicitud de Vacaciones";
+                message.To.Add(new MailAddress(EmailResponsableDepto));
+                
+                string address = ConfigurationManager.AppSettings["EMail"];
+                string displayName = ConfigurationManager.AppSettings["EMailName"];
+                message.From = new MailAddress(address, displayName);
+
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+        }
     }
 
 }

@@ -366,6 +366,7 @@
     <Content Include="Tasks.txt" />
     <Content Include="Templates\ConstanciaVacaciones.html" />
     <Content Include="Templates\FormularioVacaciones.html" />
+    <Content Include="Templates\NotificacionSolicitud.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
