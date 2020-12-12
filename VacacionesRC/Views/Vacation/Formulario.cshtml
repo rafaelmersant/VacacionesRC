@@ -455,7 +455,11 @@
                     $("#daysTaken").val(employeeDay.TakenDays)
 
                     const daysAvailable = parseInt(employeeDay.TotalDays) - parseInt(employeeDay.TakenDays)
-                    $("#daysAvailable").val(daysAvailable)
+                    if (employeeDay.TakenDays === null)
+                        $("#daysAvailable").val(0)
+                    else
+                        $("#daysAvailable").val(daysAvailable)
+                    
 
                     const today = new Date();
                     const renovationDate = new Date(employeeDay.RenovationDate);
@@ -579,7 +583,6 @@
                         $("#btnSaveForm").prop("disabled", true)
                     }
 
-                    console.log('TESTING', form.AcceptedDate === null, form.RejectedDate === null)
                     if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString()) {
                         $("#btnReject").show()
                         $("#btnAccept").show()
@@ -587,6 +590,11 @@
                         $("#btnReject").hide()
                         $("#btnAccept").hide()
                     }
+
+                    //Return date
+                    $("#_returnDate").val(form.ReturnDate)
+                    $("#returnDate").html(new Date(form.ReturnDate).toLocaleDateString("es-DO"))
+                    $("#returnDateDiv").show()
                 }
                 else if (response.result === "404") {
                     alert('El formulario no fue encontrado.');

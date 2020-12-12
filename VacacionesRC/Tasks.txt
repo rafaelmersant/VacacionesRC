@@ -9,7 +9,7 @@ Formulario Vacaciones:
 ******7-Editar el formulario
 ******8-Imprimir el formulario
 ******9-Eliminar la solicitud
-10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
+******10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
 ******11-Imprimir CONSTANCIA DE VACACIONES desde RRHH
 12-Permitir editar el dueño de Departamento
 13-
