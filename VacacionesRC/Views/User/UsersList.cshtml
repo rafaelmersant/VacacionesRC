@@ -45,11 +45,11 @@
                             <td>@item.CreatedDate</td>
 
                             <td align="center">
-                                <a class="btn btn-sm btn-success" href="@Url.Action("Edit",new { idHash = @item.IdHash })">
+                                <a class="btn btn-sm btn-success" href="@Url.Action("Edit",new { idHash = @item.IdHash })" title="Editar">
                                     <i class="fa fa-edit"></i>
 
                                 </a>
-                                <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteUser(@item.EmployeeID,@item.Id)">
+                                <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteUser(@item.EmployeeID,@item.Id)" title="Eliminar">
                                     <i class="fa fa-remove"></i>
                                 </a>
                             </td>

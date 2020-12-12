@@ -14,6 +14,8 @@ Formulario Vacaciones:
 12-Permitir editar el dueño de Departamento
 13-
 
+Agregar personal Outsourcing
+
 ******REVISAR SI EL ADMIN PUEDE EDITAR EL FORMULARIO DE ALGUIEN MAS
 
 Validaciones:
@@ -37,9 +39,9 @@ Enviar alertas:
 ******3-Tener el listado de alertas enviadas
 
 Dashboard de Vacaciones:
-1-Mostrar los dias tomados
-2-Mostrar los dias disponibles
-3-Mostrar total de dias para ese año
+******1-Mostrar los dias tomados
+******2-Mostrar los dias disponibles
+******3-Mostrar total de dias para ese año
 
 Pantalla para definir regla de dias disponibles
 1-Cantidad de dias disponibles por antiguedad
