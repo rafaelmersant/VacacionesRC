@@ -24,6 +24,19 @@ namespace VacacionesRC.Controllers
             }
         }
 
+        public ActionResult Outsourcing()
+        {
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+
+            using (var db = new VacacionesRCEntities())
+            {
+                var outsourcing = db.Employees.Where(e => e.Type == "E").OrderByDescending(o => o.CreatedDate).ToList();
+
+                return View(outsourcing);
+            }
+        }
+
         [HttpPost]
         public JsonResult UpdateEmployee(int employeeId)
         {
@@ -74,6 +87,45 @@ namespace VacacionesRC.Controllers
                     else
                     {
                         return new JsonResult { Data = new { result = "404", message = "" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
+
+        [HttpPost]
+        public JsonResult SaveOutsourcing(int employeeId, string employeeName)
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    Employee employee = db.Employees.FirstOrDefault(d => d.EmployeeId == employeeId);
+
+                    if (employee != null)
+                    {
+                        employee.EmployeeName = employeeName;
+                        db.SaveChanges();
+
+                        return new JsonResult { Data = new { result = "200", message = "Updated" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    }
+                    else
+                    {
+                        db.Employees.Add(new Employee
+                        {
+                            EmployeeId = employeeId,
+                            EmployeeName = employeeName,
+                            EmployeePosition = "",
+                            Type ="E",
+                            CreatedDate = DateTime.Now
+                        });
+                        db.SaveChanges();
+
+                        return new JsonResult { Data = new { result = "200", message = "Added" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     }
                 }
             }

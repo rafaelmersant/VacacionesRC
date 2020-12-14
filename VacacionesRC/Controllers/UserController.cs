@@ -57,7 +57,7 @@ namespace VacacionesRC.Controllers
                         Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == empId);
 
                         Session["employeeID"] = username;
-                        Session["role"] = department != null ? "Depto" : _user.Role;
+                        Session["role"] = department != null && _user.Role != "Admin" ? "Depto" : _user.Role;
                         Session["email"] = _user.Email;
 
                         db.LoginHistories.Add(new LoginHistory

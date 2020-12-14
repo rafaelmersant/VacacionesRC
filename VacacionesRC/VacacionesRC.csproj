@@ -405,6 +405,7 @@
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\Reglas\Index.cshtml" />
     <Content Include="Views\Reportes\Index.cshtml" />
+    <Content Include="Views\Reglas\Outsourcing.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

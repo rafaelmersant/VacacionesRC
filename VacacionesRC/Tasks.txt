@@ -11,10 +11,9 @@ Formulario Vacaciones:
 ******9-Eliminar la solicitud
 ******10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
 ******11-Imprimir CONSTANCIA DE VACACIONES desde RRHH
-12-Permitir editar el dueño de Departamento
-13-
+******12-Permitir editar el dueño de Departamento
 
-Agregar personal Outsourcing
+******Agregar personal Outsourcing
 
 ******REVISAR SI EL ADMIN PUEDE EDITAR EL FORMULARIO DE ALGUIEN MAS
 

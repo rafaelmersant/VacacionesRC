@@ -34,9 +34,9 @@ namespace VacacionesRC.Models
         public virtual DbSet<Holiday> Holidays { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Rule> Rules { get; set; }
         public virtual DbSet<Vacation> Vacations { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
     
         public virtual ObjectResult<GetDeptos_Result> GetDeptos()
         {

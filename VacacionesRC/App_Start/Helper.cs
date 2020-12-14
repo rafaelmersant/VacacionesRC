@@ -168,6 +168,7 @@ namespace VacacionesRC.App_Start
                             Identification = data.Tables[0].Rows[0].ItemArray[11].ToString(),
                             AdmissionDate = admissionDate,
                             TerminateDate = terminateDate,
+                            Type = "I",
                             CreatedDate = DateTime.Now
                         };
 
