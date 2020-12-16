@@ -8,7 +8,7 @@
     <section class="text-dark border-custom border">
         <div class="bg-secondary text-light panel-custom border">
             <h6 class="panel-title">
-                Departamentos
+                Empleados Outsourcing
             </h6>
         </div>
 
@@ -24,7 +24,7 @@
                 <a class="btn btn-sm btn-secondary pl-3 pr-3" href="javascript:void(0)" onclick="editEmployeeClear()" title="Limpiar campos"><span class="fa fa-remove"></span></a>
             </div>
 
-            <div class="col-1 mt-3">
+            <div class="col-1 mt-3" style="min-width: 100px">
                 <a class="btn btn-sm btn-danger pl-3 pr-3" href="javascript:void(0)" onclick="saveChangesEmployee()" title="Guardar cambios">Guardar</a>
             </div>
             <div class="col-1 mt-3">
@@ -62,7 +62,7 @@
                             <tr>
                                 <td>@item.EmployeeId</td>
                                 <td>@item.EmployeeName</td>
-                                <td>@item.CreatedDate</td>
+                                <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
 
                                 <td align="center">
                                     <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editEmployee(@item.EmployeeId, '@item.EmployeeName')" title="Editar">

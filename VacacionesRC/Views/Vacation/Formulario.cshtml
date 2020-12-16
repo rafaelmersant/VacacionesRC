@@ -178,6 +178,9 @@
                             <span class="fa fa-print"></span> Imprimir Constancia
                         </button>
                     </div>
+                    <div class="d-flex text-center">
+                        <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
+                    </div>
                 </div>
 
 
@@ -364,6 +367,9 @@
         $("#btnSaveForm").click(function (e) {
             e.preventDefault();
 
+            $("#btnSaveForm").prop("disabled", true);
+            $("#waitingIndicatorSave").show();
+
             const employeeId = $("#employeeId").val()
             const daysTaken = $("#daysTaken").val()
             const daysRequested = $("#daysRequested").val()
@@ -386,9 +392,7 @@
             const id = url.substring(url.lastIndexOf('/') + 1);
             if (id && id !== "Formulario")
                 idHash = id;
-
-            //$("#waitingIndicator").show();
-            //$("#btnSearchEmployee").hide();
+                        
             const data = {
                 'IdHash': idHash,
                 'EmployeeId': employeeId,
@@ -416,11 +420,13 @@
                         alert(response.message);
                     }
 
-                    //$("#waitingIndicator").hide();
-                    //$("#btnSearchEmployee").show();
+                    $("#waitingIndicatorSave").hide();
+                    $("#btnSaveForm").prop("disabled", false);
 
                 }).fail(function (error) {
                     alert(error);
+                    $("#waitingIndicatorSave").hide();
+                    $("#btnSaveForm").prop("disabled", false);
                 })
             }
         });
@@ -435,13 +441,13 @@
 
     });
 
-    const CorrespondingDays = async (employeeId) => {
+    const CorrespondingDays = async (employeeId, vacationId = 0) => {
 
         $("#waitingIndicator").show();
         $("#btnSearchEmployee").hide();
 
         $.ajax({
-            "url": `/Vacation/GetCorrespondingDays/?employeeId=${employeeId}`,
+            "url": `/Vacation/GetCorrespondingDays/?employeeId=${employeeId}&vacationId=${vacationId}`,
             "type": "GET",
             "success": async function (response) {
                 if (response.result === "200") {
@@ -453,13 +459,16 @@
 
                     $("#daysTotal").val(employeeDay.TotalDays)
                     $("#daysTaken").val(employeeDay.TakenDays)
+                    console.log('daysTotal', employeeDay.TotalDays)
+                    console.log('daysTaken', employeeDay.TakenDays)
 
                     const daysAvailable = parseInt(employeeDay.TotalDays) - parseInt(employeeDay.TakenDays)
                     if (employeeDay.TakenDays === null)
                         $("#daysAvailable").val(0)
                     else
                         $("#daysAvailable").val(daysAvailable)
-                    
+
+                    console.log('daysAvailable', daysAvailable)
 
                     const today = new Date();
                     const renovationDate = new Date(employeeDay.RenovationDate);
@@ -478,12 +487,30 @@
                     let _daysTaken = parseInt($("#daysTakenH").val())
                     let _daysAvailable = parseInt($("#daysAvailableH").val())
 
-                    if (!isNaN(_daysTaken)) {
-                        _daysTaken = employeeDay.TakenDays - _daysTaken
-                        _daysAvailable = daysAvailable + employeeDay.TakenDays
+                    console.log('daysTakenH', _daysTaken)
+                    console.log('daysAvailableH', _daysTaken)
 
+                    if (!isNaN(_daysTaken)) {
+                        console.log("Estatus", response.status)
+                        _daysAvailable = daysAvailable + _daysTaken
+
+                        if (response.status === "Aprobada") {
+                            _daysAvailable -= _daysTaken
+                            _daysTaken = employeeDay.TakenDays
+                        }
+                            
+                        if (response.status === "Rechazada") {
+                            _daysAvailable = daysAvailable
+                            _daysTaken = employeeDay.TakenDays
+                        } else if (response.status === "En proceso") {
+                            _daysTaken = employeeDay.TakenDays - _daysTaken
+                        }
+                        
                         $("#daysTaken").val(_daysTaken)
                         $("#daysAvailable").val(_daysAvailable)
+
+                        console.log("_daysTaken", _daysTaken)
+                        console.log("_daysAvailable", _daysAvailable)
                     }
                 } else {
                     alert(response.message)
@@ -495,7 +522,7 @@
         })
     }
 
-    async function getEmployeeDetail(employeeId) {
+    async function getEmployeeDetail(employeeId, vacationId = 0) {
 
         $("#waitingIndicator").show();
         $("#btnSearchEmployee").hide();
@@ -512,7 +539,7 @@
                     $("#employeeDepto").val(employee.EmployeeDepto)
                     $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
 
-                    await CorrespondingDays(employeeId);
+                    await CorrespondingDays(employeeId, vacationId);
                 }
                 else if (response.result === "404") {
                     alert('El colaborador no fue encontrado.');
@@ -542,7 +569,7 @@
                 if (response.result === "200") {
                     const form = JSON.parse(response.message);
                     console.log(form)
-                    await getEmployeeDetail(form.EmployeeId)
+                    await getEmployeeDetail(form.EmployeeId, form.Id)
 
                     $("#vacationId").val(form.Id);
                     $("#daysTakenH").val(form.DaysRequested)

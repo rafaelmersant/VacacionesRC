@@ -55,5 +55,10 @@ namespace VacacionesRC.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetVacacionesByDeptoOwner_Result>("GetVacacionesByDeptoOwner", ownerIdParameter, yearParameter);
         }
+    
+        public virtual ObjectResult<GetEmployeeOnVacation_Result> GetEmployeeOnVacation()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeOnVacation_Result>("GetEmployeeOnVacation");
+        }
     }
 }

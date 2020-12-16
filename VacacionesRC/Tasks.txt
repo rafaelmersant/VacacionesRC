@@ -12,9 +12,7 @@ Formulario Vacaciones:
 ******10-Enviar notificacion al responsable de departamento una vez el formulario es guardado
 ******11-Imprimir CONSTANCIA DE VACACIONES desde RRHH
 ******12-Permitir editar el dueño de Departamento
-
 ******Agregar personal Outsourcing
-
 ******REVISAR SI EL ADMIN PUEDE EDITAR EL FORMULARIO DE ALGUIEN MAS
 
 Validaciones:
@@ -46,3 +44,12 @@ Pantalla para definir regla de dias disponibles
 1-Cantidad de dias disponibles por antiguedad
 2-Poder agregar por antiguedad (rango) que cantidad de dias disponibles
 ******3-Actualizar empleado desde AS400
+
+DESPUES DE PRUEBAS:
+(1) Agregar el Email a los Outsourcing
+
+
+
+
+
+

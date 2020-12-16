@@ -179,6 +179,38 @@ namespace VacacionesRC.App_Start
                         }
                     }
                 }
+                else
+                {
+                    using (var db = new VacacionesRCEntities())
+                    {
+                        employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employee.EmployeeId);
+
+                        var data = GetEmployeeFromAS400(employeeId.ToString());
+                        if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
+                        {
+                            DateTime? terminateDate = null;
+                            if (data.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+                            {
+                                int year = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
+                                int month = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
+                                int day = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
+
+                                terminateDate = new DateTime(year, month, day);
+                            }
+
+                            employee.EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString();
+                            employee.EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString();
+                            employee.EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString());
+                            employee.Email = data.Tables[0].Rows[0].ItemArray[7].ToString();
+                            employee.Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()) * 2;
+                            employee.Location = data.Tables[0].Rows[0].ItemArray[9].ToString();
+                            employee.BankAccount = data.Tables[0].Rows[0].ItemArray[10].ToString();
+                            employee.TerminateDate = terminateDate;
+
+                            db.SaveChanges();
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -293,7 +325,7 @@ namespace VacacionesRC.App_Start
         public static string ShowVacationForm(string FechaSolicitud, string Codigo, string Nombre, 
                                        string FechaIngreso, string Puesto, string Departamento, 
                                        string DiasCorrespondientes, string DiasRestantes, string DiasSolicitados,
-                                       string FechaDesde, string FechaHasta, string FechaRetorno, string Observacion)
+                                       string FechaDesde, string FechaHasta, string FechaRetorno, string Observacion, string server)
         {
             string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
             formTemplate = System.IO.Path.Combine(formTemplate, "FormularioVacaciones.html");
@@ -315,12 +347,14 @@ namespace VacacionesRC.App_Start
             content = content.Replace("##FechaRetorno##", FechaRetorno);
             content = content.Replace("##Observacion##", Observacion);
 
+            content = content.Replace("##server##", server);
+
             return content;
         }
 
         public static string ShowConstancia(string FechaSolicitud, string Codigo, string Nombre, string FechaIngreso, string Puesto, string Departamento,
                                             string FechaDesde, string FechaHasta, string Cedula, string TiempoTrabajando, string SalarioMensual, string Localidad,
-                                            string CuentaBanco, string MontoPagado, string FirmadoPor, string DiasPagados)
+                                            string CuentaBanco, string MontoPagado, string FirmadoPor, string DiasPagados, string server)
         {
             string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
             formTemplate = System.IO.Path.Combine(formTemplate, "ConstanciaVacaciones.html");
@@ -343,6 +377,9 @@ namespace VacacionesRC.App_Start
             content = content.Replace("##MontoPagado##", MontoPagado);
             content = content.Replace("##DiasPagados##", DiasPagados);
             content = content.Replace("##FirmadoPor##", FirmadoPor);
+
+            content = content.Replace("##server##", server);
+
 
             return content;
         }

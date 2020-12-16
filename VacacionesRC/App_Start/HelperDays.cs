@@ -102,22 +102,22 @@ namespace VacacionesRC.App_Start
                 {
                     Employee employee = Helper.GetEmployee(employeeId);
                     var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
-                    var renovationDate = anniversaryDate.AddMonths(-6);
+                    var renovationDate = anniversaryDate;//.AddMonths(-6);
                     var dueDate = anniversaryDate.AddMonths(6);
 
                     //Check if this vacacions already reaches dueDate
                     if (dueDate <= DateTime.Today.Date)
                     {
                         anniversaryDate = anniversaryDate.AddYears(1);
-                        renovationDate = anniversaryDate.AddMonths(-6);
+                        renovationDate = anniversaryDate;//.AddMonths(-6);
                         dueDate = anniversaryDate.AddMonths(6);
                     }
 
                     employeeDay = new EmployeeDay { TotalDays = 0, RenovationDate = renovationDate, DueDate = dueDate, CurrentYear = anniversaryDate.Year };
 
                     //For new employee with less than 6 months working in the Company.
-                    double daysWorking = (DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays;
-                    if (daysWorking < 180) return employeeDay;
+                    //double daysWorking = (DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays;
+                    //if (daysWorking < 180) return employeeDay;
 
                     //For employee with more than 6 months working in the Company.
                     var employeeDays = db.EmployeeDays
@@ -129,8 +129,8 @@ namespace VacacionesRC.App_Start
                     {
                         int days = DaysForThisEmployeeBySeniority(employee);
 
-                        if (renovationDate <= DateTime.Today.Date)
-                        {
+                        //if (renovationDate <= DateTime.Today.Date)
+                        //{
                             employeeDay = new EmployeeDay
                             {
                                 EmployeeId = employeeId,
@@ -141,7 +141,7 @@ namespace VacacionesRC.App_Start
                                 DueDate = dueDate,
                                 CreatedDate = DateTime.Now
                             };
-                        }
+                        //}
 
                         db.EmployeeDays.Add(employeeDay);
                         db.SaveChanges();

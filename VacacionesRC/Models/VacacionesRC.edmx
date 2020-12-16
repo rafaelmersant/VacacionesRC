@@ -136,6 +136,7 @@
           <Property Name="ModifiedBy" Type="char" MaxLength="4" />
         </EntityType>
         <Function Name="GetDeptos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetEmployeeOnVacation" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetVacacionesByDeptoOwner" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="OwnerId" Type="int" Mode="In" />
           <Parameter Name="year" Type="int" Mode="In" />
@@ -172,6 +173,7 @@
             <Parameter Name="year" Mode="In" Type="Int32" />
           </FunctionImport>
           <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
+          <FunctionImport Name="GetEmployeeOnVacation" ReturnType="Collection(VacacionesRCModel.GetEmployeeOnVacation_Result)" />
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -337,6 +339,21 @@
           <Property Name="Type" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
+        <ComplexType Name="GetEmployeeOnVacation_Result">
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="Int32" Name="EmployeeId" Nullable="false" />
+          <Property Type="Int32" Name="DaysAvailable" Nullable="false" />
+          <Property Type="Int32" Name="DaysRequested" Nullable="false" />
+          <Property Type="Int32" Name="DaysTaken" Nullable="false" />
+          <Property Type="DateTime" Name="StartDate" Nullable="false" />
+          <Property Type="DateTime" Name="EndDate" Nullable="false" />
+          <Property Type="DateTime" Name="ReturnDate" Nullable="true" />
+          <Property Type="String" Name="Note" Nullable="true" MaxLength="300" />
+          <Property Type="Int32" Name="Year" Nullable="false" />
+          <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
+          <Property Type="String" Name="EmployeeDepto" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="Location" Nullable="true" MaxLength="20" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -524,6 +541,25 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetEmployeeOnVacation" FunctionName="VacacionesRCModel.Store.GetEmployeeOnVacation">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VacacionesRCModel.GetEmployeeOnVacation_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="DaysAvailable" ColumnName="DaysAvailable" />
+                <ScalarProperty Name="DaysRequested" ColumnName="DaysRequested" />
+                <ScalarProperty Name="DaysTaken" ColumnName="DaysTaken" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="ReturnDate" ColumnName="ReturnDate" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

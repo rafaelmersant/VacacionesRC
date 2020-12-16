@@ -143,13 +143,25 @@ namespace VacacionesRC.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetCorrespondingDays(int employeeId)
+        public JsonResult GetCorrespondingDays(int employeeId, int vacationId = 0)
         {
             EmployeeDay employeeDay;
+            Vacation vacation = null;
+            string status = "";
 
             try
             {
                 employeeDay = HelperDays.GetDaysForEmployee(employeeId);
+
+                if (vacationId > 0)
+                {
+                    using (var db = new VacacionesRCEntities())
+                    {
+                        vacation = db.Vacations.FirstOrDefault(v => v.Id == vacationId);
+                        if (vacation != null)
+                            status = vacation.Status.Trim();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -158,7 +170,7 @@ namespace VacacionesRC.Controllers
             }
 
             var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
-            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         [HttpPost]
@@ -404,7 +416,7 @@ namespace VacacionesRC.Controllers
                             vacation.AcceptedDate = DateTime.Now;
                             vacation.AcceptedBy = Session["employeeID"].ToString();
                             vacation.Status = "Aprobada";
-
+                            vacation.DaysTaken = vacation.DaysRequested;
                             db.SaveChanges();
                         }
                     }
@@ -468,9 +480,11 @@ namespace VacacionesRC.Controllers
                         FechaSolicitud = String.Format("{0}", vacation.CreatedDate.ToString("dd/MM/yyyy"));
                         FechaRetorno = String.Format("{0}", vacation.ReturnDate.Value.ToString("dd/MM/yyyy"));
                     }
+
+                    string urlServer = Request.Url.Authority;
                         
                     string content = Helper.ShowVacationForm(FechaSolicitud, Codigo, Nombre, FechaIngreso, Puesto, Departamento,
-                    DiasCorrespondientes, DiasRestantes, DiasSolicitados, FechaDesde, FechaHasta, FechaRetorno, Observacion);
+                    DiasCorrespondientes, DiasRestantes, DiasSolicitados, FechaDesde, FechaHasta, FechaRetorno, Observacion, urlServer);
 
                     return new JsonResult { Data = new { result = "200", message = content }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
@@ -533,9 +547,11 @@ namespace VacacionesRC.Controllers
                             TiempoTrabajando += " y " + days + " días";
                     }
 
+                    string urlServer = Request.Url.Authority;
+
                     string content = Helper.ShowConstancia(FechaSolicitud, Codigo.ToString(), Nombre, FechaIngreso, Puesto, Departamento,
                                                             FechaDesde, FechaHasta, Cedula, TiempoTrabajando, SalarioMensual, Localidad, 
-                                                            CuentaBanco, MontoPagado, FirmadoPor, DiasPagados);
+                                                            CuentaBanco, MontoPagado, FirmadoPor, DiasPagados, urlServer);
 
                     return new JsonResult { Data = new { result = "200", message = content }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
