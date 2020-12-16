@@ -38,4 +38,18 @@ namespace VacacionesRC.ViewModels
         public int OwnerId { get; set; }
         public string OwnerName { get; set; }
     }
+
+    public class EmployeeOnVacationModel
+    {
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public string EmployeeDepto { get; set; }
+        public string EmployeeLocation { get; set; }
+        public int Year { get; set; }
+        public int DaysAvailable { get; set; }
+        public int DaysTaken { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+    }
 }

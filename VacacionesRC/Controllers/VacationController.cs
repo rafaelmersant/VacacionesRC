@@ -169,8 +169,10 @@ namespace VacacionesRC.Controllers
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
 
+            DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
+
             var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
-            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status, availableFrom = avaiableFrom.ToShortDateString()}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         [HttpPost]

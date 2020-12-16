@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using VacacionesRC.Models;
+using VacacionesRC.ViewModels;
 
 namespace VacacionesRC.Controllers
 {
@@ -25,7 +26,22 @@ namespace VacacionesRC.Controllers
 
             using (var db = new VacacionesRCEntities())
             {
+                List<EmployeeOnVacationModel> employees = new List<EmployeeOnVacationModel>();
+
                 var outsourcing = db.GetEmployeeOnVacation().ToList();
+
+                foreach(var employee in outsourcing)
+                {
+                    employees.Add(new EmployeeOnVacationModel
+                    {
+                        EmployeeId = employee.EmployeeId,
+                        EmployeeName = employee.EmployeeName,
+                        EmployeeDepto = employee.EmployeeDepto,
+                        EmployeeLocation = employee.Location,
+                        Year = employee.Year,
+                        DaysAvailable = employee.DaysAvailable
+                    });
+                }
 
                 return View(outsourcing);
             }

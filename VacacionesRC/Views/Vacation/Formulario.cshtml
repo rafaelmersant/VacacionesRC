@@ -159,22 +159,22 @@
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnReject" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar">
+                        <button id="btnReject" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
                             <span class="fa fa-remove"></span> Rechazar
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnAccept" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar">
+                        <button id="btnAccept" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
                             <span class="fa fa-check"></span> Aprobar
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1">
+                        <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" style="display: none">
                             <span class="fa fa-print"></span> Imprimir Solicitud
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1">
+                        <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1" style="display: none">
                             <span class="fa fa-print"></span> Imprimir Constancia
                         </button>
                     </div>
@@ -191,6 +191,7 @@
     <input type="hidden" name="vacationId" id="vacationId" value="" />
     <input type="hidden" name="daysTakenH" id="daysTakenH" value="" />
     <input type="hidden" name="daysAvailableH" id="daysAvailableH" value="" />
+    <input type="hidden" name="availableFrom" id="availableFrom" value="" />
 
 </div>
 
@@ -202,7 +203,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 }
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
     $(document).ready(async function () {
 
@@ -382,9 +383,9 @@
             let endDate = new Date(endDateFormatted)
             let returnDate = new Date($("#_returnDate").val())
 
-            startDate = startDate.toLocaleDateString()
-            endDate = endDate.toLocaleDateString()
-            returnDate = returnDate.toLocaleDateString()
+            startDate = startDate.toLocaleString("en-US")
+            endDate = endDate.toLocaleString("en-US")
+            returnDate = returnDate.toLocaleString("en-US")
 
             const note = $("#note").val()
             let idHash = '';
@@ -392,7 +393,7 @@
             const id = url.substring(url.lastIndexOf('/') + 1);
             if (id && id !== "Formulario")
                 idHash = id;
-                        
+
             const data = {
                 'IdHash': idHash,
                 'EmployeeId': employeeId,
@@ -432,10 +433,12 @@
         });
 
         $("#startDate").on("change", function (evt) {
+            console.log("Cambiando fecha inicio")
             validateDate()
         });
 
         $("#endDate").on("change", function (evt) {
+            console.log("Cambiando fecha fin")
             validateDate()
         });
 
@@ -452,13 +455,15 @@
             "success": async function (response) {
                 if (response.result === "200") {
                     console.log('CorrespondingDays', response)
+                    $("#availableFrom").val(response.availableFrom)
 
-                    const employeeDay = JSON.parse(response.message);
+                    const employeeDay = JSON.parse(response.message)
                     $("#nextAvailableDate").val(new Date(employeeDay.RenovationDate).toLocaleDateString("es-DO"))
                     $("#dueDate").val(new Date(employeeDay.DueDate).toLocaleDateString("es-DO"))
 
                     $("#daysTotal").val(employeeDay.TotalDays)
                     $("#daysTaken").val(employeeDay.TakenDays)
+
                     console.log('daysTotal', employeeDay.TotalDays)
                     console.log('daysTaken', employeeDay.TakenDays)
 
@@ -469,19 +474,6 @@
                         $("#daysAvailable").val(daysAvailable)
 
                     console.log('daysAvailable', daysAvailable)
-
-                    const today = new Date();
-                    const renovationDate = new Date(employeeDay.RenovationDate);
-
-                    //if (renovationDate > today) {
-                    //    console.log('disable fields')
-                    //    $("#startDate").prop("readonly", true)
-                    //    $("#endDate").prop("readonly", true)
-                    //} else {
-                    //    console.log('NOT disable fields')
-                    //    $("#startDate").prop("readonly", false)
-                    //    $("#endDate").prop("readonly", false)
-                    //}
 
                     //Check Editing
                     let _daysTaken = parseInt($("#daysTakenH").val())
@@ -498,14 +490,14 @@
                             _daysAvailable -= _daysTaken
                             _daysTaken = employeeDay.TakenDays
                         }
-                            
+
                         if (response.status === "Rechazada") {
                             _daysAvailable = daysAvailable
                             _daysTaken = employeeDay.TakenDays
                         } else if (response.status === "En proceso") {
                             _daysTaken = employeeDay.TakenDays - _daysTaken
                         }
-                        
+
                         $("#daysTaken").val(_daysTaken)
                         $("#daysAvailable").val(_daysAvailable)
 
@@ -653,7 +645,7 @@
             "url": `/Vacation/RequestedDays?startDate=${startDate}&endDate=${endDate}`,
             "type": "POST",
             "success": async function (response) {
-
+                console.log("requestedDays response", response)
                 if (response.result === "200") {
                     $("#daysRequested").val(response.requestedDays)
                     $("#_returnDate").val(response.returnDate)
@@ -694,9 +686,35 @@
     function validateDate() {
         const startDateFormatted = GetDateFormat($("#startDate").val())
         const endDateFormatted = GetDateFormat($("#endDate").val())
+        const dueDateFormatted = GetDateFormat($("#dueDate").val())
+        const nextAvailableDateFormatted = GetDateFormat($("#nextAvailableDate").val())
+
+        console.log("startDateFormatted", startDateFormatted)
+        console.log("endDateFormatted", endDateFormatted)
 
         const startDate = new Date(startDateFormatted)
         const endDate = new Date(endDateFormatted)
+        const dueDate = new Date(dueDateFormatted)
+        const nextAvailableDate = new Date(nextAvailableDateFormatted)
+
+        const availableFrom = new Date($("#availableFrom"))
+
+        console.log("startDate", startDate)
+        console.log("endDate", endDate)
+        console.log("dueDate", dueDate)
+        console.log("nextAvailableDate", nextAvailableDate)
+
+        if (startDate < availableFrom) {
+            $("#message").html("La fecha de inicio debe ser minimo 6 meses antes de la renovación de vacaciones.")
+            $("#message").addClass("text-danger")
+            return false;
+        }
+
+        if (endDate > dueDate) {
+            $("#message").html("La fecha de fin no puede exceder a la fecha de vencimiento de las vacaciones.")
+            $("#message").addClass("text-danger")
+            return false;
+        }
 
         if (startDate > endDate) {
             $("#message").html("La fecha de inicio no puede ser mayor a la fecha fin")
@@ -705,8 +723,10 @@
             $("#message").html("")
             $("#message").removeClass("text-danger")
 
+            console.log("startDate instanceof Date && isFinite(startDate) && endDate instanceof Date && isFinite(endDate)", startDate instanceof Date && isFinite(startDate) && endDate instanceof Date && isFinite(endDate));
+
             if (startDate instanceof Date && isFinite(startDate) && endDate instanceof Date && isFinite(endDate))
-                requestedDays(startDate.toLocaleDateString(), endDate.toLocaleDateString())
+                requestedDays(startDate.toLocaleString("en-US"), endDate.toLocaleString("en-US"))
         }
     }
 
@@ -757,12 +777,21 @@
     }
 
     function GetDateFormat(date) {
-        const parts = date.split("/");
-        const dt = new Date(parseInt(parts[2], 10),
-            parseInt(parts[1], 10) - 1,
-            parseInt(parts[0], 10));
+        if (navigator.languages != null && navigator.languages[0].includes("es")) {
+            const parts = date.split("/");
+            const dt = new Date(parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10));
+            
+            return dt.toLocaleString("en-US")
+        } else {
+            const parts = date.split("/");
+            const dt = new Date(parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10));
 
-        return dt.toLocaleDateString();
+            return dt.toLocaleDateString();
+        }
     }
 
-    </script>
+</script>

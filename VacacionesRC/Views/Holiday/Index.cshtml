@@ -156,12 +156,21 @@
     });
 
     function GetDateFormat(date) {
-        const parts = date.split("/");
-        const dt = new Date(parseInt(parts[2], 10),
-            parseInt(parts[1], 10) - 1,
-            parseInt(parts[0], 10));
+        if (navigator.languages != null && navigator.languages[0].includes("es")) {
+            const parts = date.split("/");
+            const dt = new Date(parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10));
 
-        return dt.toLocaleDateString();
+            return dt.toLocaleString("en-US")
+        } else {
+            const parts = date.split("/");
+            const dt = new Date(parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10));
+
+            return dt.toLocaleDateString();
+        }
     }
 
 </script>
