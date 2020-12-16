@@ -98,7 +98,7 @@ namespace VacacionesRC.Controllers
         }
 
         [HttpPost]
-        public JsonResult SaveOutsourcing(int employeeId, string employeeName)
+        public JsonResult SaveOutsourcing(int employeeId, string employeeName, string employeeEmail)
         {
             try
             {
@@ -109,6 +109,7 @@ namespace VacacionesRC.Controllers
                     if (employee != null)
                     {
                         employee.EmployeeName = employeeName;
+                        employee.Email = employeeEmail;
                         db.SaveChanges();
 
                         return new JsonResult { Data = new { result = "200", message = "Updated" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
@@ -119,6 +120,7 @@ namespace VacacionesRC.Controllers
                         {
                             EmployeeId = employeeId,
                             EmployeeName = employeeName,
+                            Email = employeeEmail,
                             EmployeePosition = "",
                             Type ="E",
                             CreatedDate = DateTime.Now

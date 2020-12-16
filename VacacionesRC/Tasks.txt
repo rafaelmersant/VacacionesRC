@@ -46,8 +46,10 @@ Pantalla para definir regla de dias disponibles
 ******3-Actualizar empleado desde AS400
 
 DESPUES DE PRUEBAS:
-(1) Agregar el Email a los Outsourcing
-
+*****(1) Agregar el Email a los Outsourcing
+*****(2) La renovacion sea exactamente cuando cumple el año (no 6 meses antes)
+*****(3) Que pueda tomar dias antes del año (antes de la renovacion)
+*****(4) Siempre tomar de AS400 a los empleados para tener el dato actualizado
 
 
 

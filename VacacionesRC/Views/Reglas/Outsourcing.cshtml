@@ -19,6 +19,9 @@
             <div class="col-7 col-md-3 col-sm-3 mt-3 mb-3 ml-1" style="min-width: 235px">
                 <input type="text" id="employeeName" name="employeeName" value="" class="form-control form-control-sm" placeholder="Nombre de Empleado" readonly />
             </div>
+            <div class="col-4 col-md-2 col-sm-2 mt-3 mb-3 ml-1" style="min-width: 135px">
+                <input type="text" id="employeeEmail" name="employeeEmail" value="" class="form-control form-control-sm" placeholder="Correo del Empleado" readonly />
+            </div>
 
             <div class="col-1 mt-3" style="max-width: 65px">
                 <a class="btn btn-sm btn-secondary pl-3 pr-3" href="javascript:void(0)" onclick="editEmployeeClear()" title="Limpiar campos"><span class="fa fa-remove"></span></a>
@@ -51,6 +54,9 @@
                                 Nombre
                             </th>
                             <th>
+                                Correo
+                            </th>
+                            <th>
                                 Creado
                             </th>
                             <th class="text-center">Editar</th>
@@ -59,17 +65,18 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>@item.EmployeeId</td>
-                                <td>@item.EmployeeName</td>
-                                <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
+                        <tr>
+                            <td>@item.EmployeeId</td>
+                            <td>@item.EmployeeName</td>
+                            <td>@item.Email</td>
+                            <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
 
-                                <td align="center">
-                                    <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editEmployee(@item.EmployeeId, '@item.EmployeeName')" title="Editar">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                            <td align="center">
+                                <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editEmployee(@item.EmployeeId, '@item.EmployeeName', '@item.Email')" title="Editar">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
                         }
                     </tbody>
                 </table>
@@ -92,7 +99,7 @@
     $(document).ready(function () {
 
         $("#employeesTable").DataTable({
-            "order": [[2, "asc"]],
+            "order": [[3, "asc"]],
             "pageLength": 10
         });
 
@@ -139,39 +146,45 @@
         });
     });
 
-    function editEmployee(employeeId, employeeName) {
+    function editEmployee(employeeId, employeeName, employeeEmail) {
         $("#employeeId").val(employeeId)
         $("#employeeName").val(employeeName)
+        $("#employeeEmail").val(employeeEmail)
         
         $("#employeeId").prop("readonly", true)
         $("#employeeName").prop("readonly", false)
+        $("#employeeEmail").prop("readonly", false)
     }
 
     function editEmployeeClear() {
         $("#employeeId").val('')
         $("#employeeName").val('')
+        $("#employeeEmail").val('')
     }
 
     function newEmployee() {
         $("#employeeId").val('')
         $("#employeeName").val('')
+        $("#employeeEmail").val('')
         
         $("#employeeId").prop("readonly", false)
         $("#employeeName").prop("readonly", false)
+        $("#employeeEmail").prop("employeeEmail", false)
     }
 
     function saveChangesEmployee() {
 
         const employeeId = $("#employeeId").val()
         const employeeName = $("#employeeName").val()
+        const employeeEmail = $("#employeeEmail").val()
         
-        if (employeeId === '' || employeeName === '') {
+        if (employeeId === '' || employeeName === '' || employeeEmail === '') {
             alert("Favor especificar completar todos los campos (no dejar ninguno vacío).")
             return false;
         }
 
         $.ajax({
-            "url": `/Reglas/SaveOutsourcing?employeeId=${employeeId}&employeeName=${employeeName}`,
+            "url": `/Reglas/SaveOutsourcing?employeeId=${employeeId}&employeeName=${employeeName}&employeeEmail=${employeeEmail}`,
             "type": "POST",
             "success": async function (response) {
                 if (response.result === "200") {
