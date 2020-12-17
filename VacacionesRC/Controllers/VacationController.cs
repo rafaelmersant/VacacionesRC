@@ -528,15 +528,6 @@ namespace VacacionesRC.Controllers
                         DiasPagados = rules.FirstOrDefault(r => r.Id == 1).Value;
                         FirmadoPor = rules.FirstOrDefault(r => r.Id == 2).Value;
 
-                        Cedula = employee.Identification;
-                        SalarioMensual = "RD" + string.Format("{0:c}", employee.Salary);
-                        Localidad = employee.Location;
-                        CuentaBanco = employee.BankAccount;
-
-                        decimal montoPagado = employee.Salary.Value / 23.83M;
-                        montoPagado = montoPagado * int.Parse(DiasPagados);
-                        MontoPagado = "RD" + string.Format("{0:c}", montoPagado);
-
                         //Elapsed Time
                         //int years, months, days, hours, minutes, seconds, milliseconds;
                         Helper.GetElapsedTime(employee.AdmissionDate.Value, DateTime.Today, out int years, out int months, out int days, out int hours, out int minutes, out int seconds, out int milliseconds);
@@ -547,6 +538,18 @@ namespace VacacionesRC.Controllers
                             TiempoTrabajando += months + " meses ";
                         if (months == 0 && days > 0)
                             TiempoTrabajando += " y " + days + " días";
+
+                        if (years > 5)
+                            DiasPagados = "18";
+
+                        Cedula = employee.Identification;
+                        SalarioMensual = "RD" + string.Format("{0:c}", employee.Salary);
+                        Localidad = employee.Location;
+                        CuentaBanco = employee.BankAccount;
+
+                        decimal montoPagado = employee.Salary.Value / 23.83M;
+                        montoPagado = montoPagado * int.Parse(DiasPagados);
+                        MontoPagado = "RD" + string.Format("{0:c}", montoPagado);
                     }
 
                     string urlServer = Request.Url.Authority;

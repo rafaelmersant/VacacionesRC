@@ -475,6 +475,17 @@
 
                     console.log('daysAvailable', daysAvailable)
 
+                    //show or hide Constancia
+                    const today = new Date()
+                    let printConstanciaFrom = new Date(employeeDay.RenovationDate)
+                    printConstanciaFrom = addDays(printConstanciaFrom, - 15)
+
+                    console.log("Constancia", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
+                    if (today >= printConstanciaFrom && response.status === "Aprobada")
+                        $("#btnPrintConst").show()
+                    else 
+                        $("#btnPrintConst").hide()
+
                     //Check Editing
                     let _daysTaken = parseInt($("#daysTakenH").val())
                     let _daysAvailable = parseInt($("#daysAvailableH").val())
@@ -792,6 +803,12 @@
 
             return dt.toLocaleDateString();
         }
+    }
+
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
     }
 
 </script>

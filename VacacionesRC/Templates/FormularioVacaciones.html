@@ -25,53 +25,87 @@
             <h3>SOLICITUD DISFRUTE DE VACACIONES</h3>
         </div>
 
-        <div style="text-align: right">
+        <div style="text-align: right; margin-right: 15px; margin-top: 20px">
             Fecha de Solicitud: ##FechaSolicitud##
         </div>
         <table style="width:100%;" cellspacing="3" cellpadding="5">
             <tr>
-                <td colspan="6" style="background-color: lightgray; padding: 5px 5px">
+                <td colspan="3" style="background-color: lightgray; padding: 5px 5px; border: none">
                     <b>INFORMACION DEL COLABORADOR</b>
                 </td>
             </tr>
             <tr>
-                <td style="width:10px">Código:</td>
-                <td>##Codigo##</td>
-                <td>Nombre:</td>
-                <td>##Nombre##</td>
-                <td>Fecha de Ingreso:</td>
-                <td>##FechaIngreso##</td>
+                <td colspan="3" style="border: none">
+                    <table style="width:100%"  cellspacing="3" cellpadding="5">
+                        <tr>
+                            <td><b>Código</b></td>
+                            <td><b>Nombre</b></td>
+                            <td><b>Fecha de Ingreso</b></td>
+                        </tr>
+                        <tr>
+                            <td>##Codigo##</td>
+                            <td>##Nombre##</td>
+                            <td>##FechaIngreso##</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border: none"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Puesto</b></td>
+                            <td colspan="2"><b>Departamento</b></td>
+                        </tr>
+                        <tr>
+                            <td>##Puesto##</td>
+                            <td colspan="2">##Departamento##</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3" style="height: 25px; border: none"></td>
             </tr>
             <tr>
-                <td>Puesto</td>
-                <td>##Puesto##</td>
-                <td>Departamento:</td>
-                <td colspan="3">##Departamento##</td>
-            </tr>
-            
-            <tr>
-                <td colspan="6" style="background-color: lightgray; padding: 5px 5px">
+                <td colspan="3" style="background-color: lightgray; padding: 5px 5px; border: none">
                     <b>DETALLES DE LA SOLICITUD</b>
                 </td>
             </tr>
+
             <tr>
-                <td>Días Correspondientes:</td>
-                <td>##DiasCorrespondientes##</td>
-                <td>Días Solicitados:</td>
-                <td>##DiasSolicitados##</td>
-                <td>Días Restantes de Disfrute:</td>
-                <td>##DiasRestantes##</td>
+                <td colspan="3" style="border:none">
+                    <table style="width:100%" cellspacing="3" cellpadding="5">
+                        <tr>
+                            <td><b>Días Correspondientes</b></td>
+                            <td><b>Días Solicitados</b></td>
+                            <td><b>Días Restantes de Disfrute</b></td>
+
+                        </tr>
+                        <tr>
+                            <td>##DiasCorrespondientes##</td>
+                            <td>##DiasSolicitados##</td>
+                            <td>##DiasRestantes##</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border: none"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Fecha desde</b></td>
+                            <td><b>Fecha Hasta</b></td>
+                            <td><b>Retorno a las labores</b></td>
+                        </tr>
+                        <tr>
+                            <td>##FechaDesde##</td>
+                            <td>##FechaHasta##</td>
+                            <td>##FechaRetorno##</td>
+                        </tr>
+                    </table>
+                </td>
             </tr>
             <tr>
-                <td>Fecha desde:</td>
-                <td>##FechaDesde##</td>
-                <td>Fecha Hasta:</td>
-                <td>##FechaHasta##</td>
-                <td>Retorno a las labores:</td>
-                <td>##FechaRetorno##</td>
+                <td colspan="3" style="border: none"></td>
             </tr>
             <tr>
-                <td style="border: none"><b>Observacion</b></td>
+                <td style="border: none"><b>Observacion:</b></td>
             </tr>
             <tr>
                 <td style="border: none" colspan="6">##Observacion##</td>
