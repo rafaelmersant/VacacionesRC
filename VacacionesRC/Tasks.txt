@@ -50,6 +50,8 @@ DESPUES DE PRUEBAS:
 *****(2) La renovacion sea exactamente cuando cumple el año (no 6 meses antes)
 *****(3) Que pueda tomar dias antes del año (antes de la renovacion)
 *****(4) Siempre tomar de AS400 a los empleados para tener el dato actualizado
+*****(5) Solo 7 debes se pueden tomar de vacaciones si no ha llegado a la fecha aniversario
+*****(6) La constancia solo se puede imprimir despues de los 15 dias antes de la fecha aniversario
 
 
 

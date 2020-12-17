@@ -174,7 +174,12 @@ namespace VacacionesRC.App_Start
 
                     if (employeeDays != null)
                     {
-                        employeeDays.TakenDays += takenDays - oldDays;
+                        int _takenDays = (employeeDays.TakenDays?? 0) + takenDays - oldDays;
+
+                        if (employeeDays.RenovationDate > DateTime.Today && _takenDays > 7)
+                            throw new Exception("(1001) Esta tratando de solicitar más días de lo permitido durante el periodo previo a la renovación.");
+
+                        employeeDays.TakenDays = _takenDays;
                         db.SaveChanges();
                     }
 
@@ -183,7 +188,8 @@ namespace VacacionesRC.App_Start
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                if (!ex.Message.Contains("(1001)"))
+                    Helper.SendException(ex);
             }
 
             return null;

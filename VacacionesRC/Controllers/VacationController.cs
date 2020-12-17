@@ -284,8 +284,28 @@ namespace VacacionesRC.Controllers
                         vacationEdit.ModifiedDate = DateTime.Now;
                         vacationEdit.ModifiedBy = Session["employeeID"].ToString();
 
+                        try
+                        {
+                            var employeeDay = HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays);
+                            if (employeeDay != null)
+                            {
+                                vacationEdit.Year = employeeDay.CurrentYear;
+                            }
+                            else
+                            {
+                                //Check if the person is trying to request more than 7 days and the renovation date is not reached yet
+                                throw new Exception("No puede exceder la cantidad de 7 días antes de la fecha de renovación de las vacaciones");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex.Message.Contains("exceder"))
+                                throw ex;
+
+                            Helper.SendException(ex);
+                        }
+
                         db.SaveChanges();
-                        HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays);
                     }
                     else
                     {
@@ -315,9 +335,17 @@ namespace VacacionesRC.Controllers
                             {
                                 newVacation.Year = employeeDay.CurrentYear;
                             }
+                            else
+                            {
+                                //Check if the person is trying to request more than 7 days and the renovation date is not reached yet
+                                throw new Exception("No puede exceder la cantidad de 7 días antes de la fecha de renovación de las vacaciones");
+                            }
                         }
                         catch (Exception ex)
                         {
+                            if (ex.Message.Contains("exceder"))
+                                throw ex;
+
                             Helper.SendException(ex);
                         }
 
@@ -352,7 +380,8 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex, "employeeId:" + vacation.EmployeeId);
+                if (!ex.Message.Contains("exceder"))
+                    Helper.SendException(ex, "employeeId:" + vacation.EmployeeId);
 
                 return Json(new { result = "500", message = ex.Message });
             }
