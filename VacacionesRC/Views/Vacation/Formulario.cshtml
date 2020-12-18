@@ -154,17 +154,17 @@
 
                 <div>
                     <div class="d-inline">
-                        <button id="btnSaveForm" class="btn btn-sm btn-danger pl-5 pr-5 mt-3 ml-1">
+                        <button id="btnSaveForm" class="btn btn-sm btn-danger buttonCustom pl-5 pr-5 mt-3 ml-1">
                             <span class="fa fa-save"></span> Guardar Solicitud
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnReject" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
+                        <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
                             <span class="fa fa-remove"></span> Rechazar
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnAccept" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
+                        <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
                             <span class="fa fa-check"></span> Aprobar
                         </button>
                     </div>
@@ -478,7 +478,7 @@
                     //show or hide Constancia
                     const today = new Date()
                     let printConstanciaFrom = new Date(employeeDay.RenovationDate)
-                    printConstanciaFrom = addDays(printConstanciaFrom, - 15)
+                    //printConstanciaFrom = addDays(printConstanciaFrom, - 15)
 
                     console.log("Constancia", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
                     if (today >= printConstanciaFrom && response.status === "Aprobada")
@@ -695,6 +695,8 @@
     }
 
     function validateDate() {
+        $(".buttonCustom").prop("disabled", false);
+
         const startDateFormatted = GetDateFormat($("#startDate").val())
         const endDateFormatted = GetDateFormat($("#endDate").val())
         const dueDateFormatted = GetDateFormat($("#dueDate").val())
@@ -724,12 +726,14 @@
         if (endDate > dueDate) {
             $("#message").html("La fecha de fin no puede exceder a la fecha de vencimiento de las vacaciones.")
             $("#message").addClass("text-danger")
+            $(".buttonCustom").prop("disabled", true);
             return false;
         }
 
         if (startDate > endDate) {
             $("#message").html("La fecha de inicio no puede ser mayor a la fecha fin")
             $("#message").addClass("text-danger")
+            $(".buttonCustom").prop("disabled", true);
         } else {
             $("#message").html("")
             $("#message").removeClass("text-danger")

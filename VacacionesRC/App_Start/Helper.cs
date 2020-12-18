@@ -14,7 +14,7 @@ namespace VacacionesRC.App_Start
 {
     public class Helper
     {
-        public static void SendRawEmail(string emailto, string subject, string body)
+        public static bool SendRawEmail(string emailto, string subject, string body)
         {
             SmtpClient smtp = new SmtpClient
             {
@@ -23,7 +23,7 @@ namespace VacacionesRC.App_Start
                 UseDefaultCredentials = false,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                EnableSsl = true,
+                EnableSsl = false,
             };
 
             MailMessage message = new MailMessage();
@@ -39,10 +39,13 @@ namespace VacacionesRC.App_Start
             try
             {
                 smtp.Send(message);
+                return true;
             }
             catch (Exception ex)
             {
                 Helper.SendException(ex);
+
+                return false;
             }
         }
 
@@ -96,7 +99,7 @@ namespace VacacionesRC.App_Start
                 UseDefaultCredentials = false,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                EnableSsl = true,
+                EnableSsl = false,
             };
 
             MailMessage message = new MailMessage();
@@ -123,7 +126,7 @@ namespace VacacionesRC.App_Start
             }
         }
       
-        public static Employee GetEmployee(int employeeId)
+        public static Employee GetEmployee(int employeeId, bool onlyLocal = false)
         {
             Employee employee = GetEmployeeFromDB(employeeId);
 
@@ -179,35 +182,40 @@ namespace VacacionesRC.App_Start
                         }
                     }
                 }
-                else
+                else if (!onlyLocal)
                 {
-                    using (var db = new VacacionesRCEntities())
+                    string environmentVACACIONES = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
+
+                    if (environmentVACACIONES != "DEV")
                     {
-                        employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employee.EmployeeId);
-
-                        var data = GetEmployeeFromAS400(employeeId.ToString());
-                        if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
+                        using (var db = new VacacionesRCEntities())
                         {
-                            DateTime? terminateDate = null;
-                            if (data.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+                            employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employee.EmployeeId);
+
+                            var data = GetEmployeeFromAS400(employeeId.ToString());
+                            if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
                             {
-                                int year = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
-                                int month = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
-                                int day = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
+                                DateTime? terminateDate = null;
+                                if (data.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+                                {
+                                    int year = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
+                                    int month = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
+                                    int day = int.Parse(data.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
 
-                                terminateDate = new DateTime(year, month, day);
+                                    terminateDate = new DateTime(year, month, day);
+                                }
+
+                                employee.EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString();
+                                employee.EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString();
+                                employee.EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString());
+                                employee.Email = data.Tables[0].Rows[0].ItemArray[7].ToString();
+                                employee.Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()) * 2;
+                                employee.Location = data.Tables[0].Rows[0].ItemArray[9].ToString();
+                                employee.BankAccount = data.Tables[0].Rows[0].ItemArray[10].ToString();
+                                employee.TerminateDate = terminateDate;
+
+                                db.SaveChanges();
                             }
-
-                            employee.EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString();
-                            employee.EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString();
-                            employee.EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString());
-                            employee.Email = data.Tables[0].Rows[0].ItemArray[7].ToString();
-                            employee.Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()) * 2;
-                            employee.Location = data.Tables[0].Rows[0].ItemArray[9].ToString();
-                            employee.BankAccount = data.Tables[0].Rows[0].ItemArray[10].ToString();
-                            employee.TerminateDate = terminateDate;
-
-                            db.SaveChanges();
                         }
                     }
                 }
@@ -240,7 +248,23 @@ namespace VacacionesRC.App_Start
             sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
                 "CEVALTRANS, 'MIRAFLORES', CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
             
-            if (ConfigurationManager.AppSettings["EnvironmentVolante"] == "PROD")
+            if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
+                sQuery = sQuery.Replace("[", "").Replace("]", "");
+
+            return ExecuteDataSetODBC(sQuery, null);
+        }
+
+        public static DataSet GetPayrollDetailForEmployee(string employeeId, string cycle, string paytype)
+        {
+            string sQuery = string.Empty;
+
+            sQuery = "SELECT CECODIRE, CETIPOPAGO, CEDESCPAGO, CEINGDEDUC, CETIPTRANS, CEDESCTRAN, CEVALTRANS, CECICLOPAG," +
+            " CECODEMPLE, CENOMEMPLE, CENOMDEPTO, CENOMCARGO, CECORREOEL, CECUEBANCO, CENUSEGSOC, CENUMCEDUL, CEDESDIREC," +
+            "  CEDESCFPAG, CEDESCTCUE, CEBALAACTU, CETIPONOM, CECANTIDAD FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+            " AND CECICLOPAG = '" + cycle + "' AND CETIPOPAGO = '" + paytype + "' ORDER BY CEINGDEDUC DESC";
+
+
+            if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
                 sQuery = sQuery.Replace("[", "").Replace("]", "");
 
             return ExecuteDataSetODBC(sQuery, null);
@@ -396,7 +420,7 @@ namespace VacacionesRC.App_Start
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                    EnableSsl = true,
+                    EnableSsl = false,
                 };
 
                 string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");

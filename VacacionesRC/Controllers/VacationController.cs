@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using VacacionesRC.App_Start;
 using VacacionesRC.Models;
 using VacacionesRC.ViewModels;
+using static VacacionesRC.App_Start.HelperPayroll;
 
 namespace VacacionesRC.Controllers
 {
@@ -148,7 +150,7 @@ namespace VacacionesRC.Controllers
             EmployeeDay employeeDay;
             Vacation vacation = null;
             string status = "";
-
+            
             try
             {
                 employeeDay = HelperDays.GetDaysForEmployee(employeeId);
@@ -170,9 +172,11 @@ namespace VacacionesRC.Controllers
             }
 
             DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
+            DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value);
 
             var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
-            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status, availableFrom = avaiableFrom.ToShortDateString()}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status,
+                availableFrom = avaiableFrom.ToShortDateString(), previousConstancia = period.Value.ToShortDateString()}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         [HttpPost]
@@ -259,9 +263,11 @@ namespace VacacionesRC.Controllers
         [HttpPost]
         public JsonResult Save(Vacation vacation)
         {
+            string _detail_ = JsonConvert.SerializeObject(vacation);
+
             try
             {
-                if (Session["employeeID"] == null) throw new Exception("Por favor intente hacer saliendo y entrando nuevamente al sistema.");
+                if (Session["employeeID"] == null) throw new Exception("Por favor intente saliendo y entrando nuevamente al sistema (su sesión expiró)");
 
                 using (var db = new VacacionesRCEntities())
                 {
@@ -294,7 +300,7 @@ namespace VacacionesRC.Controllers
                             else
                             {
                                 //Check if the person is trying to request more than 7 days and the renovation date is not reached yet
-                                throw new Exception("No puede exceder la cantidad de 7 días antes de la fecha de renovación de las vacaciones");
+                                throw new Exception("No puede exceder la cantidad de 7 días antes de la fecha de renovación de las vacaciones.");
                             }
                         }
                         catch (Exception ex)
@@ -302,7 +308,7 @@ namespace VacacionesRC.Controllers
                             if (ex.Message.Contains("exceder"))
                                 throw ex;
 
-                            Helper.SendException(ex);
+                            Helper.SendException(ex, "UpdatingTakenDates -- details:" + _detail_);
                         }
 
                         db.SaveChanges();
@@ -346,7 +352,7 @@ namespace VacacionesRC.Controllers
                             if (ex.Message.Contains("exceder"))
                                 throw ex;
 
-                            Helper.SendException(ex);
+                            Helper.SendException(ex, "(2) Updating TakenDays -- details:" + _detail_);
                         }
 
                         db.Vacations.Add(newVacation);
@@ -371,7 +377,7 @@ namespace VacacionesRC.Controllers
                         }
                         catch (Exception ex)
                         {
-                            Helper.SendException(ex);
+                            Helper.SendException(ex, "SendEmailVacationNotificacion -- details:" + _detail_);
                         }
                     }
                 }
@@ -380,8 +386,8 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                if (!ex.Message.Contains("exceder"))
-                    Helper.SendException(ex, "employeeId:" + vacation.EmployeeId);
+                if (!ex.Message.Contains("exceder") && !ex.Message.Contains("intente"))
+                    Helper.SendException(ex, "details:" + _detail_);
 
                 return Json(new { result = "500", message = ex.Message });
             }
@@ -469,6 +475,7 @@ namespace VacacionesRC.Controllers
         public JsonResult GetVacation(string idHash)
         {
             Vacation vacation = null;
+            DataSet payroll = null;
 
             try
             {
@@ -478,7 +485,7 @@ namespace VacacionesRC.Controllers
                     vacation = db.Vacations.FirstOrDefault(v => v.IdHash == IdHash);
 
                     if (vacation != null)
-                    {
+                    {    
                         var vacationSerialized = JsonConvert.SerializeObject(vacation);
                         return new JsonResult { Data = new { result = "200", message = vacationSerialized }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     }
@@ -490,7 +497,7 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                Helper.SendException(ex, "vacationIDHASH:" + idHash);
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
@@ -522,7 +529,7 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                Helper.SendException(ex, "vacationIDHASH:" + IdHash);
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
@@ -550,7 +557,7 @@ namespace VacacionesRC.Controllers
                         FechaSolicitud = String.Format("{0}", vacation.CreatedDate.ToString("dd/MM/yyyy"));
                     }
 
-                    Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == Codigo);
+                    Employee employee = Helper.GetEmployee(Codigo, true);
                     if (employee != null)
                     {
                         var rules = db.Rules.ToList();
@@ -576,9 +583,15 @@ namespace VacacionesRC.Controllers
                         Localidad = employee.Location;
                         CuentaBanco = employee.BankAccount;
 
-                        decimal montoPagado = employee.Salary.Value / 23.83M;
-                        montoPagado = montoPagado * int.Parse(DiasPagados);
-                        MontoPagado = "RD" + string.Format("{0:c}", montoPagado);
+                        //Get Constancia Monto
+                        string environmentVACACIONES = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
+                        if (environmentVACACIONES != "DEV")
+                        {
+                            string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(employee.AdmissionDate.Value);
+                            DataSet payroll = Helper.GetPayrollDetailForEmployee(vacation.EmployeeId.ToString(), cycle, "N"); //paytype = CETIPOPAGO
+                            PayrollDetailHeader payrollDetail = HelperPayroll.GetPayrollDetail(payroll);
+                            MontoPagado = "RD" + string.Format("{0:c}", payrollDetail.total);
+                        } 
                     }
 
                     string urlServer = Request.Url.Authority;
@@ -592,7 +605,7 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                Helper.SendException(ex, "vacationIDHASH:" + IdHash);
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }

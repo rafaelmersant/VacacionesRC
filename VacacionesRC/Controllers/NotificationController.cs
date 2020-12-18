@@ -32,21 +32,24 @@ namespace VacacionesRC.Controllers
             {
                 using (var db = new VacacionesRCEntities())
                 {
-                    Helper.SendRawEmail(receiverEmail, "Notificación Sistema de Vacaciones", message);
+                    bool sent = Helper.SendRawEmail(receiverEmail, "Notificación Sistema de Vacaciones", message);
 
-                    Notification notification = new Notification
+                    if (sent)
                     {
-                        ReceiverEmail = receiverEmail,
-                        Message = message,
-                        SenderEmail = Session["email"].ToString(),
-                        CreatedDate = DateTime.Now
-                    };
+                        Notification notification = new Notification
+                        {
+                            ReceiverEmail = receiverEmail,
+                            Message = message,
+                            SenderEmail = Session["email"].ToString(),
+                            CreatedDate = DateTime.Now
+                        };
 
-                    db.Notifications.Add(notification);
-                    db.SaveChanges();
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+
+                        return Json(new { result = "200", message = "Sent" });
+                    }
                 }
-
-                return Json(new { result = "200", message = "Sent" });
             }
             catch (Exception ex)
             {
@@ -54,6 +57,8 @@ namespace VacacionesRC.Controllers
 
                 return Json(new { result = "500", message = ex.Message });
             }
+
+            return Json(new { result = "500", message = "Hubo un error tratando de enviar la notificación." });
         }
     }
 }

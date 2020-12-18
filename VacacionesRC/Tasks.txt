@@ -53,7 +53,9 @@ DESPUES DE PRUEBAS:
 *****(5) Solo 7 debes se pueden tomar de vacaciones si no ha llegado a la fecha aniversario
 *****(6) La constancia solo se puede imprimir despues de los 15 dias antes de la fecha aniversario
 
-
+(7) Traer monto de la quincena previa al aniversario (monto neto)
+(8) Permitir tomar más de 7 dias si la seleccion de vacaciones esta mas alla de la fecha de renovacion
+(9) 
 
 
 

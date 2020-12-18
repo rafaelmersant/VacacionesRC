@@ -7,7 +7,7 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li>
-                @Html.ActionLink("Hola " + Session["email"] + "!", "ChangePassword", "User", routeValues: null, htmlAttributes: new { title = "Cambiar Contraseña" })
+                @Html.ActionLink("Hola " + (!string.IsNullOrEmpty(Session["email"].ToString()) ? Session["email"] + "!" : Session["employeeID"]), "ChangePassword", "User", routeValues: null, htmlAttributes: new { title = "Cambiar Contraseña" })
             </li>
             <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
         </ul>

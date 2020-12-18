@@ -39,11 +39,15 @@ namespace VacacionesRC.Controllers
                         EmployeeDepto = employee.EmployeeDepto,
                         EmployeeLocation = employee.Location,
                         Year = employee.Year,
-                        DaysAvailable = employee.DaysAvailable
+                        DaysAvailable = employee.DaysAvailable,
+                        DaysTaken = employee.DaysTaken,
+                        StartDate = employee.StartDate,
+                        EndDate = employee.EndDate,
+                        ReturnDate = employee.ReturnDate
                     });
                 }
 
-                return View(outsourcing);
+                return View(employees);
             }
         }
     }

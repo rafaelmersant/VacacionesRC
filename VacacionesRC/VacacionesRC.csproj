@@ -152,6 +152,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\Helper.cs" />
     <Compile Include="App_Start\HelperDays.cs" />
+    <Compile Include="App_Start\HelperPayroll.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\DeptoController.cs" />
     <Compile Include="Controllers\HolidayController.cs" />
