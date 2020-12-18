@@ -161,7 +161,7 @@ namespace VacacionesRC.App_Start
         }
 
         //Update takenDays
-        public static EmployeeDay UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0)
+        public static EmployeeDay UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0, DateTime? endDate = null)
         {
             try
             {
@@ -176,7 +176,7 @@ namespace VacacionesRC.App_Start
                     {
                         int _takenDays = (employeeDays.TakenDays?? 0) + takenDays - oldDays;
 
-                        if (employeeDays.RenovationDate > DateTime.Today && _takenDays > 7)
+                        if (endDate != null && employeeDays.RenovationDate > endDate && _takenDays > 7)
                             throw new Exception("(1001) Esta tratando de solicitar más días de lo permitido durante el periodo previo a la renovación.");
 
                         employeeDays.TakenDays = _takenDays;

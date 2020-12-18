@@ -477,7 +477,7 @@
 
                     //show or hide Constancia
                     const today = new Date()
-                    let printConstanciaFrom = new Date(employeeDay.RenovationDate)
+                    let printConstanciaFrom = new Date(response.previousConstancia)
                     //printConstanciaFrom = addDays(printConstanciaFrom, - 15)
 
                     console.log("Constancia", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")

@@ -42,9 +42,11 @@ namespace VacacionesRC.App_Start
             public List<PayrollDetailRows> detail;
         }
 
-        public static PayrollDetailHeader GetPayrollDetail(DataSet data)
+        public static PayrollDetailHeader? GetPayrollDetail(DataSet data)
         {
             PayrollDetailHeader payrollDetail = new PayrollDetailHeader();
+            bool transact_I10 = false;
+            bool transact_I21 = false;
 
             if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
             {
@@ -100,6 +102,12 @@ namespace VacacionesRC.App_Start
                         }
                     }
 
+                    if (row.ItemArray[3].ToString() == "I" && row.ItemArray[4].ToString() == "10")
+                        transact_I10 = true;
+
+                    if (row.ItemArray[3].ToString() == "I" && row.ItemArray[4].ToString() == "21")
+                        transact_I21 = true;
+
                     payrollDetail.detail.Add(new PayrollDetailRows
                     {
                         ceingdeduc = row.ItemArray[3].ToString(),
@@ -112,7 +120,11 @@ namespace VacacionesRC.App_Start
 
                 payrollDetail.total = payrollDetail.incomeTotal - payrollDetail.discountTotal;
             }
-            return payrollDetail;
+
+            if (transact_I10 && transact_I21)
+                return payrollDetail;
+            else
+                return null;
         }
 
         public static string GetPayrollPeriodByAdmissionDate(DateTime admissionDate)

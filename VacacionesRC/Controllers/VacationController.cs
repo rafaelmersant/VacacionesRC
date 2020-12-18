@@ -292,7 +292,7 @@ namespace VacacionesRC.Controllers
 
                         try
                         {
-                            var employeeDay = HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays);
+                            var employeeDay = HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays, vacationEdit.EndDate);
                             if (employeeDay != null)
                             {
                                 vacationEdit.Year = employeeDay.CurrentYear;
@@ -336,7 +336,7 @@ namespace VacacionesRC.Controllers
 
                         try
                         {
-                            var employeeDay = HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested);
+                            var employeeDay = HelperDays.UpdateTakenDays(vacation.EmployeeId, newVacation.DaysRequested, endDate: newVacation.EndDate);
                             if (employeeDay != null)
                             {
                                 newVacation.Year = employeeDay.CurrentYear;
@@ -589,8 +589,11 @@ namespace VacacionesRC.Controllers
                         {
                             string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(employee.AdmissionDate.Value);
                             DataSet payroll = Helper.GetPayrollDetailForEmployee(vacation.EmployeeId.ToString(), cycle, "N"); //paytype = CETIPOPAGO
-                            PayrollDetailHeader payrollDetail = HelperPayroll.GetPayrollDetail(payroll);
-                            MontoPagado = "RD" + string.Format("{0:c}", payrollDetail.total);
+                            PayrollDetailHeader? payrollDetail = HelperPayroll.GetPayrollDetail(payroll);
+                            if (payrollDetail != null)
+                                MontoPagado = "RD" + string.Format("{0:c}", payrollDetail.Value.total);
+                            else
+                                throw new Exception("No puede imprimir la constancia porque el pago de vacaciones no se encontró presente para el periodo correspondiente.");
                         } 
                     }
 
@@ -605,7 +608,9 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex, "vacationIDHASH:" + IdHash);
+                if (!ex.Message.Contains("correspondiente"))
+                    Helper.SendException(ex, "vacationIDHASH:" + IdHash);
+
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
