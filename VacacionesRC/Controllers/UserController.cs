@@ -58,8 +58,20 @@ namespace VacacionesRC.Controllers
 
                         Session["employeeID"] = username;
                         Session["role"] = department != null && _user.Role != "Admin" ? "Depto" : _user.Role;
-                        Session["email"] = string.IsNullOrEmpty(_user.Email) ? "" : _user.Email;
 
+                        if (!string.IsNullOrEmpty(_user.Email))
+                        {
+                            Session["email"] = _user.Email;
+                        }
+                        else
+                        {
+                            Employee employee = Helper.GetEmployee(int.Parse(username));
+                            if (employee != null)
+                                Session["email"] = employee.EmployeeName;
+                            else
+                                Session["email"] = username;
+                        }
+                        
                         db.LoginHistories.Add(new LoginHistory
                         {
                             LastLogin = DateTime.Now,

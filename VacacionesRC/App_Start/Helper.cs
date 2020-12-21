@@ -16,28 +16,29 @@ namespace VacacionesRC.App_Start
     {
         public static bool SendRawEmail(string emailto, string subject, string body)
         {
-            SmtpClient smtp = new SmtpClient
-            {
-                Host = ConfigurationManager.AppSettings["smtpClient"],
-                Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
-                UseDefaultCredentials = false,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                EnableSsl = false,
-            };
-
-            MailMessage message = new MailMessage();
-            message.IsBodyHtml = true;
-            message.Body = body;
-            message.Subject = subject;
-            message.To.Add(new MailAddress(emailto));
-
-            string address = ConfigurationManager.AppSettings["EMail"];
-            string displayName = ConfigurationManager.AppSettings["EMailName"];
-            message.From = new MailAddress(address, displayName);
-
             try
             {
+                SmtpClient smtp = new SmtpClient
+                {
+                    Host = ConfigurationManager.AppSettings["smtpClient"],
+                    Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
+                    UseDefaultCredentials = false,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
+                    EnableSsl = false,
+                };
+
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.Body = body;
+                message.Subject = subject;
+                message.To.Add(new MailAddress(emailto));
+
+                string address = ConfigurationManager.AppSettings["EMail"];
+                string displayName = ConfigurationManager.AppSettings["EMailName"];
+                message.From = new MailAddress(address, displayName);
+
+
                 smtp.Send(message);
                 return true;
             }
@@ -51,28 +52,43 @@ namespace VacacionesRC.App_Start
 
         public static void SendException(Exception ex, string extraInfo = "")
         {
-            string _sentry = ConfigurationManager.AppSettings["sentry_dsn"];
-            string _environment = ConfigurationManager.AppSettings["sentry_environment"];
+            try
+            {
+                string _sentry = ConfigurationManager.AppSettings["sentry_dsn"];
+                string _environment = ConfigurationManager.AppSettings["sentry_environment"];
 
-            var ravenClient = new SharpRaven.RavenClient(_sentry);
-            ravenClient.Environment = _environment;
+                var ravenClient = new SharpRaven.RavenClient(_sentry);
+                ravenClient.Environment = _environment;
 
-            var exception = new SharpRaven.Data.SentryEvent(ex);
+                var exception = new SharpRaven.Data.SentryEvent(ex);
 
-            if (!string.IsNullOrEmpty(extraInfo))
-                exception.Extra = extraInfo;
+                if (!string.IsNullOrEmpty(extraInfo))
+                    exception.Extra = extraInfo;
 
-            ravenClient.Capture(exception);
+                ravenClient.Capture(exception);
+            }
+            catch (Exception _ex)
+            {
+                Console.WriteLine(_ex.ToString());
+            }
         }
 
         public static void SendException(string message)
         {
-            string _sentry = ConfigurationManager.AppSettings["sentry"];
-            string _environment = ConfigurationManager.AppSettings["sentry_environment"];
+            try
+            {
+                string _sentry = ConfigurationManager.AppSettings["sentry"];
+                string _environment = ConfigurationManager.AppSettings["sentry_environment"];
 
-            var ravenClient = new SharpRaven.RavenClient(_sentry);
-            ravenClient.Environment = _environment;
-            ravenClient.Capture(new SharpRaven.Data.SentryEvent(message));
+                var ravenClient = new SharpRaven.RavenClient(_sentry);
+                ravenClient.Environment = _environment;
+                ravenClient.Capture(new SharpRaven.Data.SentryEvent(message));
+
+            }
+            catch (Exception _ex)
+            {
+                Console.WriteLine(_ex.ToString());
+            }
         }
 
         public static string SHA256(string randomString)
@@ -90,30 +106,30 @@ namespace VacacionesRC.App_Start
 
         public static bool SendRecoverPasswordEmail(string newPassword, string email)
         {
-            string content = "Su nueva contraseña es: <b>" + newPassword + "</b>";
-
-            SmtpClient smtp = new SmtpClient
-            {
-                Host = ConfigurationManager.AppSettings["smtpClient"],
-                Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
-                UseDefaultCredentials = false,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                EnableSsl = false,
-            };
-
-            MailMessage message = new MailMessage();
-            message.IsBodyHtml = true;
-            message.Body = content;
-            message.Subject = "NUEVA CONTRASEÑA SISTEMA DE GESTION Y ADMINISTRACION DE VACACIONES";
-            message.To.Add(new MailAddress(email));
-
-            string address = ConfigurationManager.AppSettings["EMail"];
-            string displayName = ConfigurationManager.AppSettings["EMailName"];
-            message.From = new MailAddress(address, displayName);
-
             try
             {
+                string content = "Su nueva contraseña es: <b>" + newPassword + "</b>";
+
+                SmtpClient smtp = new SmtpClient
+                {
+                    Host = ConfigurationManager.AppSettings["smtpClient"],
+                    Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
+                    UseDefaultCredentials = false,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
+                    EnableSsl = false,
+                };
+
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.Body = content;
+                message.Subject = "NUEVA CONTRASEÑA SISTEMA DE GESTION Y ADMINISTRACION DE VACACIONES";
+                message.To.Add(new MailAddress(email));
+
+                string address = ConfigurationManager.AppSettings["EMail"];
+                string displayName = ConfigurationManager.AppSettings["EMailName"];
+                message.From = new MailAddress(address, displayName);
+
                 smtp.Send(message);
 
                 return true;
@@ -125,7 +141,7 @@ namespace VacacionesRC.App_Start
                 return false;
             }
         }
-      
+
         public static Employee GetEmployee(int employeeId, bool onlyLocal = false)
         {
             Employee employee = GetEmployeeFromDB(employeeId);
@@ -222,7 +238,7 @@ namespace VacacionesRC.App_Start
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                Helper.SendException(ex, "employeeId:" + employeeId);
             }
 
             return employee;
@@ -230,44 +246,71 @@ namespace VacacionesRC.App_Start
 
         public static Employee GetEmployeeFromDB(int employeeId)
         {
-            string environmentID = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
-
-            using(var db = new VacacionesRCEntities())
+            try
             {
-                return db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+                string environmentID = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
+
+                using (var db = new VacacionesRCEntities())
+                {
+                    return db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+                }
             }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "employeeId:" + employeeId);
+            }
+
+            return null;
         }
 
         public static DataSet GetEmployeeFromAS400(string employeeId)
         {
-            string sQuery = string.Empty;
+            try
+            {
+                string sQuery = string.Empty;
 
-            //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00
-            //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
+                //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO FROM QS36F.RCNOCE00
+                //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
-            sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                "CEVALTRANS, 'MIRAFLORES', CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
-            
-            if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
-                sQuery = sQuery.Replace("[", "").Replace("]", "");
+                sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
+                    "CEVALTRANS, 'MIRAFLORES', CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
 
-            return ExecuteDataSetODBC(sQuery, null);
+                if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
+                    sQuery = sQuery.Replace("[", "").Replace("]", "");
+
+                return ExecuteDataSetODBC(sQuery, null);
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return null;
         }
 
         public static DataSet GetPayrollDetailForEmployee(string employeeId, string cycle, string paytype)
         {
-            string sQuery = string.Empty;
+            try
+            {
+                string sQuery = string.Empty;
 
-            sQuery = "SELECT CECODIRE, CETIPOPAGO, CEDESCPAGO, CEINGDEDUC, CETIPTRANS, CEDESCTRAN, CEVALTRANS, CECICLOPAG," +
-            " CECODEMPLE, CENOMEMPLE, CENOMDEPTO, CENOMCARGO, CECORREOEL, CECUEBANCO, CENUSEGSOC, CENUMCEDUL, CEDESDIREC," +
-            "  CEDESCFPAG, CEDESCTCUE, CEBALAACTU, CETIPONOM, CECANTIDAD FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
-            " AND CECICLOPAG = '" + cycle + "' AND CETIPOPAGO = '" + paytype + "' ORDER BY CEINGDEDUC DESC";
+                sQuery = "SELECT CECODIRE, CETIPOPAGO, CEDESCPAGO, CEINGDEDUC, CETIPTRANS, CEDESCTRAN, CEVALTRANS, CECICLOPAG," +
+                " CECODEMPLE, CENOMEMPLE, CENOMDEPTO, CENOMCARGO, CECORREOEL, CECUEBANCO, CENUSEGSOC, CENUMCEDUL, CEDESDIREC," +
+                "  CEDESCFPAG, CEDESCTCUE, CEBALAACTU, CETIPONOM, CECANTIDAD FROM [QS36F.RCNOCE00] WHERE CECODEMPLE = " + employeeId +
+                " AND CECICLOPAG = '" + cycle + "' AND CETIPOPAGO IN ('N','V') ORDER BY CEINGDEDUC DESC";
 
 
-            if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
-                sQuery = sQuery.Replace("[", "").Replace("]", "");
+                if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
+                    sQuery = sQuery.Replace("[", "").Replace("]", "");
 
-            return ExecuteDataSetODBC(sQuery, null);
+                return ExecuteDataSetODBC(sQuery, null);
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return null;
         }
 
         public static DataSet ExecuteDataSetODBC(string query, OdbcParameter[] parameters = null)

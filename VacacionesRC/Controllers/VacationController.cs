@@ -173,10 +173,12 @@ namespace VacacionesRC.Controllers
 
             DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
             DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value);
+            string cycle_period = period != null ? period.Value.ToShortDateString() : "";
 
             var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
+
             return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status,
-                availableFrom = avaiableFrom.ToShortDateString(), previousConstancia = period.Value.ToShortDateString()}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                availableFrom = avaiableFrom.ToShortDateString(), previousConstancia = cycle_period}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         [HttpPost]
@@ -546,7 +548,6 @@ namespace VacacionesRC.Controllers
                 string Localidad = "";
                 string CuentaBanco = "";
                 string MontoPagado = "";
-                string FirmadoPor = "";
                 string DiasPagados = "";
 
                 using (var db = new VacacionesRCEntities())
@@ -562,21 +563,21 @@ namespace VacacionesRC.Controllers
                     {
                         var rules = db.Rules.ToList();
                         DiasPagados = rules.FirstOrDefault(r => r.Id == 1).Value;
-                        FirmadoPor = rules.FirstOrDefault(r => r.Id == 2).Value;
+                        //FirmadoPor = rules.FirstOrDefault(r => r.Id == 2).Value;
 
                         //Elapsed Time
                         //int years, months, days, hours, minutes, seconds, milliseconds;
                         Helper.GetElapsedTime(employee.AdmissionDate.Value, DateTime.Today, out int years, out int months, out int days, out int hours, out int minutes, out int seconds, out int milliseconds);
 
                         if (years > 0)
-                            TiempoTrabajando += years + " años ";
+                            TiempoTrabajando += years + (years > 1 ? " años " : " año ");
                         if (months > 0)
-                            TiempoTrabajando += months + " meses ";
+                            TiempoTrabajando += months + (months > 1 ? " meses " : " mes ");
                         if (months == 0 && days > 0)
-                            TiempoTrabajando += " y " + days + " días";
+                            TiempoTrabajando += " y " + days + (days > 1 ? " días" : " día");
 
                         if (years > 5)
-                            DiasPagados = "18";
+                            DiasPagados = rules.FirstOrDefault(r => r.Id == 2).Value;
 
                         Cedula = employee.Identification;
                         SalarioMensual = "RD" + string.Format("{0:c}", employee.Salary);
@@ -601,7 +602,7 @@ namespace VacacionesRC.Controllers
 
                     string content = Helper.ShowConstancia(FechaSolicitud, Codigo.ToString(), Nombre, FechaIngreso, Puesto, Departamento,
                                                             FechaDesde, FechaHasta, Cedula, TiempoTrabajando, SalarioMensual, Localidad, 
-                                                            CuentaBanco, MontoPagado, FirmadoPor, DiasPagados, urlServer);
+                                                            CuentaBanco, MontoPagado, "", DiasPagados, urlServer);
 
                     return new JsonResult { Data = new { result = "200", message = content }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
