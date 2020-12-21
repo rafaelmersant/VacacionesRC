@@ -137,6 +137,7 @@
         </EntityType>
         <Function Name="GetDeptos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetEmployeeOnVacation" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetEmployeePendingVacation" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetVacacionesByDeptoOwner" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="OwnerId" Type="int" Mode="In" />
           <Parameter Name="year" Type="int" Mode="In" />
@@ -174,6 +175,7 @@
           </FunctionImport>
           <EntitySet Name="Employees" EntityType="VacacionesRCModel.Employee" />
           <FunctionImport Name="GetEmployeeOnVacation" ReturnType="Collection(VacacionesRCModel.GetEmployeeOnVacation_Result)" />
+          <FunctionImport Name="GetEmployeePendingVacation" ReturnType="Collection(VacacionesRCModel.GetEmployeePendingVacation_Result)" />
         </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -352,6 +354,19 @@
           <Property Type="Int32" Name="Year" Nullable="false" />
           <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
           <Property Type="String" Name="EmployeeDepto" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="Location" Nullable="true" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="GetEmployeePendingVacation_Result">
+          <Property Type="DateTime" Name="RenovationDate" Nullable="true" />
+          <Property Type="Int32" Name="TimeInCompany" Nullable="true" />
+          <Property Type="DateTime" Name="dueVacationDate" Nullable="true" />
+          <Property Type="Int32" Name="daysToDueVacation" Nullable="true" />
+          <Property Type="Int32" Name="daysRequested" Nullable="false" />
+          <Property Type="DateTime" Name="AdmissionDate" Nullable="true" />
+          <Property Type="Int32" Name="EmployeeId" Nullable="false" />
+          <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
+          <Property Type="String" Name="EmployeeDepto" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="EmployeePosition" Nullable="false" MaxLength="150" />
           <Property Type="String" Name="Location" Nullable="true" MaxLength="20" />
         </ComplexType>
       </Schema>
@@ -556,6 +571,23 @@
                 <ScalarProperty Name="Year" ColumnName="Year" />
                 <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
                 <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetEmployeePendingVacation" FunctionName="VacacionesRCModel.Store.GetEmployeePendingVacation">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VacacionesRCModel.GetEmployeePendingVacation_Result">
+                <ScalarProperty Name="RenovationDate" ColumnName="RenovationDate" />
+                <ScalarProperty Name="TimeInCompany" ColumnName="TimeInCompany" />
+                <ScalarProperty Name="dueVacationDate" ColumnName="dueVacationDate" />
+                <ScalarProperty Name="daysToDueVacation" ColumnName="daysToDueVacation" />
+                <ScalarProperty Name="daysRequested" ColumnName="daysRequested" />
+                <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
                 <ScalarProperty Name="Location" ColumnName="Location" />
               </ComplexTypeMapping>
             </ResultMapping>

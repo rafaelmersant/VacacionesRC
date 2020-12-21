@@ -288,6 +288,28 @@ namespace VacacionesRC.App_Start
             return null;
         }
 
+        public static DataSet GetAllEmployeesFromAS400(string cycle)
+        {
+            try
+            {
+                string sQuery = string.Empty;
+
+                sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
+                    "CEVALTRANS, 'MIRAFLORES', CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECODEMPLE DESC";
+
+                if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
+                    sQuery = sQuery.Replace("[", "").Replace("]", "");
+
+                return ExecuteDataSetODBC(sQuery, null);
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return null;
+        }
+
         public static DataSet GetPayrollDetailForEmployee(string employeeId, string cycle, string paytype)
         {
             try

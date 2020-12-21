@@ -52,4 +52,21 @@ namespace VacacionesRC.ViewModels
         public DateTime EndDate { get; set; }
         public DateTime? ReturnDate { get; set; }
     }
+
+    public class EmployeePendingVacationModel
+    {
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public string EmployeeDepto { get; set; }
+        public string EmployeePosition { get; set; }
+        public string EmployeeLocation { get; set; }
+        public DateTime AdmissionDate { get; set; }
+        public DateTime RenovationDate { get; set; }
+        public DateTime DueVacationDate { get; set; }
+        public int DaysToDueVacation { get; set; }
+        public int TimeInCompany { get; set; }
+        public int DaysRequested { get; set; }
+        
+        
+    }
 }

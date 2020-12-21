@@ -184,6 +184,9 @@
     <Compile Include="Models\GetEmployeeOnVacation_Result.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetEmployeePendingVacation_Result.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetVacacionesByDeptoOwner_Result.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
@@ -411,6 +414,7 @@
     <Content Include="Views\Reportes\Index.cshtml" />
     <Content Include="Views\Reglas\Outsourcing.cshtml" />
     <Content Include="Views\Reportes\EnVacaciones.cshtml" />
+    <Content Include="Views\Reportes\VacacionesPendientes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
