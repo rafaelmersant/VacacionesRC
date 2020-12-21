@@ -46,6 +46,7 @@ Pantalla para definir regla de dias disponibles
 ******3-Actualizar empleado desde AS400
 
 DESPUES DE PRUEBAS:
+
 *****(1) Agregar el Email a los Outsourcing
 *****(2) La renovacion sea exactamente cuando cumple el año (no 6 meses antes)
 *****(3) Que pueda tomar dias antes del año (antes de la renovacion)
@@ -53,8 +54,8 @@ DESPUES DE PRUEBAS:
 *****(5) Solo 7 debes se pueden tomar de vacaciones si no ha llegado a la fecha aniversario
 *****(6) La constancia solo se puede imprimir despues de los 15 dias antes de la fecha aniversario
 
-(7) Traer monto de la quincena previa al aniversario (monto neto)
-(8) Permitir tomar más de 7 dias si la seleccion de vacaciones esta mas alla de la fecha de renovacion
+*****(7) Traer monto de la quincena previa al aniversario (monto neto)
+*****(8) Permitir tomar más de 7 dias si la seleccion de vacaciones esta mas alla de la fecha de renovacion
 (9) 
 
 

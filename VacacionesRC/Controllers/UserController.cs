@@ -110,10 +110,19 @@ namespace VacacionesRC.Controllers
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
             if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
 
-            using (var db = new VacacionesRCEntities())
+            try
             {
-                var users = db.Users.OrderByDescending(o => o.CreatedDate).ToList();
-                return View(users);
+                using (var db = new VacacionesRCEntities())
+                {
+                    var users = db.Users.OrderByDescending(o => o.CreatedDate).ToList();
+                    return View(users);
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return null;
             }
         }
 
@@ -178,22 +187,31 @@ namespace VacacionesRC.Controllers
         {
             if (Session["role"] != null && Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
 
-            ViewBag.Roles = GetRoles();
-
-            if (IdHash == null)
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
+                ViewBag.Roles = GetRoles();
 
-            using (var db = new VacacionesRCEntities())
-            {
-                User _user = db.Users.FirstOrDefault(u => u.IdHash == IdHash);
-                if (_user == null)
+                if (IdHash == null)
                 {
-                    return HttpNotFound();
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
 
-                return View(_user);
+                using (var db = new VacacionesRCEntities())
+                {
+                    User _user = db.Users.FirstOrDefault(u => u.IdHash == IdHash);
+                    if (_user == null)
+                    {
+                        return HttpNotFound();
+                    }
+
+                    return View(_user);
+                }
+            }
+            catch(Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return View();
             }
         }
 
@@ -201,7 +219,6 @@ namespace VacacionesRC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(User _user)
         {
-
             ViewBag.Roles = GetRoles();
 
             if (ModelState.IsValid)

@@ -80,30 +80,39 @@ namespace VacacionesRC.Controllers
 
         private List<EmployeeOnVacationModel> GetEnVacaciones()
         {
-            using (var db = new VacacionesRCEntities())
+            try
             {
-                List<EmployeeOnVacationModel> employees = new List<EmployeeOnVacationModel>();
-
-                var outsourcing = db.GetEmployeeOnVacation().ToList();
-
-                foreach (var employee in outsourcing)
+                using (var db = new VacacionesRCEntities())
                 {
-                    employees.Add(new EmployeeOnVacationModel
-                    {
-                        EmployeeId = employee.EmployeeId,
-                        EmployeeName = employee.EmployeeName,
-                        EmployeeDepto = employee.EmployeeDepto,
-                        EmployeeLocation = employee.Location,
-                        Year = employee.Year,
-                        DaysAvailable = employee.DaysAvailable,
-                        DaysTaken = employee.DaysTaken,
-                        StartDate = employee.StartDate,
-                        EndDate = employee.EndDate,
-                        ReturnDate = employee.ReturnDate
-                    });
-                }
+                    List<EmployeeOnVacationModel> employees = new List<EmployeeOnVacationModel>();
 
-                return employees;
+                    var outsourcing = db.GetEmployeeOnVacation().ToList();
+
+                    foreach (var employee in outsourcing)
+                    {
+                        employees.Add(new EmployeeOnVacationModel
+                        {
+                            EmployeeId = employee.EmployeeId,
+                            EmployeeName = employee.EmployeeName,
+                            EmployeeDepto = employee.EmployeeDepto,
+                            EmployeeLocation = employee.Location,
+                            Year = employee.Year,
+                            DaysAvailable = employee.DaysAvailable,
+                            DaysTaken = employee.DaysTaken,
+                            StartDate = employee.StartDate,
+                            EndDate = employee.EndDate,
+                            ReturnDate = employee.ReturnDate
+                        });
+                    }
+
+                    return employees;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return null;
             }
         }
     }

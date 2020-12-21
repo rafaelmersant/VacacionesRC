@@ -17,25 +17,34 @@ namespace VacacionesRC.Controllers
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
             if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
 
-            using (var db = new VacacionesRCEntities())
+            try
             {
-                List<DeptoModel> deptoModels = new List<DeptoModel>();
-
-                var deptos = db.GetDeptos();
-
-                foreach(var item in deptos)
+                using (var db = new VacacionesRCEntities())
                 {
-                    deptoModels.Add(new DeptoModel
-                    {
-                        DeptoCode = item.DeptoCode,
-                        DeptoName = item.DeptoName,
-                        OwnerId = item.DeptoOwner ?? 0,
-                        OwnerName = item.EmployeeName
-                    });
-                }
+                    List<DeptoModel> deptoModels = new List<DeptoModel>();
 
-                return View(deptoModels);
+                    var deptos = db.GetDeptos();
+
+                    foreach (var item in deptos)
+                    {
+                        deptoModels.Add(new DeptoModel
+                        {
+                            DeptoCode = item.DeptoCode,
+                            DeptoName = item.DeptoName,
+                            OwnerId = item.DeptoOwner ?? 0,
+                            OwnerName = item.EmployeeName
+                        });
+                    }
+
+                    return View(deptoModels);
+                }
             }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return View();
         }
 
         [HttpPost]

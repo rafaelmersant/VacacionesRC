@@ -46,8 +46,6 @@ namespace VacacionesRC.Controllers
             }
             catch (DbEntityValidationException e)
             {
-                Helper.SendException(e);
-
                 string validErrors = "";
                 foreach (var eve in e.EntityValidationErrors)
                 {
@@ -56,6 +54,8 @@ namespace VacacionesRC.Controllers
                         validErrors += string.Format("- Property: \"{0}\", Error: \"{1}\" <br/>", ve.PropertyName, ve.ErrorMessage);
                     }
                 }
+
+                Helper.SendException(e, "|details:" + validErrors);
 
                 return Json(new { result = "500", message = validErrors });
             }

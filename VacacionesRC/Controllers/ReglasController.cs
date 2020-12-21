@@ -63,7 +63,7 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                Helper.SendException(ex, "employeeId:" + employeeId);
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
@@ -133,7 +133,8 @@ namespace VacacionesRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                Helper.SendException(ex, "employeeId:" + employeeId + " |employeeName:" + employeeName + "|employeeEmail:" + employeeEmail);
+
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }

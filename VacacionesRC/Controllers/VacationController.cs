@@ -20,121 +20,130 @@ namespace VacacionesRC.Controllers
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
             
-            using (var db = new VacacionesRCEntities())
+            try
             {
-                List<VacationModel> vacationModels = new List<VacationModel>();
-                                
-                int employeeId = int.Parse(Session["employeeID"].ToString());
-                Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == employeeId);
-
-                Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
-
-                //Admin users
-                if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                using (var db = new VacacionesRCEntities())
                 {
-                    var vacations = db.GetVacacionesByDeptoOwner(0, DateTime.Now.Year).ToList();
+                    List<VacationModel> vacationModels = new List<VacationModel>();
 
-                    foreach (var item in vacations)
+                    int employeeId = int.Parse(Session["employeeID"].ToString());
+                    Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == employeeId);
+
+                    Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+
+                    //Admin users
+                    if (Session["role"] != null && Session["role"].ToString() == "Admin")
                     {
-                        vacationModels.Add(new VacationModel
+                        var vacations = db.GetVacacionesByDeptoOwner(0, DateTime.Now.Year).ToList();
+
+                        foreach (var item in vacations)
                         {
-                            Id = item.Id,
-                            IdHash = item.IdHash,
-                            EmployeeId = item.EmployeeId,
-                            DeptoId = item.DeptoId.Value,
-                            Status = item.Status,
-                            DaysTaken = item.DaysTaken,
-                            DaysAvailable = item.DaysAvailable,
-                            DaysRequested = item.DaysRequested,
-                            StartDate = item.StartDate,
-                            EndDate = item.EndDate,
-                            ReturnDate = item.ReturnDate,
-                            Note = item.Note,
-                            AcceptedDate = item.AcceptedDate,
-                            AcceptedBy = item.AcceptedBy,
-                            RejectedDate = item.RejectedDate,
-                            RejectedBy = item.RejectedBy,
-                            CreatedDate = item.CreatedDate,
-                            CreatedBy = item.CreatedBy,
-                            EmployeeName = item.EmployeeName,
-                            DeptoName = item.EmployeeDepto,
-                            EmployeePosition = item.EmployeePosition,
-                            Year = item.Year
-                            
-                        });
+                            vacationModels.Add(new VacationModel
+                            {
+                                Id = item.Id,
+                                IdHash = item.IdHash,
+                                EmployeeId = item.EmployeeId,
+                                DeptoId = item.DeptoId.Value,
+                                Status = item.Status,
+                                DaysTaken = item.DaysTaken,
+                                DaysAvailable = item.DaysAvailable,
+                                DaysRequested = item.DaysRequested,
+                                StartDate = item.StartDate,
+                                EndDate = item.EndDate,
+                                ReturnDate = item.ReturnDate,
+                                Note = item.Note,
+                                AcceptedDate = item.AcceptedDate,
+                                AcceptedBy = item.AcceptedBy,
+                                RejectedDate = item.RejectedDate,
+                                RejectedBy = item.RejectedBy,
+                                CreatedDate = item.CreatedDate,
+                                CreatedBy = item.CreatedBy,
+                                EmployeeName = item.EmployeeName,
+                                DeptoName = item.EmployeeDepto,
+                                EmployeePosition = item.EmployeePosition,
+                                Year = item.Year
+
+                            });
+                        }
                     }
-                }
 
-                //Depto owner
-                if (department != null)
-                {
-                    var vacations = db.GetVacacionesByDeptoOwner(employeeId, DateTime.Now.Year).ToList();
-
-                    foreach (var item in vacations)
+                    //Depto owner
+                    if (department != null)
                     {
-                        vacationModels.Add(new VacationModel
+                        var vacations = db.GetVacacionesByDeptoOwner(employeeId, DateTime.Now.Year).ToList();
+
+                        foreach (var item in vacations)
                         {
-                            Id = item.Id,
-                            IdHash = item.IdHash,
-                            EmployeeId = item.EmployeeId,
-                            DeptoId = item.DeptoId.Value,
-                            Status = item.Status,
-                            DaysTaken = item.DaysTaken,
-                            DaysAvailable = item.DaysAvailable,
-                            DaysRequested = item.DaysRequested,
-                            StartDate = item.StartDate,
-                            EndDate = item.EndDate,
-                            ReturnDate = item.ReturnDate,
-                            Note = item.Note,
-                            AcceptedDate = item.AcceptedDate,
-                            AcceptedBy = item.AcceptedBy,
-                            RejectedDate = item.RejectedDate,
-                            RejectedBy = item.RejectedBy,
-                            CreatedDate = item.CreatedDate,
-                            CreatedBy = item.CreatedBy,
-                            EmployeeName = item.EmployeeName,
-                            DeptoName = item.EmployeeDepto,
-                            EmployeePosition = item.EmployeePosition
-                        });
+                            vacationModels.Add(new VacationModel
+                            {
+                                Id = item.Id,
+                                IdHash = item.IdHash,
+                                EmployeeId = item.EmployeeId,
+                                DeptoId = item.DeptoId.Value,
+                                Status = item.Status,
+                                DaysTaken = item.DaysTaken,
+                                DaysAvailable = item.DaysAvailable,
+                                DaysRequested = item.DaysRequested,
+                                StartDate = item.StartDate,
+                                EndDate = item.EndDate,
+                                ReturnDate = item.ReturnDate,
+                                Note = item.Note,
+                                AcceptedDate = item.AcceptedDate,
+                                AcceptedBy = item.AcceptedBy,
+                                RejectedDate = item.RejectedDate,
+                                RejectedBy = item.RejectedBy,
+                                CreatedDate = item.CreatedDate,
+                                CreatedBy = item.CreatedBy,
+                                EmployeeName = item.EmployeeName,
+                                DeptoName = item.EmployeeDepto,
+                                EmployeePosition = item.EmployeePosition
+                            });
+                        }
                     }
-                }
 
-                //End user
-                if (Session["role"] != null && Session["role"].ToString() != "Admin" && department == null)
-                {
-                    var vacations = db.Vacations.Where(v => v.EmployeeId == employeeId).OrderByDescending(o => o.CreatedDate).ToList();
-
-                    foreach (var item in vacations)
+                    //End user
+                    if (Session["role"] != null && Session["role"].ToString() != "Admin" && department == null)
                     {
-                        vacationModels.Add(new VacationModel
-                        {
-                            Id = item.Id,
-                            IdHash = item.IdHash,
-                            EmployeeId = item.EmployeeId,
-                            DeptoId = item.DeptoId.Value,
-                            Status = item.Status,
-                            DaysTaken = item.DaysTaken,
-                            DaysAvailable = item.DaysAvailable,
-                            DaysRequested = item.DaysRequested,
-                            StartDate = item.StartDate,
-                            EndDate = item.EndDate,
-                            ReturnDate = item.ReturnDate,
-                            Note = item.Note,
-                            AcceptedDate = item.AcceptedDate,
-                            AcceptedBy = item.AcceptedBy,
-                            RejectedDate = item.RejectedDate,
-                            RejectedBy = item.RejectedBy,
-                            CreatedDate = item.CreatedDate,
-                            CreatedBy = item.CreatedBy
-                            //EmployeeName = item.EmployeeName,
-                            //DeptoName = item.EmployeeDepto,
-                            //EmployeePosition = item.EmployeePosition
-                        });
-                    }
-                }
+                        var vacations = db.Vacations.Where(v => v.EmployeeId == employeeId).OrderByDescending(o => o.CreatedDate).ToList();
 
-                return View(vacationModels);
+                        foreach (var item in vacations)
+                        {
+                            vacationModels.Add(new VacationModel
+                            {
+                                Id = item.Id,
+                                IdHash = item.IdHash,
+                                EmployeeId = item.EmployeeId,
+                                DeptoId = item.DeptoId.Value,
+                                Status = item.Status,
+                                DaysTaken = item.DaysTaken,
+                                DaysAvailable = item.DaysAvailable,
+                                DaysRequested = item.DaysRequested,
+                                StartDate = item.StartDate,
+                                EndDate = item.EndDate,
+                                ReturnDate = item.ReturnDate,
+                                Note = item.Note,
+                                AcceptedDate = item.AcceptedDate,
+                                AcceptedBy = item.AcceptedBy,
+                                RejectedDate = item.RejectedDate,
+                                RejectedBy = item.RejectedBy,
+                                CreatedDate = item.CreatedDate,
+                                CreatedBy = item.CreatedBy
+                                //EmployeeName = item.EmployeeName,
+                                //DeptoName = item.EmployeeDepto,
+                                //EmployeePosition = item.EmployeePosition
+                            });
+                        }
+                    }
+
+                    return View(vacationModels);
+                }
             }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return View();
         }
 
         public ActionResult Formulario(Guid? id)
@@ -150,7 +159,7 @@ namespace VacacionesRC.Controllers
             EmployeeDay employeeDay;
             Vacation vacation = null;
             string status = "";
-            
+          
             try
             {
                 employeeDay = HelperDays.GetDaysForEmployee(employeeId);
@@ -164,21 +173,31 @@ namespace VacacionesRC.Controllers
                             status = vacation.Status.Trim();
                     }
                 }
+
+                DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
+                DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value);
+                string cycle_period = period != null ? period.Value.ToShortDateString() : "";
+
+                var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
+
+                return new JsonResult
+                {
+                    Data = new
+                    {
+                        result = "200",
+                        message = employeeDaySerialized,
+                        status,
+                        availableFrom = avaiableFrom.ToShortDateString(),
+                        previousConstancia = cycle_period
+                    },
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
             }
             catch (Exception ex)
             {
                 Helper.SendException(ex);
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
-
-            DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
-            DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value);
-            string cycle_period = period != null ? period.Value.ToShortDateString() : "";
-
-            var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
-
-            return new JsonResult { Data = new { result = "200", message = employeeDaySerialized, status,
-                availableFrom = avaiableFrom.ToShortDateString(), previousConstancia = cycle_period}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         [HttpPost]
@@ -477,8 +496,7 @@ namespace VacacionesRC.Controllers
         public JsonResult GetVacation(string idHash)
         {
             Vacation vacation = null;
-            DataSet payroll = null;
-
+            
             try
             {
                 using(var db = new VacacionesRCEntities())
