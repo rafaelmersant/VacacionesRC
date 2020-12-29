@@ -362,6 +362,7 @@
           <Property Type="DateTime" Name="dueVacationDate" Nullable="true" />
           <Property Type="Int32" Name="daysToDueVacation" Nullable="true" />
           <Property Type="Int32" Name="daysRequested" Nullable="false" />
+          <Property Type="Int32" Name="daysAvailable" Nullable="true" />
           <Property Type="DateTime" Name="AdmissionDate" Nullable="true" />
           <Property Type="Int32" Name="EmployeeId" Nullable="false" />
           <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
@@ -583,6 +584,7 @@
                 <ScalarProperty Name="dueVacationDate" ColumnName="dueVacationDate" />
                 <ScalarProperty Name="daysToDueVacation" ColumnName="daysToDueVacation" />
                 <ScalarProperty Name="daysRequested" ColumnName="daysRequested" />
+                <ScalarProperty Name="daysAvailable" ColumnName="daysAvailable" />
                 <ScalarProperty Name="AdmissionDate" ColumnName="AdmissionDate" />
                 <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
                 <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />

@@ -415,6 +415,8 @@
     <Content Include="Views\Reglas\Outsourcing.cshtml" />
     <Content Include="Views\Reportes\EnVacaciones.cshtml" />
     <Content Include="Views\Reportes\VacacionesPendientes.cshtml" />
+    <Content Include="Views\Reportes\VacacionesSolicitadas.cshtml" />
+    <Content Include="Views\Reportes\VacacionesVencidas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

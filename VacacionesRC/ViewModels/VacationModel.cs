@@ -64,9 +64,8 @@ namespace VacacionesRC.ViewModels
         public DateTime RenovationDate { get; set; }
         public DateTime DueVacationDate { get; set; }
         public int DaysToDueVacation { get; set; }
+        public int DaysAvailable { get; set; }
         public int TimeInCompany { get; set; }
         public int DaysRequested { get; set; }
-        
-        
     }
 }

@@ -41,36 +41,32 @@
                             Fecha de Vencimiento
                         </th>
                         <th>
-                            Días restantes para vencer
+                            Días restantes a vencer
+                        </th>
+                        <th>
+                            Días Disponibles
                         </th>
                         <th>
                             Días solicitados
                         </th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
-                    <tr>
-                        <td>@item.EmployeeId</td>
-                        <td>@item.EmployeeName</td>
-                        <td>@item.EmployeeDepto</td>
-                        <td>@item.EmployeeLocation</td>
-                        <td>@string.Format("{0:dd/MM/yyyy}", item.AdmissionDate)</td>
-                        <td>@string.Format("{0:dd/MM/yyyy}", item.RenovationDate)</td>
-                        <td>@string.Format("{0:dd/MM/yyyy}", item.DueVacationDate)</td>
-                        @if (item.DaysToDueVacation == 0)
-                        {
-                            <td class="text-center text-danger">Vencidos</td>
-                        }
-                        else
-                        {
+                        <tr>
+                            <td>@item.EmployeeId</td>
+                            <td>@item.EmployeeName</td>
+                            <td>@item.EmployeeDepto</td>
+                            <td>@item.EmployeeLocation</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.AdmissionDate)</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.RenovationDate)</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.DueVacationDate)</td>
                             <td class="text-center">@item.DaysToDueVacation</td>
-                        }
-
-                        <td class="text-center">@item.DaysRequested</td>
-                    </tr>
+                            <td class="text-center">@item.DaysAvailable</td>
+                            <td class="text-center">@item.DaysRequested</td>
+                        </tr>
                     }
                 </tbody>
             </table>

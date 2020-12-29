@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<VacacionesRC.ViewModels.EmployeeOnVacationModel>
 
 @{
-    ViewBag.Title = "Colaboradores en disfrute de vacaciones";
+    ViewBag.Title = "Colaboradores con vacaciones solicitadas";
 }
 
 <div class="container-fluid">
     <section class="text-dark border-custom border">
         <div class="bg-secondary text-light panel-custom border">
             <h6 class="panel-title">
-                Colaboradores en disfrute de vacaciones
+                Colaboradores con vacaciones solicitadas
                 <span class="btn-group pull-right">
                     <a href="javascript:void(0)" id="exportReport" class="btn btn-success btn-sm" style="margin-top: -3px">Exportar a excel</a>
                 </span>
@@ -54,18 +54,18 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                    <tr>
-                        <td>@item.EmployeeId</td>
-                        <td>@item.EmployeeName</td>
-                        <td>@item.EmployeeDepto</td>
-                        <td>@item.EmployeeLocation</td>
-                        <td class="text-center">@item.DaysTaken</td>
-                        <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
-                        <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
-                        <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
-                        <td class="text-center">@item.DaysAvailable</td>
-                        <td class="text-center">@item.Year</td>
-                    </tr>
+                        <tr>
+                            <td>@item.EmployeeId</td>
+                            <td>@item.EmployeeName</td>
+                            <td>@item.EmployeeDepto</td>
+                            <td>@item.EmployeeLocation</td>
+                            <td class="text-center">@item.DaysTaken</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
+                            <td class="text-center">@item.DaysAvailable</td>
+                            <td class="text-center">@item.Year</td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -170,7 +170,7 @@
         const identifier = new Date() - 100
 
         var link = document.createElement("a");
-        link.download = `Empleados_En_Disfrute_Vacaciones_${identifier}.xls`;
+        link.download = `Empleados_con_Vacaciones_Solicitadas_${identifier}.xls`;
         link.href = uri + base64(format(template, ctx));
         link.click();
     }

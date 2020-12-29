@@ -41,6 +41,26 @@ namespace VacacionesRC.Controllers
             return View(employees);
         }
 
+        public ActionResult VacacionesSolicitadas()
+        {
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+
+            List<EmployeeOnVacationModel> employees = GetEnVacaciones();
+
+            return View(employees);
+        }
+
+        public ActionResult VacacionesVencidas()
+        {
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+
+            List<EmployeePendingVacationModel> employees = GetVacacionesVencidas();
+            
+            return View(employees);
+        }
+
         [HttpPost]
         public JsonResult GetEmployeeOnVacation()
         {
@@ -91,11 +111,14 @@ namespace VacacionesRC.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetEmployeePendingVacation()
+        public JsonResult GetEmployeePendingVacation(bool vencidas = false)
         {
             try
             {
                 var employees = GetVacacionesPendientes();
+
+                if (vencidas)
+                    employees = GetVacacionesVencidas();
 
                 string detailed = "<table width='100%' border=1>";
 
@@ -108,7 +131,11 @@ namespace VacacionesRC.Controllers
                 detailed += "<td><b>Fecha de Ingreso</b></td>";
                 detailed += "<td><b>Fecha de Renovación</b></td>";
                 detailed += "<td><b>Fecha de Vencimiento</b></td>";
-                detailed += "<td><b>Días restantes para vencer</b></td>";
+
+                if (!vencidas)
+                    detailed += "<td><b>Días restantes para vencer</b></td>";
+
+                detailed += "<td><b>Días disponibles</b></td>";
                 detailed += "<td><b>Días solicitados</b></td>";
                 
                 foreach (var employee in employees)
@@ -121,7 +148,11 @@ namespace VacacionesRC.Controllers
                     detailed += "<td>" + employee.AdmissionDate.ToString("dd/MM/yyyy") + "</td>";
                     detailed += "<td>" + employee.RenovationDate.ToString("dd/MM/yyyy") + "</td>";
                     detailed += "<td>" + employee.DueVacationDate.ToString("dd/MM/yyyy") + "</td>";
-                    detailed += "<td>" + employee.DaysToDueVacation + " </td>";
+
+                    if (!vencidas)
+                        detailed += "<td>" + employee.DaysToDueVacation + " </td>";
+
+                    detailed += "<td>" + employee.DaysAvailable + " </td>";
                     detailed += "<td>" + employee.DaysRequested + "</td>";
                     detailed += "</tr>";
                 }
@@ -129,6 +160,22 @@ namespace VacacionesRC.Controllers
                 detailed += "</table>";
 
                 return new JsonResult { Data = new { result = "200", message = detailed }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
+
+        [HttpPost]
+        public JsonResult UpdateAllEmployees()
+        {
+            try
+            {
+                Helper.UpdateWithAllEmployeesFromAS400();
+
+                return new JsonResult { Data = new { result = "200", message = "success" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
             catch (Exception ex)
             {
@@ -183,7 +230,8 @@ namespace VacacionesRC.Controllers
                 {
                     List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
 
-                    var _employees = db.GetEmployeePendingVacation().ToList();
+                    //var _employees = db.GetEmployeePendingVacation().ToList();
+                    var _employees = db.GetEmployeePendingVacation().Where(f => f.daysToDueVacation.HasValue && f.daysToDueVacation.Value > 0).ToList();
 
                     foreach (var employee in _employees)
                     {
@@ -199,7 +247,48 @@ namespace VacacionesRC.Controllers
                             DueVacationDate = employee.dueVacationDate.Value,
                             DaysToDueVacation = employee.daysToDueVacation.Value < 0 ? 0 : employee.daysToDueVacation.Value,
                             TimeInCompany = employee.TimeInCompany ?? 0,
-                            DaysRequested = employee.daysRequested
+                            DaysRequested = employee.daysRequested,
+                            DaysAvailable = employee.daysAvailable ?? 0
+                        });
+                    }
+
+                    return employees;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return null;
+            }
+        }
+
+        private List<EmployeePendingVacationModel> GetVacacionesVencidas()
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
+
+                    var _employees = db.GetEmployeePendingVacation().Where(f => !f.daysToDueVacation.HasValue || f.daysToDueVacation.Value < 0).ToList();
+
+                    foreach (var employee in _employees)
+                    {
+                        employees.Add(new EmployeePendingVacationModel
+                        {
+                            EmployeeId = employee.EmployeeId,
+                            EmployeeName = employee.EmployeeName,
+                            EmployeeDepto = employee.EmployeeDepto,
+                            EmployeePosition = employee.EmployeePosition,
+                            EmployeeLocation = employee.Location,
+                            AdmissionDate = employee.AdmissionDate.Value,
+                            RenovationDate = employee.RenovationDate.Value,
+                            DueVacationDate = employee.dueVacationDate.Value,
+                            DaysToDueVacation = employee.daysToDueVacation.Value < 0 ? 0 : employee.daysToDueVacation.Value,
+                            TimeInCompany = employee.TimeInCompany ?? 0,
+                            DaysRequested = employee.daysRequested,
+                            DaysAvailable = employee.daysAvailable ?? 0
                         });
                     }
 

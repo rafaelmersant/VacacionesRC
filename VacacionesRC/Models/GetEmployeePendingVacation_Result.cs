@@ -18,6 +18,7 @@ namespace VacacionesRC.Models
         public Nullable<System.DateTime> dueVacationDate { get; set; }
         public Nullable<int> daysToDueVacation { get; set; }
         public int daysRequested { get; set; }
+        public Nullable<int> daysAvailable { get; set; }
         public Nullable<System.DateTime> AdmissionDate { get; set; }
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }

@@ -1,23 +1,61 @@
 ﻿
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Reportes";
 }
 
 <div class="container-fluid">
     <section class="text-dark border-custom border mt-3 mb-3">
+
         <div class="bg-secondary text-light panel-custom border">
             <h6 class="panel-title">
                 Reportes
+                <span class="btn-group pull-right">
+                    <a href="javascript:void(0)" class="btn btn-danger btn-sm" style="margin-top: -3px" onclick="updateAllEmployees()">Actualiza Empleados</a>
+                </span>
             </h6>
         </div>
 
         <div class="list-group col-6 ml-3">
             <a href="/Reportes/EnVacaciones/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores en disfrute de vacaciones</h6></a>
+            <a href="/Reportes/VacacionesSolicitadas/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores con vacaciones solicitadas</h6></a>
             <a href="/Reportes/VacacionesPendientes/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores con vacaciones a vencer</h6></a>
-            @*<button type="button" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores en disfrute de vacaciones</h6></button>*@
+            <a href="/Reportes/VacacionesVencidas/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores con vacaciones vencidas</h6></a>
             <!--<button type="button" class="list-group-item list-group-item-action border-0 text-dark"><h6>Colaboradores próximo a reintegrarse</h6></button>-->
             @*<button type="button" class="list-group-item list-group-item-action border-0 text-dark"><h6>Colaboradores que no han tomado vacaciones</h6></button>
-            <button type="button" class="list-group-item list-group-item-action border-0 pb-4 text-dark"><h6>Colaboradores próximo a vencer vacaciones</h6></button>*@
+        <button type="button" class="list-group-item list-group-item-action border-0 pb-4 text-dark"><h6>Colaboradores próximo a vencer vacaciones</h6></button>*@
+
+            <div class="d-flex text-center">
+                <span id="waitingIndicatorSave" class="spinner-border text-danger" style="font-size: 1.6em; display: none"></span>
+            </div>
         </div>
     </section>
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+       console.log("Reportes")
+    });
+
+    function updateAllEmployees() {
+
+        $("#waitingIndicatorSave").show();
+
+        $.ajax({
+            "url": `/Reportes/UpdateAllEmployees`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    alert("La data de empleados fue actualizada!")
+                    window.location.reload();
+                } else {
+                    alert(response.message)
+                }
+
+                $("#waitingIndicatorSave").hide();
+            }
+        });
+    }
+
+</script>
