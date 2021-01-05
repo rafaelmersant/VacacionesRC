@@ -46,7 +46,7 @@ namespace VacacionesRC.Controllers
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
             if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
 
-            List<EmployeeOnVacationModel> employees = GetEnVacaciones();
+            List<EmployeeOnVacationModel> employees = GetVacacionesSolicitadas();
 
             return View(employees);
         }
@@ -76,12 +76,62 @@ namespace VacacionesRC.Controllers
                 detailed += "<td><b>Nombre</b></td>";
                 detailed += "<td><b>Departamento</b></td>";
                 detailed += "<td><b>Localidad</b></td>";
-                detailed += "<td><b>Año</b></td>";
-                detailed += "<td><b>Días Disponibles</b></td>";
-                detailed += "<td><b>Días Solicitados</b></td>";
+                detailed += "<td><b>Días en Disfrute</b></td>";
                 detailed += "<td><b>Fecha Inicio</b></td>";
                 detailed += "<td><b>Fecha Fin</b></td>";
                 detailed += "<td><b>Fecha Retorno</b></td>";
+                detailed += "<td><b>Días Disponibles</b></td>";
+                detailed += "<td><b>Año</b></td>";
+
+                foreach (var employee in employees)
+                {
+                    detailed += "<tr>";
+                    detailed += "<td>" + employee.EmployeeId + "</td>";
+                    detailed += "<td>" + employee.EmployeeName + "</td>";
+                    detailed += "<td>" + employee.EmployeeDepto + "</td>";
+                    detailed += "<td>" + employee.EmployeeLocation + "</td>";    
+                    detailed += "<td>" + employee.DaysTaken + "</td>";
+                    detailed += "<td>" + employee.StartDate.ToString("dd/MM/yyyy") + " </td>";
+                    detailed += "<td>" + employee.EndDate.ToString("dd/MM/yyyy") + "</td>";
+                    detailed += "<td>" + employee.ReturnDate.Value.ToString("dd/MM/yyyy") + "</td>";
+                    detailed += "<td>" + employee.DaysAvailable + "</td>";
+                    detailed += "<td>" + employee.Year + "</td>";
+                    detailed += "</tr>";
+                }
+
+                detailed += "</table>";
+
+                return new JsonResult { Data = new { result = "200", message = detailed }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+                return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
+
+        [HttpPost]
+        public JsonResult GetEmployeeVacationRequested()
+        {
+            try
+            {
+                var employees = GetVacacionesSolicitadas();
+
+                string detailed = "<table width='100%' border=1>";
+
+                //HEADER for table
+                detailed += "<tr>";
+                detailed += "<td><b>Código</b></td>";
+                detailed += "<td><b>Nombre</b></td>";
+                detailed += "<td><b>Departamento</b></td>";
+                detailed += "<td><b>Localidad</b></td>";
+                detailed += "<td><b>Días Solicitados</b></td>";
+                detailed += "<td><b>Días Disponibles</b></td>";
+                detailed += "<td><b>Fecha Inicio</b></td>";
+                detailed += "<td><b>Fecha Fin</b></td>";
+                detailed += "<td><b>Fecha Retorno</b></td>";
+                detailed += "<td><b>Año</b></td>";
+                detailed += "<td><b>Estatus</b></td>";
 
                 foreach (var employee in employees)
                 {
@@ -90,12 +140,13 @@ namespace VacacionesRC.Controllers
                     detailed += "<td>" + employee.EmployeeName + "</td>";
                     detailed += "<td>" + employee.EmployeeDepto + "</td>";
                     detailed += "<td>" + employee.EmployeeLocation + "</td>";
-                    detailed += "<td>" + employee.Year + "</td>";
-                    detailed += "<td>" + employee.DaysAvailable + "</td>";
                     detailed += "<td>" + employee.DaysTaken + "</td>";
+                    detailed += "<td>" + employee.DaysAvailable + "</td>";
                     detailed += "<td>" + employee.StartDate.ToString("dd/MM/yyyy") + " </td>";
                     detailed += "<td>" + employee.EndDate.ToString("dd/MM/yyyy") + "</td>";
                     detailed += "<td>" + employee.ReturnDate.Value.ToString("dd/MM/yyyy") + "</td>";
+                    detailed += "<td>" + employee.Year + "</td>";
+                    detailed += "<td>" + employee.Status + "</td>";
                     detailed += "</tr>";
                 }
 
@@ -133,9 +184,13 @@ namespace VacacionesRC.Controllers
                 detailed += "<td><b>Fecha de Vencimiento</b></td>";
 
                 if (!vencidas)
-                    detailed += "<td><b>Días restantes para vencer</b></td>";
+                    detailed += "<td><b>Días restantes a vencer</b></td>";
 
-                detailed += "<td><b>Días disponibles</b></td>";
+                if (vencidas)
+                    detailed += "<td><b>Días vencidos</b></td>";
+                else
+                    detailed += "<td><b>Días disponibles a vencer</b></td>";
+
                 detailed += "<td><b>Días solicitados</b></td>";
                 
                 foreach (var employee in employees)
@@ -208,6 +263,45 @@ namespace VacacionesRC.Controllers
                             StartDate = employee.StartDate,
                             EndDate = employee.EndDate,
                             ReturnDate = employee.ReturnDate
+                        });
+                    }
+
+                    return employees;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return null;
+            }
+        }
+
+        private List<EmployeeOnVacationModel> GetVacacionesSolicitadas()
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    List<EmployeeOnVacationModel> employees = new List<EmployeeOnVacationModel>();
+
+                    var _employees = db.GetEmployeeVacationRequested().ToList();
+
+                    foreach (var employee in _employees)
+                    {
+                        employees.Add(new EmployeeOnVacationModel
+                        {
+                            EmployeeId = employee.EmployeeId,
+                            EmployeeName = employee.EmployeeName,
+                            EmployeeDepto = employee.EmployeeDepto,
+                            EmployeeLocation = employee.Location,
+                            Year = employee.Year,
+                            DaysAvailable = employee.DaysAvailable,
+                            DaysTaken = employee.DaysTaken,
+                            StartDate = employee.StartDate,
+                            EndDate = employee.EndDate,
+                            ReturnDate = employee.ReturnDate,
+                            Status = employee.Status
                         });
                     }
 

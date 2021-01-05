@@ -32,7 +32,10 @@
                             Localidad
                         </th>
                         <th>
-                            Días en Disfrute
+                            Días Solicitados
+                        </th>
+                        <th>
+                            Días Disponibles
                         </th>
                         <th>
                             Fecha Inicio
@@ -43,29 +46,30 @@
                         <th>
                             Fecha Retorno
                         </th>
-                        <th>
-                            Días Disponibles
-                        </th>
                         <th class="text-center">
                             Año
+                        </th>
+                        <th class="text-center">
+                            Estatus
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>@item.EmployeeId</td>
-                            <td>@item.EmployeeName</td>
-                            <td>@item.EmployeeDepto</td>
-                            <td>@item.EmployeeLocation</td>
-                            <td class="text-center">@item.DaysTaken</td>
-                            <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
-                            <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
-                            <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
-                            <td class="text-center">@item.DaysAvailable</td>
-                            <td class="text-center">@item.Year</td>
-                        </tr>
+                    <tr>
+                        <td>@item.EmployeeId</td>
+                        <td>@item.EmployeeName</td>
+                        <td>@item.EmployeeDepto</td>
+                        <td>@item.EmployeeLocation</td>
+                        <td class="text-center">@item.DaysTaken</td>
+                        <td class="text-center">@item.DaysAvailable</td>
+                        <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
+                        <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
+                        <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
+                        <td class="text-center">@item.Year</td>
+                        <td class="text-center">@item.Status</td>
+                    </tr>
                     }
                 </tbody>
             </table>
@@ -145,6 +149,13 @@
             return this.nodeType === 3;
         }).replaceWith(function () {
             return this.nodeValue.replace('Search', 'Buscar');
+        });
+
+        //No data available in table -> No hay registros disponibles
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('No data available in table', 'No hay registros disponibles');
         });
     });
 

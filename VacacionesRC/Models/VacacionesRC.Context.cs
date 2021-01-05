@@ -65,5 +65,10 @@ namespace VacacionesRC.Models
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeePendingVacation_Result>("GetEmployeePendingVacation");
         }
+    
+        public virtual ObjectResult<GetEmployeeVacationRequested_Result> GetEmployeeVacationRequested()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeVacationRequested_Result>("GetEmployeeVacationRequested");
+        }
     }
 }

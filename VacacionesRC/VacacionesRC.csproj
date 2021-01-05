@@ -187,6 +187,9 @@
     <Compile Include="Models\GetEmployeePendingVacation_Result.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\GetEmployeeVacationRequested_Result.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\GetVacacionesByDeptoOwner_Result.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>

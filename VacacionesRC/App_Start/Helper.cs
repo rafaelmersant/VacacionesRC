@@ -150,8 +150,10 @@ namespace VacacionesRC.App_Start
 
                 if (environmentVACACIONES != "DEV")
                 {
-                    string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(DateTime.Today.AddDays(-15));
+                    string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(DateTime.Today.AddDays(-30));
                     var data = GetAllEmployeesFromAS400(cycle);
+
+                    Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload", "EmployeesToUpdate:" + data.Tables[0].Rows.Count + " Ciclo:" + cycle);
 
                     if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
                     {
@@ -245,6 +247,8 @@ namespace VacacionesRC.App_Start
 
                 return false;
             }
+
+            //Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload", "EmployeesToUpdate ends");
 
             return true;
         }
@@ -380,7 +384,7 @@ namespace VacacionesRC.App_Start
                 //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, 'MIRAFLORES', CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
 
                 if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
                     sQuery = sQuery.Replace("[", "").Replace("]", "");
@@ -402,7 +406,7 @@ namespace VacacionesRC.App_Start
                 string sQuery = string.Empty;
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, 'MIRAFLORES', CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECODEMPLE DESC";
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECODEMPLE DESC";
 
                 if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
                     sQuery = sQuery.Replace("[", "").Replace("]", "");

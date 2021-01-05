@@ -135,6 +135,19 @@ namespace VacacionesRC.Controllers
             return View();
         }
 
+        public void addUser(string email, string employeeID, string pass)
+        {
+            User user = new User
+            {
+                Email = email,
+                EmployeeID = employeeID,
+                PasswordHash = pass,
+                Role = "Consulta"
+            };
+
+            RegisterUser(user);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult RegisterUser(User user)

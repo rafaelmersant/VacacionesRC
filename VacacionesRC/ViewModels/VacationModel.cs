@@ -51,6 +51,7 @@ namespace VacacionesRC.ViewModels
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime? ReturnDate { get; set; }
+        public string Status { get; set; }
     }
 
     public class EmployeePendingVacationModel

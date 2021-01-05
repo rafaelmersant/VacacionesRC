@@ -40,14 +40,11 @@
                         <th>
                             Fecha de Vencimiento
                         </th>
-                        @*<th>
-                            Días restantes a vencer
-                        </th>*@
                         <th>
-                            Días Disponibles
+                            Días Vencidos
                         </th>
                         <th>
-                            Días solicitados
+                            Días Solicitados
                         </th>
 
                     </tr>
@@ -64,7 +61,7 @@
                             <td>@string.Format("{0:dd/MM/yyyy}", item.RenovationDate)</td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.DueVacationDate)</td>
                             @*<td class="text-center">@item.DaysToDueVacation</td>*@
-                            <td class="text-center">@item.DaysAvailable</td>
+                            <td class="text-center text-danger">@item.DaysAvailable</td>
                             <td class="text-center">@item.DaysRequested</td>
                         </tr>
                     }
@@ -146,6 +143,13 @@
             return this.nodeType === 3;
         }).replaceWith(function () {
             return this.nodeValue.replace('Search', 'Buscar');
+        });
+
+        //No data available in table -> No hay registros disponibles
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('No data available in table', 'No hay registros disponibles');
         });
     });
 
