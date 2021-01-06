@@ -127,11 +127,11 @@ namespace VacacionesRC.App_Start
                 return null;
         }
 
-        public static string GetPayrollPeriodByAdmissionDate(DateTime admissionDate)
+        public static string GetPayrollPeriodByAdmissionDate(DateTime admissionDate, int _year = 0)
         {
             int month = admissionDate.Month;
             int day = admissionDate.Day;
-            int year = DateTime.Today.Year;
+            int year = _year == 0 ? DateTime.Today.Year : _year;
             int oldYear = year - 1;
 
             if (month == 1 && day > 15)

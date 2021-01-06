@@ -150,69 +150,36 @@ namespace VacacionesRC.App_Start
 
                 if (environmentVACACIONES != "DEV")
                 {
-                    string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(DateTime.Today.AddDays(-30));
+                    string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(DateTime.Today.AddDays(-15), DateTime.Today.AddDays(-15).Year);
+
+                    Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload Starts " + DateTime.Now.ToString(), "EmployeesToUpdate ciclo:" + cycle);
+                    
                     var data = GetAllEmployeesFromAS400(cycle);
 
-                    Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload", "EmployeesToUpdate:" + data.Tables[0].Rows.Count + " Ciclo:" + cycle);
+                    Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload " + DateTime.Now.ToString(), "EmployeesToUpdate:" + data.Tables[0].Rows.Count + " Ciclo:" + cycle);
 
                     if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
                     {
                         foreach (DataRow emp in data.Tables[0].Rows)
                         {
-                            int _employeeId = int.Parse(emp.ItemArray[0].ToString());
-                            var _employee = Helper.GetEmployee(_employeeId);
+                            int _employeeId = 0;
 
-                            if (_employee == null)
+                            try
                             {
-                                DateTime? admissionDate = null;
-                                if (emp.ItemArray[4].ToString().Length >= 8)
-                                {
-                                    int year = int.Parse(emp.ItemArray[4].ToString().Substring(0, 4));
-                                    int month = int.Parse(emp.ItemArray[4].ToString().Substring(4, 2));
-                                    int day = int.Parse(emp.ItemArray[4].ToString().Substring(6, 2));
+                                _employeeId = int.Parse(emp.ItemArray[0].ToString());
+                                var _employee = Helper.GetEmployee(_employeeId);
 
-                                    admissionDate = new DateTime(year, month, day);
-                                }
-
-                                DateTime? terminateDate = null;
-                                if (emp.ItemArray[5].ToString().Length >= 8)
+                                if (_employee == null)
                                 {
-                                    int year = int.Parse(emp.ItemArray[5].ToString().Substring(0, 4));
-                                    int month = int.Parse(emp.ItemArray[5].ToString().Substring(4, 2));
-                                    int day = int.Parse(emp.ItemArray[5].ToString().Substring(6, 2));
+                                    DateTime? admissionDate = null;
+                                    if (emp.ItemArray[4].ToString().Length >= 8)
+                                    {
+                                        int year = int.Parse(emp.ItemArray[4].ToString().Substring(0, 4));
+                                        int month = int.Parse(emp.ItemArray[4].ToString().Substring(4, 2));
+                                        int day = int.Parse(emp.ItemArray[4].ToString().Substring(6, 2));
 
-                                    terminateDate = new DateTime(year, month, day);
-                                }
-
-                                Employee employee = new Employee
-                                {
-                                    EmployeeId = _employee.EmployeeId,
-                                    EmployeeName = emp.ItemArray[1].ToString(),
-                                    EmployeePosition = emp.ItemArray[2].ToString(),
-                                    EmployeeDepto = emp.ItemArray[3].ToString(),
-                                    EmployeeDeptoId = int.Parse(emp.ItemArray[6].ToString()),
-                                    Email = emp.ItemArray[7].ToString(),
-                                    Salary = decimal.Parse(emp.ItemArray[8].ToString()),
-                                    Location = emp.ItemArray[9].ToString(),
-                                    BankAccount = emp.ItemArray[10].ToString(),
-                                    Identification = emp.ItemArray[11].ToString(),
-                                    AdmissionDate = admissionDate,
-                                    TerminateDate = terminateDate,
-                                    Type = "I",
-                                    CreatedDate = DateTime.Now
-                                };
-
-                                using (var db = new VacacionesRCEntities())
-                                {
-                                    db.Employees.Add(employee);
-                                    db.SaveChanges();
-                                }
-                            }
-                            else
-                            {
-                                using (var db = new VacacionesRCEntities())
-                                {
-                                    var employee = db.Employees.FirstOrDefault(e => e.EmployeeId == _employee.EmployeeId);
+                                        admissionDate = new DateTime(year, month, day);
+                                    }
 
                                     DateTime? terminateDate = null;
                                     if (emp.ItemArray[5].ToString().Length >= 8)
@@ -224,18 +191,65 @@ namespace VacacionesRC.App_Start
                                         terminateDate = new DateTime(year, month, day);
                                     }
 
-                                    employee.EmployeePosition = emp.ItemArray[2].ToString();
-                                    employee.EmployeeDepto = emp.ItemArray[3].ToString();
-                                    employee.EmployeeDeptoId = int.Parse(emp.ItemArray[6].ToString());
-                                    employee.Email = emp.ItemArray[7].ToString();
-                                    employee.Salary = decimal.Parse(emp.ItemArray[8].ToString()) * 2;
-                                    employee.Location = emp.ItemArray[9].ToString();
-                                    employee.BankAccount = emp.ItemArray[10].ToString();
-                                    employee.TerminateDate = terminateDate;
+                                    if (terminateDate != null) continue; // do not add people cancelled
 
-                                    db.SaveChanges();
+                                    Employee employee = new Employee
+                                    {
+                                        EmployeeId = _employee.EmployeeId,
+                                        EmployeeName = emp.ItemArray[1].ToString(),
+                                        EmployeePosition = emp.ItemArray[2].ToString(),
+                                        EmployeeDepto = emp.ItemArray[3].ToString(),
+                                        EmployeeDeptoId = int.Parse(emp.ItemArray[6].ToString()),
+                                        Email = emp.ItemArray[7].ToString(),
+                                        Salary = decimal.Parse(emp.ItemArray[8].ToString()),
+                                        Location = emp.ItemArray[9].ToString(),
+                                        BankAccount = emp.ItemArray[10].ToString(),
+                                        Identification = emp.ItemArray[11].ToString(),
+                                        AdmissionDate = admissionDate,
+                                        TerminateDate = terminateDate,
+                                        Type = "I",
+                                        CreatedDate = DateTime.Now
+                                    };
+
+                                    using (var db = new VacacionesRCEntities())
+                                    {
+                                        db.Employees.Add(employee);
+                                        db.SaveChanges();
+                                    }
                                 }
+                                else
+                                {
+                                    using (var db = new VacacionesRCEntities())
+                                    {
+                                        var employee = db.Employees.FirstOrDefault(e => e.EmployeeId == _employee.EmployeeId);
 
+                                        DateTime? terminateDate = null;
+                                        if (emp.ItemArray[5].ToString().Length >= 8)
+                                        {
+                                            int year = int.Parse(emp.ItemArray[5].ToString().Substring(0, 4));
+                                            int month = int.Parse(emp.ItemArray[5].ToString().Substring(4, 2));
+                                            int day = int.Parse(emp.ItemArray[5].ToString().Substring(6, 2));
+
+                                            terminateDate = new DateTime(year, month, day);
+                                        }
+
+                                        employee.EmployeePosition = emp.ItemArray[2].ToString();
+                                        employee.EmployeeDepto = emp.ItemArray[3].ToString();
+                                        employee.EmployeeDeptoId = int.Parse(emp.ItemArray[6].ToString());
+                                        employee.Email = emp.ItemArray[7].ToString();
+                                        employee.Salary = decimal.Parse(emp.ItemArray[8].ToString()) * 2;
+                                        employee.Location = emp.ItemArray[9].ToString();
+                                        employee.BankAccount = emp.ItemArray[10].ToString();
+                                        employee.TerminateDate = terminateDate;
+
+                                        db.SaveChanges();
+                                    }
+
+                                }
+                            }
+                            catch (Exception exEmp)
+                            {
+                                Helper.SendException(exEmp, "EmployeeID:" + _employeeId);
                             }
                         }
                     }
@@ -248,7 +262,7 @@ namespace VacacionesRC.App_Start
                 return false;
             }
 
-            //Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload", "EmployeesToUpdate ends");
+            Helper.SendRawEmail("rafaelmersant@yahoo.com", "Employee Massive Upload Ends " + DateTime.Now.ToString(), "EmployeesToUpdate ends");
 
             return true;
         }
@@ -384,7 +398,7 @@ namespace VacacionesRC.App_Start
                 //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECICLOPAG DESC";
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' ORDER BY CECICLOPAG DESC";
 
                 if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
                     sQuery = sQuery.Replace("[", "").Replace("]", "");
@@ -406,7 +420,10 @@ namespace VacacionesRC.App_Start
                 string sQuery = string.Empty;
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' AND CETIPTRANS = 1 ORDER BY CECODEMPLE DESC";
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CEINGDEDUC = 'I' AND CEFRETIRO = 0 ORDER BY CECICLOPAG DESC"; //AND CETIPTRANS = 1
+
+                //sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
+                //"CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' ORDER BY CECODEMPLE DESC"; //AND CETIPTRANS = 1
 
                 if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
                     sQuery = sQuery.Replace("[", "").Replace("]", "");

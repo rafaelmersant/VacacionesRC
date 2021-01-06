@@ -68,7 +68,7 @@ namespace VacacionesRC.Controllers
                     }
 
                     //Depto owner
-                    if (department != null)
+                    if (department != null && vacationModels.Count() == 0)
                     {
                         var vacations = db.GetVacacionesByDeptoOwner(employeeId, DateTime.Now.Year).ToList();
 

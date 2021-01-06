@@ -10,9 +10,6 @@ namespace VacacionesRC.Controllers
     {
         public ActionResult Index()
         {
-            //UserController userController = new UserController();
-            //userController.addUser("ralmonte@radiocentro.com.do", "61", "0596");
-            
             if (Session["role"] == null) return RedirectToAction("Login", "User");
 
             return View();
@@ -22,6 +19,8 @@ namespace VacacionesRC.Controllers
         {
             ViewBag.Message = "Your application description page.";
 
+            //UserController userController = new UserController();
+            
             return View();
         }
 
