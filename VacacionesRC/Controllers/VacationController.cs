@@ -96,7 +96,8 @@ namespace VacacionesRC.Controllers
                                 CreatedBy = item.CreatedBy,
                                 EmployeeName = item.EmployeeName,
                                 DeptoName = item.EmployeeDepto,
-                                EmployeePosition = item.EmployeePosition
+                                EmployeePosition = item.EmployeePosition,
+                                Year = item.Year
                             });
                         }
                     }
@@ -127,7 +128,8 @@ namespace VacacionesRC.Controllers
                                 RejectedDate = item.RejectedDate,
                                 RejectedBy = item.RejectedBy,
                                 CreatedDate = item.CreatedDate,
-                                CreatedBy = item.CreatedBy
+                                CreatedBy = item.CreatedBy,
+                                Year = item.Year
                                 //EmployeeName = item.EmployeeName,
                                 //DeptoName = item.EmployeeDepto,
                                 //EmployeePosition = item.EmployeePosition

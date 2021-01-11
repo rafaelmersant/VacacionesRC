@@ -19,12 +19,19 @@ namespace VacacionesRC.Controllers
 
         public ActionResult Login()
         {
-            if (Session["employeeId"] != null)
+            try
             {
-                if (Request.QueryString["form"] != null)
+                if (Session["employeeId"] != null)
                 {
-                    return RedirectToAction("Formulario", "Vacation", new { id = Request.QueryString["form"] });
+                    if (Request.QueryString["form"] != null)
+                    {
+                        return RedirectToAction("Formulario", "Vacation", new { id = Request.QueryString["form"] });
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
             }
 
             return View();
@@ -33,9 +40,16 @@ namespace VacacionesRC.Controllers
 
         public ActionResult Logout()
         {
-            Session["employeeID"] = null;
-            Session["role"] = null;
-            Session["email"] = null;
+            try
+            {
+                Session["employeeID"] = null;
+                Session["role"] = null;
+                Session["email"] = null;
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
 
             return RedirectToAction("Login", "User");
         }
@@ -137,15 +151,22 @@ namespace VacacionesRC.Controllers
 
         public void addUser(string email, string employeeID, string pass)
         {
-            User user = new User
+            try
             {
-                Email = email,
-                EmployeeID = employeeID,
-                PasswordHash = pass,
-                Role = "Consulta"
-            };
+                User user = new User
+                {
+                    Email = email,
+                    EmployeeID = employeeID,
+                    PasswordHash = pass,
+                    Role = "Consulta"
+                };
 
-            RegisterUser(user);
+                RegisterUser(user);
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
         }
 
         [HttpPost]

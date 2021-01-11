@@ -61,9 +61,7 @@
                                     Departamento
                                 </th>
                             }
-                            <th class="text-center" style="width: 10px">
-                                Año
-                            </th>
+
                             <th style="width: 50px">
                                 Fecha Inicio
                             </th>
@@ -75,6 +73,9 @@
                             </th>
                             <th style="width: 50px">
                                 Fecha Regreso
+                            </th>
+                            <th class="text-center" style="width: 10px">
+                                Año
                             </th>
                             <th class="text-center" style="width: 80px">
                                 Estatus
@@ -115,11 +116,11 @@
                                 <td>@item.EmployeePosition</td>
                                 <td>@item.DeptoName</td>
                             }
-                            <td>@item.Year</td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
                             <td class="text-center">@item.DaysRequested</td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
+                            <td class="text-center">@item.Year</td>
                             <td class="text-center @(statusColor)"><b>@item.Status</b></td>
 
                             @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
@@ -131,16 +132,23 @@
                                             <span class="fa fa-check"></span>
                                         </button>
                                     </td>
-                                    <td align="center">
-                                        <button class="btn btn-sm btn-secondary" disabled>
-                                            <span class="fa fa-remove"></span>
-                                        </button>
-                                    </td>
-                                    @*<td align="center">
-                    <button class="btn btn-sm btn-secondary" disabled>
-                        <span class="fa fa-edit"></span>
-                    </button>
-                </td>*@
+
+                                    if (item.AcceptedDate != null && item.RejectedDate == null && item.StartDate > DateTime.Today && Session["role"].ToString() == "Admin")
+                                    {
+                                        <td align="center">
+                                            <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="rejectRequest(@item.Id)" title="Rechazar">
+                                                <i class="fa fa-remove"></i>
+                                            </a>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td align="center">
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                <span class="fa fa-remove"></span>
+                                            </button>
+                                        </td>
+                                    }
                                 }
                                 else
                                 {
@@ -154,41 +162,8 @@
                                             <i class="fa fa-remove"></i>
                                         </a>
                                     </td>
-                                    @*if (Session["employeeId"].ToString() == item.EmployeeId.ToString() || Session["role"].ToString() == "Admin")
-                {
-                    <td align="center">
-                        <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                    </td>
-                }
-                else
-                {
-                    <td align="center">
-                        <button class="btn btn-sm btn-secondary" disabled>
-                            <span class="fa fa-edit"></span>
-                        </button>
-                    </td>
-                }*@
                                 }
                             }
-                            @*else if (Session["employeeId"].ToString() == item.EmployeeId.ToString() && !(item.RejectedDate != null || item.AcceptedDate != null))
-        {
-            <td align="center">
-                <a class="btn btn-sm btn-warning" href="@Url.Action("Formulario", new { id = @item.IdHash })" title="Editar">
-                    <i class="fa fa-edit"></i>
-                </a>
-            </td>
-        }
-        else
-        {
-            <td align="center">
-                <button class="btn btn-sm btn-secondary" disabled>
-                    <span class="fa fa-edit"></span>
-                </button>
-            </td>
-        }*@
-
                         </tr>
                         }
                     </tbody>
@@ -266,7 +241,10 @@
     });
 
     function rejectRequest(id) {
-        if (confirm(`Seguro que desea RECHAZAR esta solicitud de vacaciones?`)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        
+        if (confirm(`Seguro que desea RECHAZAR esta solicitud de vacaciones? \n Esta acción no es reversible.`)) {
             $.ajax({
                 "url": "/Vacation/RejectRequest?id=" + id,
                 "type": "POST",
@@ -287,6 +265,9 @@
     }
 
     function acceptRequest(id) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
         if (confirm(`Seguro que desea APROBAR esta solicitud de vacaciones?`)) {
             $.ajax({
                 "url": "/Vacation/AcceptRequest?id=" + id,

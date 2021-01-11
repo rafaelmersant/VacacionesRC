@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using VacacionesRC.App_Start;
 
 namespace VacacionesRC.Controllers
 {
@@ -10,6 +11,7 @@ namespace VacacionesRC.Controllers
     {
         public ActionResult Index()
         {
+
             if (Session["role"] == null) return RedirectToAction("Login", "User");
 
             return View();

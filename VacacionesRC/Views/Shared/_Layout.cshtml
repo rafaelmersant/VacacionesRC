@@ -45,6 +45,13 @@
                     <li><a href="/Reportes"><i class="fa fa-folder"></i>Reportes</a></li>
                     <!--<li><a href="/Reglas"><i class="fa fa-address-book"></i>Reglas y otros</a></li>-->
                     <li><a href="/Reglas/Outsourcing"><i class="fa fa-group"></i>Outsourcing</a></li>
+                    <li><a href="/Excepciones"><i class="fa fa-circle-o-notch"></i>Excepciones</a></li>
+                }
+
+                @if (Session["role"] != null && Session["role"].ToString() == "Depto")
+                {
+                    <li><a href="/Reportes"><i class="fa fa-folder"></i>Reportes</a></li>
+                    <!--<li><a href="/Reglas"><i class="fa fa-address-book"></i>Reglas y otros</a></li>-->
                 }
             </ul>
         </nav>

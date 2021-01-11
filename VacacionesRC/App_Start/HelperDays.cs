@@ -177,8 +177,13 @@ namespace VacacionesRC.App_Start
                         int _takenDays = (employeeDays.TakenDays?? 0) + takenDays - oldDays;
 
                         if (endDate != null && employeeDays.RenovationDate > endDate && _takenDays > 7)
-                            throw new Exception("(1001) Esta tratando de solicitar más días de lo permitido durante el periodo previo a la renovación.");
+                        {
+                            ExceptionsVacation exceptionsVacation = db.ExceptionsVacations.FirstOrDefault(e => e.EmployeeId == employeeId && e.Year == employeeDays.CurrentYear);
 
+                            if (exceptionsVacation == null)
+                                throw new Exception("(1001) Esta tratando de solicitar más días de lo permitido durante el periodo previo a la renovación.");
+                        }
+                            
                         employeeDays.TakenDays = _takenDays;
                         db.SaveChanges();
                     }

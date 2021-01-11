@@ -155,6 +155,7 @@
     <Compile Include="App_Start\HelperPayroll.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\DeptoController.cs" />
+    <Compile Include="Controllers\ExcepcionesController.cs" />
     <Compile Include="Controllers\HolidayController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
@@ -176,6 +177,9 @@
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EmployeeDay.cs">
+      <DependentUpon>VacacionesRC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ExceptionsVacation.cs">
       <DependentUpon>VacacionesRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GetDeptos_Result.cs">
@@ -420,6 +424,7 @@
     <Content Include="Views\Reportes\VacacionesPendientes.cshtml" />
     <Content Include="Views\Reportes\VacacionesSolicitadas.cshtml" />
     <Content Include="Views\Reportes\VacacionesVencidas.cshtml" />
+    <Content Include="Views\Excepciones\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

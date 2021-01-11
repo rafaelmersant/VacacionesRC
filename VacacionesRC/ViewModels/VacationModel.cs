@@ -39,6 +39,16 @@ namespace VacacionesRC.ViewModels
         public string OwnerName { get; set; }
     }
 
+    public class ExceptionModel
+    {
+        public int Id { get; set; }
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public int Year { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int CreatedBy { get; set; }
+    }
+
     public class EmployeeOnVacationModel
     {
         public int EmployeeId { get; set; }

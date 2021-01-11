@@ -72,6 +72,9 @@
 <script type="text/javascript">
 
     const deleteDay = (day, id) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
         if (confirm(`Seguro que desea eliminar el día ${day} ?`)) {
             $.ajax({
                 "url": "/Holiday/Delete?id=" + id,
@@ -89,6 +92,9 @@
     }
 
     const AddDay = () => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
         const date = GetDateFormat($("#holidate").val())
 
         $.ajax({
