@@ -19,11 +19,24 @@
             </h6>
         </div>
 
-        <div class="list-group col-6 ml-3">
-            <a href="/Reportes/EnVacaciones/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores en disfrute de vacaciones<span class="badge badge-danger ml-2">@ViewBag.EnVacaciones</span></h6> </a>
-            <a href="/Reportes/VacacionesSolicitadas/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores con vacaciones solicitadas<span class="badge badge-danger ml-2">@ViewBag.VacacionesSolicitadas</span></h6></a>
-            <a href="/Reportes/VacacionesPendientes/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores con vacaciones a vencer<span class="badge badge-danger ml-2">@ViewBag.VacacionesPendientes</span></h6></a>
-            <a href="/Reportes/VacacionesVencidas/" class="list-group-item list-group-item-action border-0 mt-3 text-dark"><h6>Colaboradores con vacaciones vencidas<span class="badge badge-danger ml-2">@ViewBag.VacacionesVencidas</span></h6></a>
+        <div class="list-group col-lg-6 col-md-11 col-sm-12 ml-3">
+            <a href="/Reportes/EnVacaciones/" class="list-group-item list-group-item-action border-0 mt-3 text-dark">
+                <h6>Colaboradores en disfrute de vacaciones<span class="badge badge-danger ml-2">@ViewBag.EnVacaciones</span></h6> 
+                <span class="text-danger">Hace referencia a los colaboradores que estan disfrutando sus vacaciones actualmente.</span>
+            </a>
+            <a href="/Reportes/VacacionesSolicitadas/" class="list-group-item list-group-item-action border-0 mt-3 text-dark mt-2">
+                <h6>Colaboradores con vacaciones solicitadas<span class="badge badge-danger ml-2">@ViewBag.VacacionesSolicitadas</span></h6>
+                <span class="text-danger">Hace referencia a los colaboradores que tienen vacaciones solicitadas (aprobadas o en proceso) y que la fecha del disfrute no ha llegado.</span>
+            </a>
+            <a href="/Reportes/VacacionesPendientes/" class="list-group-item list-group-item-action border-0 mt-3 text-dark mt-2">
+                <h6>Colaboradores con vacaciones a vencer<span class="badge badge-danger ml-2">@ViewBag.VacacionesPendientes</span></h6>
+                <span class="text-danger">Hace referencia a los colaboradores que tienen días disponibles próximos a vencer o que no han solicitado vacaciones.</span>
+            </a>
+            <a href="/Reportes/VacacionesVencidas/" class="list-group-item list-group-item-action border-0 mt-3 text-dark mt-2">
+                <h6>Colaboradores con vacaciones vencidas<span class="badge badge-danger ml-2">@ViewBag.VacacionesVencidas</span></h6>
+                <span class="text-danger">Hace referencia a los colaboradores que se le vencieron los días disponibles.</span>
+            </a>
+
             <!--<button type="button" class="list-group-item list-group-item-action border-0 text-dark"><h6>Colaboradores próximo a reintegrarse</h6></button>-->
             @*<button type="button" class="list-group-item list-group-item-action border-0 text-dark"><h6>Colaboradores que no han tomado vacaciones</h6></button>
         <button type="button" class="list-group-item list-group-item-action border-0 pb-4 text-dark"><h6>Colaboradores próximo a vencer vacaciones</h6></button>*@

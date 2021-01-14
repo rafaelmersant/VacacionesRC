@@ -165,6 +165,13 @@
         }).replaceWith(function () {
             return this.nodeValue.replace('Search', 'Buscar');
         });
+
+        //No data available in table -> No hay registros disponibles
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('No data available in table', 'No hay registros disponibles');
+        });
     });
 
     function editException(Id, EmployeeId, Year) {

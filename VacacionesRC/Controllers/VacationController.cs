@@ -29,7 +29,7 @@ namespace VacacionesRC.Controllers
                     int employeeId = int.Parse(Session["employeeID"].ToString());
                     Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == employeeId);
 
-                    Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+                    //Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId && e.Type == "I");
 
                     //Admin users
                     if (Session["role"] != null && Session["role"].ToString() == "Admin")
@@ -209,7 +209,7 @@ namespace VacacionesRC.Controllers
 
             try
             {
-                if (employee != null)
+                if (employee != null && employee.Type == "I")
                 {
                     using(var db = new VacacionesRCEntities())
                     {
