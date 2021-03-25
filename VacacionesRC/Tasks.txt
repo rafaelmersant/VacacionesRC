@@ -56,7 +56,14 @@ DESPUES DE PRUEBAS:
 
 *****(7) Traer monto de la quincena previa al aniversario (monto neto)
 *****(8) Permitir tomar más de 7 dias si la seleccion de vacaciones esta mas alla de la fecha de renovacion
-(9) 
+
+NUEVOS: MARZO 2021
+1-Corregir reportes
+2-Ajuste de la carta de constancia
+3-Suspender vacaciones ya en curso
+4-Estructura de permisos: Aprobador, Apoyo, Director
+5-Bloquear los sabados y domingos en la seleccion de fecha
+
 
 
 

@@ -229,7 +229,12 @@
         await editForm()
 
         //$(".datepicker").val(new Date().toLocaleDateString())
-        $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
+        $(".datepicker").datepicker(
+            {
+                dateFormat: 'dd/mm/yy',
+                beforeShowDay: $.datepicker.noWeekends
+            }
+        );
 
         $(".numericOnly").keypress(function (e) {
             if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false;
