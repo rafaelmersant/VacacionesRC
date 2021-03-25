@@ -94,7 +94,7 @@
             e.preventDefault();
 
             $.ajax({
-                "url": `/Reportes/GetEmployeeOnVacation`,
+                "url": `/Reportes/GetEmployeeVacationRequested`,
                 "type": "POST",
                 "success": async function (response) {
                     if (response.result === "200") {
