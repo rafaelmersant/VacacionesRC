@@ -561,8 +561,20 @@ namespace VacacionesRC.Controllers
         }
 
         [HttpPost]
-        public JsonResult PrintConstancia(Guid IdHash, int Codigo, string Nombre, string FechaSolicitud,
-                                      string FechaIngreso, string Puesto, string Departamento, string FechaDesde, string FechaHasta)
+        public JsonResult PrintConstancia
+            (
+            Guid IdHash, 
+            int Codigo, 
+            string Nombre, 
+            string FechaSolicitud,
+            string FechaIngreso, 
+            string Puesto, 
+            string Departamento, 
+            string FechaDesde, 
+            string FechaHasta, 
+            string FechaRetorno, 
+            string DiasSolicitados
+            )
         {
             try
             {
@@ -573,6 +585,9 @@ namespace VacacionesRC.Controllers
                 string CuentaBanco = "";
                 string MontoPagado = "";
                 string DiasPagados = "";
+
+                //format days requested
+                DiasSolicitados = int.Parse(DiasSolicitados) > 1 ? (DiasSolicitados + " días") : (DiasSolicitados + " día");
 
                 using (var db = new VacacionesRCEntities())
                 {
@@ -625,7 +640,7 @@ namespace VacacionesRC.Controllers
 
                     string content = Helper.ShowConstancia(FechaSolicitud, Codigo.ToString(), Nombre, FechaIngreso, Puesto, Departamento,
                                                             FechaDesde, FechaHasta, Cedula, TiempoTrabajando, SalarioMensual, Localidad, 
-                                                            CuentaBanco, MontoPagado, "", DiasPagados, urlServer);
+                                                            CuentaBanco, MontoPagado, "", DiasPagados, FechaRetorno, DiasSolicitados, urlServer);
 
                     return new JsonResult { Data = new { result = "200", message = content }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }

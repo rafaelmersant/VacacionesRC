@@ -587,7 +587,8 @@ namespace VacacionesRC.App_Start
 
         public static string ShowConstancia(string FechaSolicitud, string Codigo, string Nombre, string FechaIngreso, string Puesto, string Departamento,
                                             string FechaDesde, string FechaHasta, string Cedula, string TiempoTrabajando, string SalarioMensual, string Localidad,
-                                            string CuentaBanco, string MontoPagado, string FirmadoPor, string DiasPagados, string server)
+                                            string CuentaBanco, string MontoPagado, string FirmadoPor, string DiasPagados, string FechaRetorno, string DiasSolicitados,
+                                            string server)
         {
             string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
             formTemplate = System.IO.Path.Combine(formTemplate, "ConstanciaVacaciones.html");
@@ -606,10 +607,12 @@ namespace VacacionesRC.App_Start
             content = content.Replace("##Localidad##", Localidad);
             content = content.Replace("##FechaDesde##", FechaDesde);
             content = content.Replace("##FechaHasta##", FechaHasta);
+            content = content.Replace("##FechaRetorno##", FechaRetorno);
             content = content.Replace("##CuentaBanco##", CuentaBanco);
             content = content.Replace("##MontoPagado##", MontoPagado);
             content = content.Replace("##DiasPagados##", DiasPagados);
             content = content.Replace("##FirmadoPor##", FirmadoPor);
+            content = content.Replace("##DiasSolicitados##", DiasSolicitados);
 
             content = content.Replace("##server##", server);
 
