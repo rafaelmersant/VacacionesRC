@@ -19,6 +19,15 @@
             </h6>
         </div>
 
+        <div class="ml-2 mt-1 mb-1 mr-2 float-right">
+            <span>Año</span> @Html.DropDownList("IdYear", new SelectList(ViewBag.Years, "Text", "Value"), new
+                        {
+                            @class = "form-control-sm",
+                            @style = "border: 1px solid lightgray; color: gray",
+                            @onchange = "filterByYear($('#IdYear').val())"
+                        })
+        </div>
+
         <!--
     <div class="row bg-light ml-3 mr-3 mt-2">
         <div class="col-2 mt-3 mb-3 ml-1">
@@ -32,7 +41,7 @@
         -->
 
         @if (Model.Count() == 0)
-        {
+                    {
             <div class="text-center mt-5 mb-5">
                 <h5>No existen registros para mostrar</h5>
             </div>
@@ -60,7 +69,7 @@
                                 <th>
                                     Departamento
                                 </th>
-                            }
+            }
 
                             <th style="width: 50px">
                                 Fecha Inicio
@@ -190,6 +199,13 @@
             "order": [[0, "desc"]]
         });
 
+        const url = window.location.pathname
+        const id = url.substring(url.lastIndexOf('/') + 1);
+        if (id) {
+            console.log('id', id)
+            $(`#IdYear option[value='${id}'`).attr('selected', 'selected');
+        }
+            
         //Replace Previous -> Anterior
         $('body :not(script)').contents().filter(function () {
             return this.nodeType === 3;
@@ -285,6 +301,15 @@
                     }
                 }
             });
+        }
+    }
+
+    function filterByYear(year) {
+        
+        if (year && year != "Todos") {
+            window.location = `/Vacation/Index/${year}`
+        } else {
+            window.location = `/Vacation`
         }
     }
 

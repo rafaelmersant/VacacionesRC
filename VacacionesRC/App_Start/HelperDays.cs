@@ -125,13 +125,16 @@ namespace VacacionesRC.App_Start
                                             .OrderByDescending(o => o.CreatedDate)
                                             .FirstOrDefault();
 
+                    //Take vacation after one year (exceptions)
+                    ExceptionsVacation exceptionsVacation = db.ExceptionsVacations.FirstOrDefault(e => e.EmployeeId == employeeId && e.Year == employeeDay.CurrentYear);
+                    if (exceptionsVacation != null)
+                        dueDate = dueDate.AddMonths(6);
+
                     if (employeeDays == null)
                     {
                         int days = DaysForThisEmployeeBySeniority(employee);
 
-                        //if (renovationDate <= DateTime.Today.Date)
-                        //{
-                            employeeDay = new EmployeeDay
+                        employeeDay = new EmployeeDay
                             {
                                 EmployeeId = employeeId,
                                 TakenDays = 0,
@@ -141,13 +144,15 @@ namespace VacacionesRC.App_Start
                                 DueDate = dueDate,
                                 CreatedDate = DateTime.Now
                             };
-                        //}
 
                         db.EmployeeDays.Add(employeeDay);
                         db.SaveChanges();
                     }
                     else
                     {
+                        employeeDays.DueDate = dueDate;
+                        db.SaveChanges();
+
                         return employeeDays;
                     }
                 }

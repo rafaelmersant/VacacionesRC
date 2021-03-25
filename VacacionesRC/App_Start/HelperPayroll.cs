@@ -136,62 +136,62 @@ namespace VacacionesRC.App_Start
 
             if (month == 1 && day > 15)
                 return string.Format("{0}0101", year);
-            if (month == 1 && day < 15)
+            if (month == 1 && day <= 15)
                 return string.Format("{0}1224", oldYear);
 
             if (month == 2 && day > 15)
                 return string.Format("{0}0203", year);
-            if (month == 2 && day < 15)
+            if (month == 2 && day <= 15)
                 return string.Format("{0}0102", year);
 
             if (month == 3 && day > 15)
                 return string.Format("{0}0305", year);
-            if (month == 3 && day < 15)
+            if (month == 3 && day <= 15)
                 return string.Format("{0}0204", year);
 
             if (month == 4 && day > 15)
                 return string.Format("{0}0407", year);
-            if (month == 4 && day < 15)
+            if (month == 4 && day <= 15)
                 return string.Format("{0}0306", year);
 
             if (month == 5 && day > 15)
                 return string.Format("{0}0509", year);
-            if (month == 5 && day < 15)
+            if (month == 5 && day <= 15)
                 return string.Format("{0}0408", year);
 
             if (month == 6 && day > 15)
                 return string.Format("{0}0611", year);
-            if (month == 6 && day < 15)
+            if (month == 6 && day <= 15)
                 return string.Format("{0}0510", year);
 
             if (month == 7 && day > 15)
                 return string.Format("{0}0713", year);
-            if (month == 7 && day < 15)
+            if (month == 7 && day <= 15)
                 return string.Format("{0}0612", year);
 
             if (month == 8 && day > 15)
                 return string.Format("{0}0815", year);
-            if (month == 8 && day < 15)
+            if (month == 8 && day <= 15)
                 return string.Format("{0}0714", year);
 
             if (month == 9 && day > 15)
                 return string.Format("{0}0917", year);
-            if (month == 9 && day < 15)
+            if (month == 9 && day <= 15)
                 return string.Format("{0}0816", year);
 
             if (month == 10 && day > 15)
                 return string.Format("{0}1019", year);
-            if (month == 10 && day < 15)
+            if (month == 10 && day <= 15)
                 return string.Format("{0}0918", year);
 
             if (month == 11 && day > 15)
                 return string.Format("{0}1121", year);
-            if (month == 11 && day < 15)
+            if (month == 11 && day <= 15)
                 return string.Format("{0}1020", year);
 
             if (month == 12 && day > 15)
                 return string.Format("{0}1223", year);
-            if (month == 12 && day < 15)
+            if (month == 12 && day <= 15)
                 return string.Format("{0}1122", year);
 
             return "";
@@ -206,62 +206,62 @@ namespace VacacionesRC.App_Start
 
             if (month == 1 && day > 15)
                 return DateTime.Parse(string.Format("{0}-01-01", year));
-            if (month == 1 && day < 15)
+            if (month == 1 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-12-15", oldYear));
             
             if (month == 2 && day > 15)
                 return DateTime.Parse(string.Format("{0}-02-01", year));
-            if (month == 2 && day < 15)
+            if (month == 2 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-01-15", year));
 
             if (month == 3 && day > 15)
                 return DateTime.Parse(string.Format("{0}-03-01", year));
-            if (month == 3 && day < 15)
+            if (month == 3 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-02-15", year));
 
             if (month == 4 && day > 15)
                 return DateTime.Parse(string.Format("{0}-04-01", year));
-            if (month == 4 && day < 15)
+            if (month == 4 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-03-15", year));
 
             if (month == 5 && day > 15)
                 return DateTime.Parse(string.Format("{0}-05-01", year));
-            if (month == 5 && day < 15)
+            if (month == 5 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-04-01", year));
 
             if (month == 6 && day > 15)
                 return DateTime.Parse(string.Format("{0}-06-01", year));
-            if (month == 6 && day < 15)
+            if (month == 6 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-05-15", year));
 
             if (month == 7 && day > 15)
                 return DateTime.Parse(string.Format("{0}-07-01", year));
-            if (month == 7 && day < 15)
+            if (month == 7 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-06-15", year));
 
             if (month == 8 && day > 15)
                 return DateTime.Parse(string.Format("{0}-08-01", year));
-            if (month == 8 && day < 15)
+            if (month == 8 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-07-15", year));
 
             if (month == 9 && day > 15)
                 return DateTime.Parse(string.Format("{0}-09-01", year));
-            if (month == 9 && day < 15)
+            if (month == 9 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-08-15", year));
 
             if (month == 10 && day > 15)
                 return DateTime.Parse(string.Format("{0}-10-01", year));
-            if (month == 10 && day < 15)
+            if (month == 10 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-09-15", year));
 
             if (month == 11 && day > 15)
                 return DateTime.Parse(string.Format("{0}-11-01", year));
-            if (month == 11 && day < 15)
+            if (month == 11 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-10-15", year));
 
             if (month == 12 && day > 15)
                 return DateTime.Parse(string.Format("{0}-12-01", year));
-            if (month == 12 && day < 15)
+            if (month == 12 && day <= 15)
                 return DateTime.Parse(string.Format("{0}-11-15", year));
 
             return null;

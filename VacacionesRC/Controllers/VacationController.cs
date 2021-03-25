@@ -16,8 +16,10 @@ namespace VacacionesRC.Controllers
     public class VacationController : Controller
     {
         // GET: Vacation
-        public ActionResult Index()
+        public ActionResult Index(int id = 0)
         {
+            int _year = id; //== 0 ? DateTime.Today.Year : id;
+
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
             
             try
@@ -34,7 +36,7 @@ namespace VacacionesRC.Controllers
                     //Admin users
                     if (Session["role"] != null && Session["role"].ToString() == "Admin")
                     {
-                        var vacations = db.GetVacacionesByDeptoOwner(0, DateTime.Now.Year).ToList();
+                        var vacations = db.GetVacacionesByDeptoOwner(0, _year).ToList();
 
                         foreach (var item in vacations)
                         {
@@ -70,7 +72,7 @@ namespace VacacionesRC.Controllers
                     //Depto owner
                     if (department != null && vacationModels.Count() == 0)
                     {
-                        var vacations = db.GetVacacionesByDeptoOwner(employeeId, DateTime.Now.Year).ToList();
+                        var vacations = db.GetVacacionesByDeptoOwner(employeeId, _year).ToList();
 
                         foreach (var item in vacations)
                         {
@@ -105,7 +107,7 @@ namespace VacacionesRC.Controllers
                     //End user
                     if (Session["role"] != null && Session["role"].ToString() != "Admin" && department == null)
                     {
-                        var vacations = db.Vacations.Where(v => v.EmployeeId == employeeId).OrderByDescending(o => o.CreatedDate).ToList();
+                        var vacations = db.Vacations.Where(v => v.EmployeeId == employeeId && (v.CreatedDate.Year == _year || _year == 0)).OrderByDescending(o => o.CreatedDate).ToList();
 
                         foreach (var item in vacations)
                         {
@@ -137,6 +139,8 @@ namespace VacacionesRC.Controllers
                         }
                     }
 
+                    ViewBag.Years = Helper.GetYears();
+                    
                     return View(vacationModels);
                 }
             }
@@ -587,7 +591,7 @@ namespace VacacionesRC.Controllers
 
                         //Elapsed Time
                         //int years, months, days, hours, minutes, seconds, milliseconds;
-                        Helper.GetElapsedTime(employee.AdmissionDate.Value, DateTime.Today, out int years, out int months, out int days, out int hours, out int minutes, out int seconds, out int milliseconds);
+                        Helper.GetElapsedTime(employee.AdmissionDate.Value, vacation.EndDate, out int years, out int months, out int days, out int hours, out int minutes, out int seconds, out int milliseconds);
 
                         if (years > 0)
                             TiempoTrabajando += years + (years > 1 ? " años " : " año ");
@@ -596,8 +600,7 @@ namespace VacacionesRC.Controllers
                         if (months == 0 && days > 0)
                             TiempoTrabajando += " y " + days + (days > 1 ? " días" : " día");
 
-                        if (years > 5)
-                            DiasPagados = rules.FirstOrDefault(r => r.Id == 2).Value;
+                        DiasPagados = years >= 5 ? "18" : "14"; // rules.FirstOrDefault(r => r.Id == 2).Value;
 
                         Cedula = employee.Identification;
                         SalarioMensual = "RD" + string.Format("{0:c}", employee.Salary);

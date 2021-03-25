@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Web;
+using System.Web.Mvc;
 using VacacionesRC.Models;
 
 namespace VacacionesRC.App_Start
@@ -102,6 +103,21 @@ namespace VacacionesRC.App_Start
                 hash.Append(theByte.ToString("X2"));
             }
             return hash.ToString();
+        }
+
+        public static List<SelectListItem> GetYears()
+        {
+            int startYear = 2021;
+            
+            List<SelectListItem> years = new List<SelectListItem>();
+            years.Add(new SelectListItem {Text="0", Value="Todos"});
+
+            for(int year = startYear; year <= DateTime.Today.Year; year++)
+            {
+                years.Add(new SelectListItem { Text = year.ToString(), Value = year.ToString() });
+            }
+
+            return years;
         }
 
         public static bool SendRecoverPasswordEmail(string newPassword, string email)
