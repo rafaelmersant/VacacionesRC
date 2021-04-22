@@ -425,6 +425,7 @@
     <Content Include="Views\Reportes\VacacionesSolicitadas.cshtml" />
     <Content Include="Views\Reportes\VacacionesVencidas.cshtml" />
     <Content Include="Views\Excepciones\Index.cshtml" />
+    <Content Include="Views\Vacation\Suspender.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

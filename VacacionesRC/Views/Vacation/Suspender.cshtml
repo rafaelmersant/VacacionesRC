@@ -1,0 +1,225 @@
+﻿
+@{
+    ViewBag.Title = "Suspender";
+}
+
+<div class="container-fluid">
+    <section class="text-dark border-custom border">
+        <div class="bg-secondary text-light panel-custom border">
+            <h6 class="panel-title">
+                Suspender vacaciones en curso
+            </h6>
+        </div>
+
+        <section class="mt-2 bg-light">
+            <div class="row ml-1 mr-1">
+                <div class="form-group col">
+                    <label for="validationDefault01">Nombres</label>
+                    <input type="text" id="employeeName" name="employeeName" value="" class="form-control form-control-sm col-12" readonly />
+                </div>
+                <div class="form-group col">
+                    <label for="validationDefault01">Puesto</label>
+                    <input type="text" id="employeePosition" name="employeePosition" value="" class="form-control form-control-sm col-12" readonly />
+                </div>
+                <div class="form-group col">
+                    <label for="validationDefault01">Departamento</label>
+                    <input type="text" id="employeeDepto" name="employeeDepto" value="" class="form-control form-control-sm col-12" readonly />
+                </div>
+            </div>
+            <div class="row ml-1 mr-1">
+                <div class="col-4">
+                    <label for="validationDefault02">Solicitar Desde</label>
+                    <input type="text" id="startDate" name="startDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" readonly />
+                </div>
+
+                <div class="col-4">
+                    <label for="validationDefault02">Solicitar Hasta</label>
+                    <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" readonly/>
+                </div>
+                <div class="col-4 mb-2">
+                    <label for="validationDefault01">Días Solicitados</label>
+                    <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-3 mb-2">
+            <div class="col-2 mb-2">
+                <label for="validationDefault02">Fecha de Suspensión</label>
+                <input type="text" id="suspendDate" name="suspendDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+            </div>
+            <div class="col-4">
+                <label for="validationDefault02">Motivo de Suspensión</label>
+
+                <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
+            </div>
+            <div class="col-1 mt-3">
+                <a class="btn btn-sm btn-danger pl-3 pr-3" href="javascript:void(0)" id="btnSuspend">Suspender</a>
+            </div>
+        </section>
+        
+    </section>
+</div>
+
+
+<link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
+@section scripts {
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/dataTables.bootstrap4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+}
+<script type="text/javascript">
+
+    $(document).ready(async function() {
+        $(".datepicker").datepicker(
+            {
+                dateFormat: 'dd/mm/yy',
+                beforeShowDay: $.datepicker.noWeekends
+            }
+        );
+
+        const url = window.location.pathname
+        var vacationId = url.substring(url.lastIndexOf('/') + 1);
+
+        if (vacationId && vacationId !== "Formulario") 
+            await showVacationDetail(vacationId)
+
+        $("#btnSuspend").click(async function (e) {
+            e.preventDefault();
+
+            const suspendDateFormatted = GetDateFormat($("#suspendDate").val())
+            let suspendDate = new Date(suspendDateFormatted).toLocaleDateString()
+
+            console.log($("#suspendDate").val())
+            console.log('fine:', suspendDate)
+            
+            const data = {
+                'vacationId': vacationId,
+                'suspendDate': suspendDate,
+                'suspendReason': $("#note").val()
+            }
+
+            $.ajax({
+                url: `/Vacation/SuspendVacation`,
+                type: "POST",
+                data: data
+            }).done(async function (response) {
+                if (response.result === "200") {
+                    alert("Las vacaciones fueron suspendidas con exito!")
+                    $("#suspendDate").prop("readonly", true)
+                    $("#note").prop("readonly", true)
+                    $("#btnSuspend").prop("disable", "disable")
+                }
+                else {
+                    console.log(response.message);
+                    alert(response.message);
+                }
+            }).fail(function (error) {
+                alert(error);
+            })
+            
+        });
+    });
+
+    function showVacationDetail(idHash) {
+
+        $.ajax({
+            "url": `/Vacation/GetVacation?idHash=${idHash}`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    const form = JSON.parse(response.message);
+                    console.log('form:', form)
+                    await getEmployeeDetail(form.EmployeeId, form.Id)
+
+                    $("#vacationId").val(form.Id);
+                    $("#daysTakenH").val(form.DaysRequested)
+                    $("#daysAvailableH").val(form.DaysAvailable)
+
+                    $("#startDate").val(new Date(form.StartDate).toLocaleDateString("es-DO"))
+                    $("#endDate").val(new Date(form.EndDate).toLocaleDateString("es-DO"))
+                    $("#daysRequested").val(form.DaysRequested)
+                                        
+                    $("#requestedDate").html(new Date(form.CreatedDate).toLocaleDateString("es-DO"))
+                    $("#requestStatus").html(form.Status)
+
+                    $("#employeeId").prop("readonly", true)
+                    $("#btnSearchEmployee").addClass("disabled")
+
+                    if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString()) {
+                        $("#btnReject").show()
+                        $("#btnAccept").show()
+                    } else {
+                        $("#btnReject").hide()
+                        $("#btnAccept").hide()
+                    }
+
+                    //Return date
+                    $("#_returnDate").val(form.ReturnDate)
+                    $("#returnDate").html(new Date(form.ReturnDate).toLocaleDateString("es-DO"))
+                    
+                    const _startDateVacation = new Date(form.StartDate)
+                    const _endDateVacation = new Date(form.EndDate)
+                    const currentDate = new Date()
+
+                    console.log('currentDate', currentDate)
+                    console.log('_startDateVacation', _startDateVacation)
+                    console.log('_endDateVacation', _endDateVacation)
+
+                    if (currentDate > _startDateVacation && currentDate < _endDateVacation && '@Session["role"].ToString()' == "Admin")
+                        $("#btnSuspend").show()
+                }
+                else if (response.result === "404") {
+                    alert('El formulario no fue encontrado.');
+                }
+                else {
+                    console.log(response.message);
+                    alert('Hubo un error tratando de encontrar al colaborador.');
+                }
+
+            }
+        });
+    }
+
+    async function getEmployeeDetail(employeeId, vacationId = 0) {
+
+        $.ajax({
+            "url": `/Vacation/GetEmployee?employeeId=${employeeId}`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    const employee = JSON.parse(response.message);
+                    $("#employeeId").val(employee.EmployeeId);
+                    $("#employeeName").val(employee.EmployeeName)
+                    $("#employeePosition").val(employee.EmployeePosition)
+                    $("#employeeDepto").val(employee.EmployeeDepto)
+                    $("#employeeAdmissionDate").val(new Date(employee.AdmissionDate).toLocaleDateString("es-DO"))
+
+                    //await CorrespondingDays(employeeId, vacationId);
+                }
+                else if (response.result === "404") {
+                    alert('El colaborador no fue encontrado.');
+                }
+                else {
+                    if (response.message.includes('(403)')) {
+                        alert(response.message);
+                    }
+                    else
+                        alert('Hubo un error tratando de encontrar al colaborador.');
+                }
+            }
+        });
+    }
+
+    function GetDateFormat(date) {
+        const parts = date.split("/");
+        const dt = new Date(parseInt(parts[2], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[0], 10));
+
+        return dt.toLocaleDateString();
+    }
+
+</script>
+

@@ -178,6 +178,11 @@
                             <span class="fa fa-print"></span> Imprimir Constancia
                         </button>
                     </div>
+                    <div class="d-inline">
+                        <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
+                            <span class="fa fa-times-circle"></span> Suspender
+                        </button>
+                    </div>
                     <div class="d-flex text-center">
                         <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
                     </div>
@@ -197,9 +202,13 @@
 
 <div id="printModal" title="Imprimir Formulario de Vacaciones"></div>
 
+@*<link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />*@
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/dataTables.bootstrap4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 }
 
@@ -439,6 +448,16 @@
             }
         });
 
+        //Suspender
+        $("#btnSuspend").click(function (evt) {
+            evt.preventDefault();
+
+            const url = window.location.pathname
+            const id = url.substring(url.lastIndexOf('/') + 1);
+            if (id && id !== "Formulario")
+                window.location = `/Vacation/Suspender/${id}`
+        })
+
         $("#startDate").on("change", function (evt) {
             console.log("Cambiando fecha inicio")
             validateDate()
@@ -490,7 +509,7 @@
                     console.log("Constancia", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
                     if (today >= printConstanciaFrom && response.status === "Aprobada")
                         $("#btnPrintConst").show()
-                    else 
+                    else
                         $("#btnPrintConst").hide()
 
                     //Check Editing
@@ -578,7 +597,7 @@
             "success": async function (response) {
                 if (response.result === "200") {
                     const form = JSON.parse(response.message);
-                    console.log(form)
+                    console.log('form:', form)
                     await getEmployeeDetail(form.EmployeeId, form.Id)
 
                     $("#vacationId").val(form.Id);
@@ -620,7 +639,7 @@
                         $("#btnSaveForm").prop("disabled", true)
                     }
 
-                    if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString()) {
+                    if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString() && form.Status != "Suspendida") {
                         $("#btnReject").show()
                         $("#btnAccept").show()
                     } else {
@@ -632,6 +651,17 @@
                     $("#_returnDate").val(form.ReturnDate)
                     $("#returnDate").html(new Date(form.ReturnDate).toLocaleDateString("es-DO"))
                     $("#returnDateDiv").show()
+
+                    const _startDateVacation = new Date(form.StartDate)
+                    const _endDateVacation = new Date(form.EndDate)
+                    const currentDate = new Date()
+
+                    console.log('currentDate', currentDate)
+                    console.log('_startDateVacation', _startDateVacation)
+                    console.log('_endDateVacation', _endDateVacation)
+
+                    if (currentDate > _startDateVacation && currentDate < _endDateVacation && '@Session["role"].ToString()' == "Admin")
+                        $("#btnSuspend").show()
                 }
                 else if (response.result === "404") {
                     alert('El formulario no fue encontrado.');
@@ -804,7 +834,7 @@
             const dt = new Date(parseInt(parts[2], 10),
                 parseInt(parts[1], 10) - 1,
                 parseInt(parts[0], 10));
-            
+
             return dt.toLocaleString("en-US")
         } else {
             const parts = date.split("/");

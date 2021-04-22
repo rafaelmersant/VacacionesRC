@@ -159,6 +159,13 @@ namespace VacacionesRC.Controllers
             return View();
         }
 
+        public ActionResult Suspender(Guid? id)
+        {
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+
+            return View();
+        }
+
         [HttpGet]
         public JsonResult GetCorrespondingDays(int employeeId, int vacationId = 0)
         {
@@ -418,6 +425,77 @@ namespace VacacionesRC.Controllers
 
                 return Json(new { result = "500", message = ex.Message });
             }
+        }
+
+        [HttpPost]
+        public JsonResult SuspendVacation(string vacationId, string suspendDate, string suspendReason)
+        {
+            try
+            {
+                if (Session["employeeID"] == null)
+                    throw new Exception("(501) Intente salir y entrar del sistema para realizar esta acción.");
+
+                if (!string.IsNullOrEmpty(vacationId))
+                {
+                    using (var db = new VacacionesRCEntities())
+                    {
+                        var _suspendDate = DateTime.Parse(suspendDate);
+                        
+                        var id = Guid.Parse(vacationId);
+                        var vacation = db.Vacations.FirstOrDefault(v => v.IdHash == id);
+
+                        if (vacation != null)
+                        {
+                            var suspendedDays = (vacation.EndDate - _suspendDate).Days;
+
+                            //Update current vacation record
+                            vacation.ModifiedDate = DateTime.Now;
+                            vacation.ModifiedBy = Session["employeeID"].ToString();
+                            vacation.DaysTaken = vacation.DaysTaken - suspendedDays;
+                            vacation.DaysRequested = vacation.DaysRequested - suspendedDays;
+                            vacation.DaysAvailable = vacation.DaysAvailable + suspendedDays;
+                            vacation.EndDate = _suspendDate;
+                            db.SaveChanges();
+
+                            //Suspend vacation
+                            var suspendVacation = new Vacation
+                            {
+                                IdHash = Guid.NewGuid(),
+                                EmployeeId = vacation.EmployeeId,
+                                DeptoId = vacation.DeptoId,
+                                Status = "Suspendida",
+                                DaysTaken = 0,
+                                DaysAvailable = 0,
+                                DaysRequested = suspendedDays,
+                                StartDate = _suspendDate,
+                                EndDate = vacation.EndDate,
+                                ReturnDate = vacation.ReturnDate,
+                                Note = suspendReason,
+                                Year = vacation.Year,
+                                CreatedDate = DateTime.Now,
+                                CreatedBy = Session["employeeID"].ToString(),
+                            };
+                            db.Vacations.Add(suspendVacation);
+                            db.SaveChanges();
+
+                            //Rollback days taken
+                            var employeeDays = db.EmployeeDays.FirstOrDefault(d => d.EmployeeId == vacation.EmployeeId && d.CurrentYear == vacation.Year);
+                            employeeDays.TakenDays = employeeDays.TakenDays - suspendedDays;
+                            db.SaveChanges();
+                        }
+                    }
+
+                    return Json(new { result = "200", message = "Suspended" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "vacationId:" + vacationId);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "404", message = "No encontrado" });
         }
 
         [HttpPost]
