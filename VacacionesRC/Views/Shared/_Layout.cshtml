@@ -25,9 +25,13 @@
     @RenderSection("Styles", false)
 </head>
 <body>
+    @*<div style="height: 27px" class="bg-warning text-center">
+        <h4 class="text-light">AMBIENTE DE PRUEBA</h4>
+    </div>*@
     <div class="wrapper">
         <!-- Sidebar  -->
         <nav id="sidebar">
+
             <div class="sidebar-header">
                 <a href="/"><img src="~/Content/images/RCLogo.PNG" alt="logo" id="site_logo_id" style="width: 220px" /></a>
                 @*<strong>BS</strong>*@
@@ -48,10 +52,13 @@
                     <li><a href="/Excepciones"><i class="fa fa-circle-o-notch"></i>Excepciones</a></li>
                 }
 
-                @if (Session["role"] != null && Session["role"].ToString() == "Depto")
+                @if (Session["role"] != null)
                 {
-                    <li><a href="/Reportes"><i class="fa fa-folder"></i>Reportes</a></li>
-                    <!--<li><a href="/Reglas"><i class="fa fa-address-book"></i>Reglas y otros</a></li>-->
+                    if (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO"))
+                    {
+                        <li><a href="/Reportes"><i class="fa fa-folder"></i>Reportes</a></li>
+                        <!--<li><a href="/Reglas"><i class="fa fa-address-book"></i>Reglas y otros</a></li>-->
+                    }
                 }
             </ul>
         </nav>

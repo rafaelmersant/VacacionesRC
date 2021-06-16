@@ -40,7 +40,8 @@
                     <div class="row">
                         <div class="col-3 mb-1">
                             <label for="validationDefault01">Código</label>
-                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null && 
+                                (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString() == "Admin"))
                             {
                                 <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" style="min-width: 65px !important" />
                             }
@@ -134,7 +135,7 @@
                                 <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
                             </div>
                             <div class="col-4 mb-2">
-                                <label for="validationDefault01">Días Solicitados</label>
+                                <label for="validationDefault01" id="requestedDaysLabel">Días Solicitados</label>
                                 <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
                             </div>
 
@@ -159,37 +160,58 @@
                         </button>
                     </div>
                     <div class="d-inline">
-                        <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
-                            <span class="fa fa-remove"></span> Rechazar
-                        </button>
-                    </div>
-                    <div class="d-inline">
-                        <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
-                            <span class="fa fa-check"></span> Aprobar
-                        </button>
-                    </div>
-                    <div class="d-inline">
                         <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" style="display: none">
                             <span class="fa fa-print"></span> Imprimir Solicitud
                         </button>
                     </div>
+
+                    @if (Session["role"] != null &&
+                               (Session["role"].ToString().Contains("APROBADOR")
+                                || Session["role"].ToString().Contains("DIRECTOR")
+                                || Session["role"].ToString().Contains("APOYO")
+                                || Session["role"].ToString() == "Admin"))
+                    {
+                        <div class="d-inline">
+                            <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
+                                <span class="fa fa-remove"></span> Rechazar
+                            </button>
+                        </div>
+                        <div class="d-inline">
+                            <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
+                                <span class="fa fa-check"></span> Aprobar
+                            </button>
+                        </div>
+                        <div class="d-inline">
+                            <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
+                                <span class="fa fa-times-circle"></span> Suspender
+                            </button>
+                        </div>
+                    }
+
                     <div class="d-inline">
                         <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1" style="display: none">
                             <span class="fa fa-print"></span> Imprimir Constancia
                         </button>
                     </div>
-                    <div class="d-inline">
-                        <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
-                            <span class="fa fa-times-circle"></span> Suspender
-                        </button>
-                    </div>
+
                     <div class="d-flex text-center">
                         <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
                     </div>
                 </div>
 
-
                 <span id="message" class="d-block pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
+            }
+        </div>
+        
+        <div class="ml-3">
+            @if (ViewBag.SuspendedVacation != null)
+            {
+                @Html.ActionLink("Ver registro de vacaciones suspendidas", "Formulario", "Vacation", new { id = ViewBag.SuspendedVacation }, new { @class = "text-info" })
+            }
+
+            @if (ViewBag.AcceptedVacation != null)
+            {
+                @Html.ActionLink("Ver registro de vacaciones aprobadas", "Formulario", "Vacation", new { id = ViewBag.AcceptedVacation }, new { @class = "text-info" })
             }
         </div>
     </section>
@@ -507,8 +529,9 @@
                     //printConstanciaFrom = addDays(printConstanciaFrom, - 15)
 
                     console.log("Constancia", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
-                    if (today >= printConstanciaFrom && response.status === "Aprobada")
+                    if (today >= printConstanciaFrom && response.status === "Aprobada") {
                         $("#btnPrintConst").show()
+                    }
                     else
                         $("#btnPrintConst").hide()
 
@@ -533,6 +556,10 @@
                             _daysTaken = employeeDay.TakenDays
                         } else if (response.status === "En proceso") {
                             _daysTaken = employeeDay.TakenDays - _daysTaken
+                        }
+
+                        if (response.status.includes("Suspendida")) {
+                            _daysAvailable = parseInt($("#daysAvailableH").val())
                         }
 
                         $("#daysTaken").val(_daysTaken)
@@ -622,13 +649,23 @@
                     if (form.Status.includes('Rechazada'))
                         $("#requestStatus").addClass("text-danger")
 
+                    if (form.Status.includes('Suspendida')) {
+                        $("#daysTakenH").val(form.DaysTaken)
+                    }
+                        
                     $("#employeeId").prop("readonly", true)
                     $("#btnSearchEmployee").addClass("disabled")
 
-                    if ((form.AcceptedDate !== null || form.RejectedDate !== null)
-                        || (parseInt($("#employeeId").val()) !== @Session["employeeID"].ToString() && '@Session["role"].ToString()' !== "Admin")) {
+                    console.log("EMPLOYEE_ID::::", @Session["employeeID"].ToString())
+                    console.log("ROLE:::", '@Session["role"].ToString()')
+                    console.log("EXTRA__:::", $("#employeeId").val())
+                    console.log("EXTRA2__:::", form.EmployeeId)
+                    console.log('complete FORM variable::', form)
 
-                        if (form.AcceptedDate !== null) {
+                     if ((form.AcceptedDate !== null || form.RejectedDate !== null)
+                         || (form.EmployeeId !== parseInt(@Session["employeeID"].ToString()) && '@Session["role"].ToString()' !== "Admin")) {
+
+                         if (form.AcceptedDate !== null) {
                             $("#btnPrint").show()
                             $("#btnPrintConst").show()
                         }
@@ -639,7 +676,7 @@
                         $("#btnSaveForm").prop("disabled", true)
                     }
 
-                    if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString() && form.Status != "Suspendida") {
+                    if ((form.AcceptedDate === null && form.RejectedDate === null) && parseInt(form.EmployeeId) !== @Session["employeeID"].ToString() && form.Status !== "Suspendida") {
                         $("#btnReject").show()
                         $("#btnAccept").show()
                     } else {
@@ -652,6 +689,12 @@
                     $("#returnDate").html(new Date(form.ReturnDate).toLocaleDateString("es-DO"))
                     $("#returnDateDiv").show()
 
+                    if (form.Status.includes("Suspendida")) {
+                        $("#requestedDaysLabel").text("Días Suspendidos")
+                        $("#requestedDaysLabel").addClass("text-danger")
+                        $("#returnDateDiv").hide()
+                    }
+
                     const _startDateVacation = new Date(form.StartDate)
                     const _endDateVacation = new Date(form.EndDate)
                     const currentDate = new Date()
@@ -659,8 +702,9 @@
                     console.log('currentDate', currentDate)
                     console.log('_startDateVacation', _startDateVacation)
                     console.log('_endDateVacation', _endDateVacation)
+                    console.log('form.Status.includes("Aprobada")', form.Status.includes("Aprobada"));
 
-                    if (currentDate > _startDateVacation && currentDate < _endDateVacation && '@Session["role"].ToString()' == "Admin")
+                    if (currentDate > _startDateVacation && currentDate < _endDateVacation && '@Session["role"].ToString()' == "Admin" && form.Status.includes("Aprobada") && '@ViewBag.SuspendedVacation' === "")
                         $("#btnSuspend").show()
                 }
                 else if (response.result === "404") {

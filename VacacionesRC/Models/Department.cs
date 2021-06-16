@@ -16,7 +16,8 @@ namespace VacacionesRC.Models
     {
         public int DeptoCode { get; set; }
         public string DeptoName { get; set; }
-        public Nullable<int> DeptoOwner { get; set; }
+        public int DeptoOwner { get; set; }
+        public string UserRole { get; set; }
         public System.DateTime CreatedDate { get; set; }
     }
 }

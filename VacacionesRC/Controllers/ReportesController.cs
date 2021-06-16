@@ -16,7 +16,10 @@ namespace VacacionesRC.Controllers
         public ActionResult Index()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin" && Session["role"].ToString() != "Depto") return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin" 
+                && !Session["role"].ToString().Contains("APROBADOR")
+                && !Session["role"].ToString().Contains("APOYO")
+                && !Session["role"].ToString().Contains("DIRECTOR")) return RedirectToAction("Index", "Home");
 
             try
             {
@@ -36,7 +39,10 @@ namespace VacacionesRC.Controllers
         public ActionResult EnVacaciones()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin" && Session["role"].ToString() != "Depto") return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin"
+                && !Session["role"].ToString().Contains("APROBADOR")
+                && !Session["role"].ToString().Contains("APOYO")
+                && !Session["role"].ToString().Contains("DIRECTOR")) return RedirectToAction("Index", "Home");
 
             List<EmployeeOnVacationModel> employees = GetEnVacaciones();
 
@@ -46,7 +52,10 @@ namespace VacacionesRC.Controllers
         public ActionResult VacacionesPendientes()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin" && Session["role"].ToString() != "Depto") return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin"
+                && !Session["role"].ToString().Contains("APROBADOR")
+                && !Session["role"].ToString().Contains("APOYO")
+                && !Session["role"].ToString().Contains("DIRECTOR")) return RedirectToAction("Index", "Home");
 
             List<EmployeePendingVacationModel> employees = GetVacacionesPendientes();
 
@@ -56,7 +65,10 @@ namespace VacacionesRC.Controllers
         public ActionResult VacacionesSolicitadas()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin" && Session["role"].ToString() != "Depto") return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin"
+                && !Session["role"].ToString().Contains("APROBADOR")
+                && !Session["role"].ToString().Contains("APOYO")
+                && !Session["role"].ToString().Contains("DIRECTOR")) return RedirectToAction("Index", "Home");
 
             List<EmployeeOnVacationModel> employees = GetVacacionesSolicitadas();
 
@@ -66,7 +78,10 @@ namespace VacacionesRC.Controllers
         public ActionResult VacacionesVencidas()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin" && Session["role"].ToString() != "Depto") return RedirectToAction("Index", "Home");
+            if (Session["role"].ToString() != "Admin"
+                && !Session["role"].ToString().Contains("APROBADOR")
+                && !Session["role"].ToString().Contains("APOYO")
+                && !Session["role"].ToString().Contains("DIRECTOR")) return RedirectToAction("Index", "Home");
 
             List<EmployeePendingVacationModel> employees = GetVacacionesVencidas();
             
@@ -258,15 +273,10 @@ namespace VacacionesRC.Controllers
                 using (var db = new VacacionesRCEntities())
                 {
                     int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
-                    int deptoId = 0;
-
+                    
                     List<EmployeeOnVacationModel> employees = new List<EmployeeOnVacationModel>();
 
-                    Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == deptoOwner);
-                    if (department != null && Session["role"].ToString() != "Admin")
-                        deptoId = department.DeptoCode;
-
-                    var _employees = db.GetEmployeeOnVacation(deptoId).ToList();
+                    var _employees = db.GetEmployeeOnVacation(deptoOwner).ToList();
 
                     foreach (var employee in _employees)
                     {
@@ -303,15 +313,10 @@ namespace VacacionesRC.Controllers
                 using (var db = new VacacionesRCEntities())
                 {
                     int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
-                    int deptoId = 0;
-
+                    
                     List<EmployeeOnVacationModel> employees = new List<EmployeeOnVacationModel>();
 
-                    Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == deptoOwner);
-                    if (department != null && Session["role"].ToString() != "Admin")
-                        deptoId = department.DeptoCode;
-
-                    var _employees = db.GetEmployeeVacationRequested(deptoId).ToList();
+                    var _employees = db.GetEmployeeVacationRequested(deptoOwner).ToList();
 
                     foreach (var employee in _employees)
                     {
@@ -349,16 +354,11 @@ namespace VacacionesRC.Controllers
                 using (var db = new VacacionesRCEntities())
                 {
                     int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
-                    int deptoId = 0;
 
                     List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
 
-                    Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == deptoOwner);
-                    if (department != null && Session["role"].ToString() != "Admin")
-                        deptoId = department.DeptoCode;
-                    
                     //var _employees = db.GetEmployeePendingVacation().ToList();
-                    var _employees = db.GetEmployeePendingVacation(deptoId).Where(f => f.daysToDueVacation.HasValue && f.daysToDueVacation.Value > 0).ToList();
+                    var _employees = db.GetEmployeePendingVacation(deptoOwner).Where(f => f.daysToDueVacation.HasValue && f.daysToDueVacation.Value > 0).ToList();
 
                     foreach (var employee in _employees)
                     {
@@ -397,15 +397,10 @@ namespace VacacionesRC.Controllers
                 using (var db = new VacacionesRCEntities())
                 {
                     int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
-                    int deptoId = 0;
-
+                    
                     List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
 
-                    Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == deptoOwner);
-                    if (department != null && Session["role"].ToString() != "Admin")
-                        deptoId = department.DeptoCode;
-                    
-                    var _employees = db.GetEmployeePendingVacation(deptoId).Where(f => !f.daysToDueVacation.HasValue || f.daysToDueVacation.Value < 0).ToList();
+                    var _employees = db.GetEmployeePendingVacation(deptoOwner).Where(f => !f.daysToDueVacation.HasValue || f.daysToDueVacation.Value < 0).ToList();
 
                     foreach (var employee in _employees)
                     {

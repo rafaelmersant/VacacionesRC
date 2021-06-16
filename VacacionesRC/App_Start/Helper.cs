@@ -207,7 +207,7 @@ namespace VacacionesRC.App_Start
                                         terminateDate = new DateTime(year, month, day);
                                     }
 
-                                    if (terminateDate != null) continue; // do not add people cancelled
+                                    //if (terminateDate != null) continue; // do not add people cancelled
 
                                     Employee employee = new Employee
                                     {
@@ -260,7 +260,6 @@ namespace VacacionesRC.App_Start
 
                                         db.SaveChanges();
                                     }
-
                                 }
                             }
                             catch (Exception exEmp)
@@ -436,7 +435,7 @@ namespace VacacionesRC.App_Start
                 string sQuery = string.Empty;
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CEINGDEDUC = 'I' AND CEFRETIRO = 0 ORDER BY CECICLOPAG DESC"; //AND CETIPTRANS = 1
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CEINGDEDUC = 'I' ORDER BY CECICLOPAG DESC"; //AND CETIPTRANS = 1
 
                 //sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
                 //"CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' ORDER BY CECODEMPLE DESC"; //AND CETIPTRANS = 1

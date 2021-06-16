@@ -37,5 +37,7 @@ namespace VacacionesRC.Models
         public string CreatedBy { get; set; }
         public Nullable<System.DateTime> ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }
+        public Nullable<int> ReferenceId { get; set; }
+        public Nullable<System.Guid> ReferenceHash { get; set; }
     }
 }

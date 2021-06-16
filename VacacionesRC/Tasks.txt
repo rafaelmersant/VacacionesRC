@@ -58,11 +58,18 @@ DESPUES DE PRUEBAS:
 *****(8) Permitir tomar más de 7 dias si la seleccion de vacaciones esta mas alla de la fecha de renovacion
 
 NUEVOS: MARZO 2021
-1-Corregir reportes
-2-Ajuste de la carta de constancia
-3-Suspender vacaciones ya en curso
-4-Estructura de permisos: Aprobador, Apoyo, Director
-5-Bloquear los sabados y domingos en la seleccion de fecha
+****1-Corregir reportes
+****2-Ajuste de la carta de constancia
+****3-Suspender vacaciones ya en curso
+****4-Estructura de permisos: Aprobador, Apoyo, Director
+****5-Bloquear los sabados y domingos en la seleccion de fecha
+
+-Validar empleado 471 vacaciones Suspendidas no correctas
+******-Agregar a vacaciones suspendidas la fecha inicio sera la fecha de la suspension.
+-Agregar a vacaciones suspendidas la fecha fin vacia
+-Poner dias suspendidos en la solicitud suspendida
+-Establecer una relacion ID->ID entre el registro suspendida y aprobada
+-
 
 
 

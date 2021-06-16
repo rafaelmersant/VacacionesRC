@@ -52,10 +52,14 @@
                 <table id="vacationsTable" class="table table-striped table-bordered table-condensed table-sm mt-4">
                     <thead>
                         <tr>
+                            <th>
+                                Id
+                            </th>
                             <th style="width: 50px">
                                 Fecha Solicitud
                             </th>
-                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null && 
+                                (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString() == "Admin"))
                             {
                                 <th>
                                     Código
@@ -90,7 +94,7 @@
                                 Estatus
                             </th>
 
-                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null && (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString() == "Admin"))
                             {
                                 <th class="text-center" style="width: 15px">Aprobar</th>
                                 <th class="text-center" style="width: 15px">Rechazar</th>
@@ -114,27 +118,61 @@
                             {
                                 statusColor = "text-dark";
                             }
+                            if (item.Status == "Suspendida")
+                            {
+                                statusColor = "text-dark";
+                            }
 
                         <tr class="tr-hover-class" onclick="location.href = '@Url.Action("Formulario", new { id = @item.IdHash })'" style="cursor: pointer" title="Click para ver detalle">
+                            <td>@item.Id</td>
                             <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
 
-                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null &&
+                                (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString() == "Admin"))
                             {
                                 <td>@item.EmployeeId</td>
                                 <td>@item.EmployeeName</td>
                                 <td>@item.EmployeePosition</td>
                                 <td>@item.DeptoName</td>
                             }
-                            <td>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</td>
-                            <td>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</td>
-                            <td class="text-center">@item.DaysRequested</td>
+                                <td>
+                                    @*@if (item.Status.Contains("Suspendida"))
+                                    {
+                                        <span></span>
+                                    }
+                                    else
+                                    {*@
+                                        <span>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</span>
+                                    @*}*@
+                                    
+                                </td>
+                                <td>
+                                    @if (item.Status.Contains("Suspendida"))
+                                    {
+                                        <span></span>
+                                    }
+                                    else
+                                    {
+                                        <span>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</span>
+                                    }
+                                </td>
+                            <td class="text-center">
+                                @if (item.Status.Contains("Suspendida"))
+                                {
+                                    <span>0</span>
+                                }
+                                else
+                                {
+                                    <span>@item.DaysRequested</span>
+                                }
+                            </td>
                             <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
                             <td class="text-center">@item.Year</td>
                             <td class="text-center @(statusColor)"><b>@item.Status</b></td>
 
-                            @if (Session["role"] != null && (Session["role"].ToString() == "Depto" || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null && (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString() == "Admin"))
                             {
-                                if ((Session["employeeId"].ToString() == item.EmployeeId.ToString() && Session["role"].ToString() != "Admin") || (item.RejectedDate != null || item.AcceptedDate != null))
+                                if ((Session["employeeId"].ToString() == item.EmployeeId.ToString() && Session["role"].ToString() != "Admin") || (item.RejectedDate != null || item.AcceptedDate != null) || (item.Status.Contains("Suspendida")))
                                 {
                                     <td align="center">
                                         <button class="btn btn-sm btn-secondary" disabled>

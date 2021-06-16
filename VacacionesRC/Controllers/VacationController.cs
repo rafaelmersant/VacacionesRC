@@ -64,7 +64,6 @@ namespace VacacionesRC.Controllers
                                 DeptoName = item.EmployeeDepto,
                                 EmployeePosition = item.EmployeePosition,
                                 Year = item.Year
-
                             });
                         }
                     }
@@ -140,7 +139,7 @@ namespace VacacionesRC.Controllers
                     }
 
                     ViewBag.Years = Helper.GetYears();
-                    
+
                     return View(vacationModels);
                 }
             }
@@ -156,6 +155,29 @@ namespace VacacionesRC.Controllers
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
 
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    if (id.HasValue)
+                    {
+                        //Suspended
+                        var suspendedVacation = db.Vacations.FirstOrDefault(v => v.Status.Contains("Suspendida") && v.ReferenceHash == id.Value);
+                        if (suspendedVacation != null)
+                            ViewBag.SuspendedVacation = suspendedVacation.IdHash;
+
+                        //Accepted
+                        var acceptedVacation = db.Vacations.FirstOrDefault(v => v.Status.Contains("Aprobada") && v.ReferenceHash == id.Value);
+                        if (acceptedVacation != null)
+                            ViewBag.AcceptedVacation = acceptedVacation.IdHash;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+            
             return View();
         }
 
@@ -229,7 +251,9 @@ namespace VacacionesRC.Controllers
                         if (Session["role"] != null && Session["role"].ToString() == "Consulta" && empId != employeeId)
                             throw new Exception("(403) Usted no esta autorizado para consultar este colaborador.");
 
-                        if (Session["role"] != null && Session["role"].ToString() == "Depto")
+                        if (Session["role"] != null && 
+                            (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString().Contains("DIRECTOR"))
+                            )
                         {
                             int ownerId = int.Parse(Session["employeeID"].ToString());
                             Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == ownerId && d.DeptoCode == employee.EmployeeDeptoId);
@@ -395,7 +419,12 @@ namespace VacacionesRC.Controllers
                         //Send notification to depto owner
                         try
                         {
-                            Department department = db.Departments.FirstOrDefault(d => d.DeptoCode == newVacation.DeptoId);
+                            Department department = db.Departments.FirstOrDefault(d => d.DeptoCode == newVacation.DeptoId && d.UserRole.Contains("APROBADOR"));
+
+                            //IF APROBADOR is the same REQUESTED then send the notification to the DIRECTOR for this department
+                            if (department.DeptoOwner == newVacation.EmployeeId)
+                                department = db.Departments.FirstOrDefault(d => d.DeptoCode == newVacation.DeptoId && d.UserRole.Contains("DIRECTOR"));
+
                             if (department != null)
                             {
                                 Employee ownerDepto = db.Employees.FirstOrDefault(o => o.EmployeeId == department.DeptoOwner);
@@ -446,15 +475,25 @@ namespace VacacionesRC.Controllers
 
                         if (vacation != null)
                         {
-                            var suspendedDays = (vacation.EndDate - _suspendDate).Days;
+                            //var suspendedDays = (vacation.EndDate - _suspendDate).Days;
+                            int suspendedDays = 0;
+                            var _suspendDate_ = _suspendDate;
 
+                            while (_suspendDate_ <= vacation.EndDate)
+                            {
+                                if (_suspendDate_.DayOfWeek != DayOfWeek.Saturday && _suspendDate_.DayOfWeek != DayOfWeek.Sunday)
+                                    suspendedDays += 1;
+
+                                _suspendDate_ = _suspendDate_.AddDays(1);
+                            }
+                            
                             //Update current vacation record
                             vacation.ModifiedDate = DateTime.Now;
                             vacation.ModifiedBy = Session["employeeID"].ToString();
                             vacation.DaysTaken = vacation.DaysTaken - suspendedDays;
-                            vacation.DaysRequested = vacation.DaysRequested - suspendedDays;
+                            //vacation.DaysRequested = vacation.DaysRequested - suspendedDays;
                             vacation.DaysAvailable = vacation.DaysAvailable + suspendedDays;
-                            vacation.EndDate = _suspendDate;
+                            //vacation.EndDate = _suspendDate;
                             db.SaveChanges();
 
                             //Suspend vacation
@@ -464,18 +503,25 @@ namespace VacacionesRC.Controllers
                                 EmployeeId = vacation.EmployeeId,
                                 DeptoId = vacation.DeptoId,
                                 Status = "Suspendida",
-                                DaysTaken = 0,
-                                DaysAvailable = 0,
+                                DaysTaken = vacation.DaysTaken,
+                                DaysAvailable = vacation.DaysAvailable,
                                 DaysRequested = suspendedDays,
                                 StartDate = _suspendDate,
                                 EndDate = vacation.EndDate,
-                                ReturnDate = vacation.ReturnDate,
+                                ReturnDate = null,
                                 Note = suspendReason,
                                 Year = vacation.Year,
                                 CreatedDate = DateTime.Now,
                                 CreatedBy = Session["employeeID"].ToString(),
+                                ReferenceId = vacation.Id,
+                                ReferenceHash =vacation.IdHash
                             };
                             db.Vacations.Add(suspendVacation);
+                            db.SaveChanges();
+
+                            //Relationship beteween Suspended and Accepted vacation
+                            vacation.ReferenceId = suspendVacation.Id;
+                            vacation.ReferenceHash = suspendVacation.IdHash;
                             db.SaveChanges();
 
                             //Rollback days taken

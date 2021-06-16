@@ -19,9 +19,15 @@
             <div class="col-7 col-md-3 col-sm-3 mt-3 mb-3 ml-1" style="min-width: 235px">
                 <input type="text" id="DeptoName" name="DeptoName" value="" class="form-control form-control-sm" placeholder="Depto. Descripción" readonly />
             </div>
+
             <div class="col-1 col-md-3 col-sm-3 mt-3 mb-3 ml-1" style="max-width: 115px">
                 <input type="text" id="OwnerDeptoId" name="OwnerDeptoId" value="" class="form-control form-control-sm" autocomplete="off" placeholder="Resp. ID" readonly />
             </div>
+
+            <div class="col-1 col-md-3 col-sm-3 mt-3 mb-3 ml-1" style="max-width: 215px">
+                @Html.DropDownList("UserRoleId", new SelectList(ViewBag.Roles, "Value", "Text"), new { @class = "form-control form-control-sm", @disabled="true" })
+            </div>
+            
             <div class="col-1 mt-3" style="max-width: 65px">
                 <a class="btn btn-sm btn-secondary pl-3 pr-3" href="javascript:void(0)" onclick="editDeptoClear()" title="Limpiar campos"><span class="fa fa-remove"></span></a>
             </div>
@@ -50,6 +56,9 @@
                         <th>
                             Responsable
                         </th>
+                        <th>
+                            Rol
+                        </th>
                         <th class="text-center">Editar</th>
                     </tr>
                 </thead>
@@ -61,10 +70,14 @@
                         <td>@item.DeptoName</td>
                         <td>@item.OwnerId</td>
                         <td>@item.OwnerName</td>
+                        <td>@item.UserRole</td>
 
                         <td align="center">
-                            <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editDepto(@item.DeptoCode, '@item.DeptoName', @item.OwnerId)" title="Editar">
+                            <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editDepto(@item.DeptoCode, '@item.DeptoName', @item.OwnerId, '@item.UserRole')" title="Editar">
                                 <i class="fa fa-edit"></i>
+                            </a>
+                            <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteRecord(@item.DeptoCode, @item.OwnerId, '@item.UserRole', '@item.OwnerName')" title="Eliminar">
+                                <i class="fa fa-remove"></i>
                             </a>
                         </td>
                     </tr>
@@ -133,32 +146,41 @@
         }).replaceWith(function () {
             return this.nodeValue.replace('Search', 'Buscar');
         });
+
+        $("#DeptoCode").keyup(async function (evt) {
+            GetDepartmentByCode($("#DeptoCode").val())
+        });
     });
 
-    function editDepto(DeptoCode, DeptoName, OwnerDeptoId) {
+    function editDepto(DeptoCode, DeptoName, OwnerDeptoId, UserRole) {
         $("#DeptoCode").val(DeptoCode)
         $("#DeptoName").val(DeptoName)
         $("#OwnerDeptoId").val(OwnerDeptoId)
+        $("#UserRoleId").val(UserRole)
 
         $("#DeptoCode").prop("readonly", true)
         $("#DeptoName").prop("readonly", false)
-        $("#OwnerDeptoId").prop("readonly", false)
+        //$("#OwnerDeptoId").prop("readonly", false)
+        $("#UserRoleId").prop("disabled", false)
     }
 
     function editDeptoClear() {
         $("#DeptoCode").val('')
         $("#DeptoName").val('')
         $("#OwnerDeptoId").val('')
+        $("#UserRoleId").val('APROBADOR')
     }
 
     function newDepto() {
         $("#DeptoCode").val('')
         $("#DeptoName").val('')
         $("#OwnerDeptoId").val('')
+        $("#UserRoleId").val('APROBADOR')
 
         $("#DeptoCode").prop("readonly", false)
         $("#DeptoName").prop("readonly", false)
         $("#OwnerDeptoId").prop("readonly", false)
+        $("#UserRoleId").prop("disabled", false)
     }
 
     function saveChangesDepto() {
@@ -166,6 +188,7 @@
         const DeptoCode = $("#DeptoCode").val()
         const DeptoName = $("#DeptoName").val()
         const OwnerDeptoId = $("#OwnerDeptoId").val()
+        const UserRoleId = $("#UserRoleId option:selected").val();
 
         if (DeptoCode === '' || DeptoName === '' || OwnerDeptoId === '') {
             alert("Favor completar todos los campos (no dejar ninguno vacío).")
@@ -173,7 +196,7 @@
         }
 
         $.ajax({
-            "url": `/Depto/Save?DeptoCode=${DeptoCode}&DeptoName=${DeptoName}&OwnerDeptoId=${OwnerDeptoId}`,
+            "url": `/Depto/Save?DeptoCode=${DeptoCode}&DeptoName=${DeptoName}&OwnerDeptoId=${OwnerDeptoId}&UserRoleId=${UserRoleId}`,
             "type": "POST",
             "success": async function (response) {
                 if (response.result === "200") {
@@ -184,6 +207,45 @@
                 }
             }
         });
+    }
+
+    async function GetDepartmentByCode(DeptoCode) {
+
+        $.ajax({
+            "url": `/Depto/GetDepartamentByCode?DeptoCode=${DeptoCode}`,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+                    $("#DeptoName").val(response.message)
+                } else {
+                    $("#DeptoName").val('')
+                }
+            }
+        });
+    }
+
+    function deleteRecord(DeptoCode, OwnerCode, UserRole, UserName) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        if (confirm(`Seguro que desea eliminar el registro: Departamento ${DeptoCode} ${UserRole} - ${UserName}`)) {
+            $.ajax({
+                "url": `/Depto/DeleteRecord?DeptoCode=${DeptoCode}&OwnerCode=${OwnerCode}&UserRole=${UserRole}`,
+                "type": "POST",
+                "success": function (response) {
+                    if (response.result === "200") {
+                        window.location.reload();
+                    } else {
+                        console.log(response.message);
+                        if (response.message.includes("501")) {
+                            alert(response.message)
+                        } else {
+                            alert('Hubo un error tratando de eliminar el registro.');
+                        }
+                    }
+                }
+            });
+        }
     }
 
 </script>

@@ -32,17 +32,12 @@ namespace VacacionesRC.Models
         public virtual DbSet<DaysBySeniority> DaysBySeniorities { get; set; }
         public virtual DbSet<EmployeeDay> EmployeeDays { get; set; }
         public virtual DbSet<Holiday> Holidays { get; set; }
-        public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Rule> Rules { get; set; }
-        public virtual DbSet<Vacation> Vacations { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<ExceptionsVacation> ExceptionsVacations { get; set; }
-    
-        public virtual ObjectResult<GetDeptos_Result> GetDeptos()
-        {
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDeptos_Result>("GetDeptos");
-        }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Vacation> Vacations { get; set; }
     
         public virtual ObjectResult<GetVacacionesByDeptoOwner_Result> GetVacacionesByDeptoOwner(Nullable<int> ownerId, Nullable<int> year)
         {
@@ -57,31 +52,36 @@ namespace VacacionesRC.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetVacacionesByDeptoOwner_Result>("GetVacacionesByDeptoOwner", ownerIdParameter, yearParameter);
         }
     
-        public virtual ObjectResult<GetEmployeeOnVacation_Result> GetEmployeeOnVacation(Nullable<int> deptoId)
+        public virtual ObjectResult<GetDeptos_Result> GetDeptos()
         {
-            var deptoIdParameter = deptoId.HasValue ?
-                new ObjectParameter("deptoId", deptoId) :
-                new ObjectParameter("deptoId", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeOnVacation_Result>("GetEmployeeOnVacation", deptoIdParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDeptos_Result>("GetDeptos");
         }
     
-        public virtual ObjectResult<GetEmployeePendingVacation_Result> GetEmployeePendingVacation(Nullable<int> deptoId)
+        public virtual ObjectResult<GetEmployeeOnVacation_Result> GetEmployeeOnVacation(Nullable<int> deptoOwnerId)
         {
-            var deptoIdParameter = deptoId.HasValue ?
-                new ObjectParameter("deptoId", deptoId) :
-                new ObjectParameter("deptoId", typeof(int));
+            var deptoOwnerIdParameter = deptoOwnerId.HasValue ?
+                new ObjectParameter("deptoOwnerId", deptoOwnerId) :
+                new ObjectParameter("deptoOwnerId", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeePendingVacation_Result>("GetEmployeePendingVacation", deptoIdParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeOnVacation_Result>("GetEmployeeOnVacation", deptoOwnerIdParameter);
         }
     
-        public virtual ObjectResult<GetEmployeeVacationRequested_Result> GetEmployeeVacationRequested(Nullable<int> deptoId)
+        public virtual ObjectResult<GetEmployeePendingVacation_Result> GetEmployeePendingVacation(Nullable<int> deptoOwnerId)
         {
-            var deptoIdParameter = deptoId.HasValue ?
-                new ObjectParameter("deptoId", deptoId) :
-                new ObjectParameter("deptoId", typeof(int));
+            var deptoOwnerIdParameter = deptoOwnerId.HasValue ?
+                new ObjectParameter("deptoOwnerId", deptoOwnerId) :
+                new ObjectParameter("deptoOwnerId", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeVacationRequested_Result>("GetEmployeeVacationRequested", deptoIdParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeePendingVacation_Result>("GetEmployeePendingVacation", deptoOwnerIdParameter);
+        }
+    
+        public virtual ObjectResult<GetEmployeeVacationRequested_Result> GetEmployeeVacationRequested(Nullable<int> deptoOwnerId)
+        {
+            var deptoOwnerIdParameter = deptoOwnerId.HasValue ?
+                new ObjectParameter("deptoOwnerId", deptoOwnerId) :
+                new ObjectParameter("deptoOwnerId", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeVacationRequested_Result>("GetEmployeeVacationRequested", deptoOwnerIdParameter);
         }
     }
 }

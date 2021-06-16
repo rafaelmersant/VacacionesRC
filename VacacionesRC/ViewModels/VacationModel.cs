@@ -37,6 +37,7 @@ namespace VacacionesRC.ViewModels
         public string DeptoName { get; set; }
         public int OwnerId { get; set; }
         public string OwnerName { get; set; }
+        public string UserRole { get; set; }
     }
 
     public class ExceptionModel
