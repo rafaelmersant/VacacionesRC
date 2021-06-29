@@ -251,9 +251,11 @@ namespace VacacionesRC.Controllers
                         if (Session["role"] != null && Session["role"].ToString() == "Consulta" && empId != employeeId)
                             throw new Exception("(403) Usted no esta autorizado para consultar este colaborador.");
 
-                        if (Session["role"] != null && 
-                            (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString().Contains("DIRECTOR"))
-                            )
+                        if (Session["role"] != null 
+                            && ( Session["role"].ToString().Contains("APROBADOR") 
+                                || Session["role"].ToString().Contains("APOYO") 
+                                || Session["role"].ToString().Contains("DIRECTOR"))
+                            && empId != employeeId)
                         {
                             int ownerId = int.Parse(Session["employeeID"].ToString());
                             Department department = db.Departments.FirstOrDefault(d => d.DeptoOwner == ownerId && d.DeptoCode == employee.EmployeeDeptoId);
