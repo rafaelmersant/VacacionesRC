@@ -291,7 +291,7 @@ namespace VacacionesRC.App_Start
                 if (employee == null)
                 {
                     var data = GetEmployeeFromAS400(employeeId.ToString());
-                    if (data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
+                    if (data != null &&data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
                     {
                         DateTime? admissionDate = null;
                         if (data.Tables[0].Rows[0].ItemArray[4].ToString().Length >= 8)

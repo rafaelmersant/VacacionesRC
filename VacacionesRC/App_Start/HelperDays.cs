@@ -105,6 +105,14 @@ namespace VacacionesRC.App_Start
                     var renovationDate = anniversaryDate;//.AddMonths(-6);
                     var dueDate = anniversaryDate.AddMonths(6);
 
+                    //Check if it's a new employee, so the anniversaryDate should be after one year
+                    if (employee.AdmissionDate.Value.AddDays(365) > DateTime.Today)
+                    {
+                        anniversaryDate = employee.AdmissionDate.Value.AddYears(1);
+                        renovationDate = anniversaryDate;
+                        dueDate = anniversaryDate.AddMonths(6);
+                    }
+
                     //Check if this vacacions already reaches dueDate
                     if (dueDate <= DateTime.Today.Date)
                     {
@@ -114,10 +122,6 @@ namespace VacacionesRC.App_Start
                     }
 
                     employeeDay = new EmployeeDay { TotalDays = 0, RenovationDate = renovationDate, DueDate = dueDate, CurrentYear = anniversaryDate.Year };
-
-                    //For new employee with less than 6 months working in the Company.
-                    //double daysWorking = (DateTime.Now.Date - employee.AdmissionDate.Value).TotalDays;
-                    //if (daysWorking < 180) return employeeDay;
 
                     //For employee with more than 6 months working in the Company.
                     var employeeDays = db.EmployeeDays
