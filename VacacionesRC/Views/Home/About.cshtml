@@ -1,7 +1,33 @@
 ﻿@{
     ViewBag.Title = "About";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
-<p>Use this area to provide additional information.</p>
+<div class="text-center">
+
+    <img src="~/Content/images/RCLogo.PNG" alt="logo" id="site_logo_id" style="width: 320px" class="mb-3" />
+    <br />
+    <span class="d-block mt-3" style="font-size: 2.5em; font-weight:bolder">Portal de Aplicaciones</span>
+
+</div>
+
+
+<div class="d-flex justify-content-center mt-4">
+    <a href="http://adc01:82" class="btn btn-danger buttonCustom pt-3 pb-3 mt-3 ml-1" style="min-width: 250px !important">Sistema de Reclamo</a>
+    <a href="http://adc01:83" class="btn btn-danger buttonCustom pt-3 pb-3 mt-3 ml-3" style="min-width: 250px !important">Sistema de Encuestas</a>
+</div>
+
+<div class="d-flex justify-content-center mt-2">
+    <a href="http://adc01:84" class="btn btn-danger buttonCustom pt-3 pb-3 mt-3 ml-1" style="min-width: 250px !important">Sistema de Vacaciones</a>
+    <a href="http://adc01:81" class="btn btn-danger buttonCustom pt-3 pb-3 mt-3 ml-3" style="min-width: 250px !important">Volante Nomina</a>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(async function () {
+
+        $("#sidebar").hide();
+        $("#loginLink").hide();
+        $(".fa-bars").hide();
+    });
+</script>

@@ -11,7 +11,7 @@ namespace VacacionesRC.Controllers
     {
         public ActionResult Index()
         {
-
+            //return RedirectToAction("About");
             if (Session["role"] == null) return RedirectToAction("Login", "User");
 
             return View();

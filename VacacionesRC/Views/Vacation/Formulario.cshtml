@@ -223,6 +223,9 @@
     <input type="hidden" name="daysTakenH" id="daysTakenH" value="" />
     <input type="hidden" name="daysAvailableH" id="daysAvailableH" value="" />
     <input type="hidden" name="availableFrom" id="availableFrom" value="" />
+    
+    <input type="hidden" name="_renovationDate" id="_renovationDate" value="" />
+    <input type="hidden" name="_dueDate" id="_dueDate" value="" />
 
 </div>
 
@@ -517,15 +520,36 @@
                     $("#nextAvailableDate").val(new Date(employeeDay.RenovationDate).toLocaleDateString("es-DO"))
                     $("#dueDate").val(new Date(employeeDay.DueDate).toLocaleDateString("es-DO"))
 
+                    $("#_renovationDate").val(new Date(employeeDay.RenovationDate));
+                    $("#_dueDate").val(new Date(employeeDay.DueDate))
+
                     $("#daysTotal").val(employeeDay.TotalDays)
+
+                    if ($("#yearOfVacation").html() == "")
+                        $("#yearOfVacation").html(employeeDay.CurrentYear);
 
                     if (!$("#requestStatus").html().includes("Aprobada") && !$("#requestStatus").html().includes("Rechazada") && !$("#requestStatus").html().includes("Suspendida")) {
                         console.log("new assignment takenDay");
                         $("#daysTaken").val(employeeDay.TakenDays);
                     }
 
-                    if ($("#yearOfVacation").html() == "")
-                        $("#yearOfVacation").html(employeeDay.CurrentYear);
+                    if (!$("#requestStatus").html().includes('Suspendida') || !$("#requestStatus").html().includes('Aprobada') || !$("#requestStatus").html().includes('Rechazada')) {
+                        //Change renovation and due date according to historical data (when form was created)
+                        console.log("Historical Date Data:::::")
+
+                        let _renovationDate = new Date($("#_renovationDate").val());
+                        let _dueDate = new Date($("#_dueDate").val());
+                        const _currentYear = parseInt($("#yearOfVacation").html());
+
+                        _renovationDate.setFullYear(_currentYear + 0);
+                        _dueDate.setFullYear(_currentYear + 1);
+
+                        console.log('_renovationDate: ', _renovationDate.toLocaleDateString("es-DO"))
+                        console.log('_dueDate: ', _dueDate.toLocaleDateString("es-DO"))
+
+                        $("#nextAvailableDate").val(_renovationDate.toLocaleDateString("es-DO"))
+                        $("#dueDate").val(_dueDate.toLocaleDateString("es-DO"))
+                    }
 
                     //console.log('daysTotal', employeeDay.TotalDays)
                     //console.log('daysTaken', employeeDay.TakenDays)

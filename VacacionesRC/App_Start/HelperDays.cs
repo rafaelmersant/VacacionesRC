@@ -102,8 +102,8 @@ namespace VacacionesRC.App_Start
                 {
                     Employee employee = Helper.GetEmployee(employeeId);
                     var anniversaryDate = new DateTime(DateTime.Now.Date.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
-                    var renovationDate = anniversaryDate;//.AddMonths(-6);
-                    var dueDate = anniversaryDate.AddMonths(6);
+                    var renovationDate = anniversaryDate.AddYears(1);//anniversaryDate;
+                    var dueDate = renovationDate.AddMonths(6); //anniversaryDate.AddMonths(6);
 
                     //Check if it's a new employee, so the anniversaryDate should be after one year
                     if (employee.AdmissionDate.Value.AddDays(365) > DateTime.Today)
