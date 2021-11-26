@@ -562,7 +562,9 @@ namespace VacacionesRC.Controllers
 
                         if (vacation != null)
                         {
-                            EmployeeDay employeeDay = db.EmployeeDays.Where(d => d.EmployeeId == vacation.EmployeeId).OrderByDescending(o => o.CreatedDate).FirstOrDefault();
+                            EmployeeDay employeeDay = db.EmployeeDays.Where(d => d.EmployeeId == vacation.EmployeeId && d.CurrentYear == vacation.Year)
+                                                        .OrderByDescending(o => o.CreatedDate)
+                                                        .FirstOrDefault();
 
                             vacation.RejectedDate = DateTime.Now;
                             vacation.RejectedBy = Session["employeeID"].ToString();
