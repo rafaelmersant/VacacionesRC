@@ -581,8 +581,9 @@
                     let _daysTaken = parseInt($("#daysTakenH").val())
                     let _daysAvailable = parseInt($("#daysAvailableH").val())
 
-                    //console.log('daysTakenH', _daysTaken)
-                    //console.log('daysAvailableH', _daysTaken)
+                    console.log('daysTakenH', _daysTaken)
+                    console.log('employeeDay.TakenDays', employeeDay.TakenDays)
+                    console.log('daysAvailableH', _daysTaken)
 
                     if (!isNaN(_daysTaken)) {
                         console.log("Estatus", response.status)
@@ -598,6 +599,10 @@
                             _daysTaken = employeeDay.TakenDays
                         } else if (response.status === "En proceso") {
                             _daysTaken = employeeDay.TakenDays - _daysTaken
+                            if (_daysTaken < 0) {
+                                _daysAvailable = _daysTaken * -1
+                                _daysTaken = daysAvailable + _daysTaken
+                            }
                         }
 
                         if (response.status.includes("Suspendida")) {

@@ -114,6 +114,29 @@ namespace VacacionesRC.App_Start
             return false;
         }
 
+        private static int GetCurrentYearForEmployee(int employeeId)
+        {
+            try
+            {
+                using (VacacionesRCEntities db = new VacacionesRCEntities())
+                {
+                    var employeeDays = db.EmployeeDays
+                                         .Where(e => e.EmployeeId == employeeId && e.TakenDays < 14)
+                                         .OrderBy(o => o.CurrentYear)
+                                         .FirstOrDefault();
+
+                    if (employeeDays != null)
+                        return employeeDays.CurrentYear;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return 0;
+        }
+
         //Get how many days belong to this employee for the current year
         public static EmployeeDay GetDaysForEmployee(int employeeId)
         {
@@ -126,7 +149,8 @@ namespace VacacionesRC.App_Start
                     Employee employee = Helper.GetEmployee(employeeId);
 
                     bool currentYearFull = AllDaysTakenCurrentYear(employeeId);
-                    var _currentDate = currentYearFull ? DateTime.Today.AddYears(1) : DateTime.Today;
+                    var __current__ = GetCurrentYearForEmployee(employeeId);
+                    var _currentDate = currentYearFull ? DateTime.Today.AddYears(1) : new DateTime(__current__, 1, 1);
 
                     var anniversaryDate = new DateTime(_currentDate.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
                     var renovationDate = anniversaryDate.AddYears(1);//anniversaryDate;
@@ -214,7 +238,7 @@ namespace VacacionesRC.App_Start
                     {
                         int _takenDays = (employeeDays.TakenDays?? 0) + takenDays - oldDays;
 
-                        if (endDate != null && employeeDays.RenovationDate > endDate && _takenDays > 7)
+                        if (endDate != null && employeeDays.RenovationDate > endDate && _takenDays > 7 && (employeeDays.RenovationDate.Value.Year == year))
                         {
                             ExceptionsVacation exceptionsVacation = db.ExceptionsVacations.FirstOrDefault(e => e.EmployeeId == employeeId && e.Year == employeeDays.CurrentYear);
 
