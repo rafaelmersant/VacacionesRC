@@ -570,7 +570,7 @@
                     let printConstanciaFrom = new Date(response.previousConstancia)
                     //printConstanciaFrom = addDays(printConstanciaFrom, - 15)
 
-                    //console.log("Constancia", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
+                    console.log(":::Constancia::::", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
                     if (today >= printConstanciaFrom && response.status === "Aprobada") {
                         $("#btnPrintConst").show()
                     }
@@ -818,8 +818,8 @@
         const daysRequested = parseInt($("#daysRequested").val())
         const daysAvailable = parseInt($("#daysAvailable").val())
 
-        //console.log("daysRequested", daysRequested)
-        //console.log("daysAvailable", daysAvailable)
+        console.log("daysRequested", daysRequested)
+        console.log("daysAvailable", daysAvailable)
 
         if (daysRequested > daysAvailable) {
             $("#returnDateDiv").hide()

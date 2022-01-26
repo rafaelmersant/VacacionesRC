@@ -91,19 +91,18 @@ namespace VacacionesRC.App_Start
             }
         }
 
-        private static bool AllDaysTakenCurrentYear(int employeeId)
+        private static EmployeeDay AllDaysTakenCurrentYear(int employeeId)
         {
             try
             {
                 using (VacacionesRCEntities db = new VacacionesRCEntities())
                 {
                     var employeeDays = db.EmployeeDays
-                                         .Where(e => e.EmployeeId == employeeId && e.CurrentYear == DateTime.Today.Year)
+                                         .Where(e => e.EmployeeId == employeeId)
                                          .OrderByDescending(o => o.CreatedDate)
                                          .FirstOrDefault();
 
-                    if (employeeDays != null)
-                        return employeeDays.TotalDays == (employeeDays.TakenDays?? 0);
+                    return employeeDays;
                 }
             }
             catch (Exception ex)
@@ -111,7 +110,7 @@ namespace VacacionesRC.App_Start
                 Helper.SendException(ex);
             }
 
-            return false;
+            return null;
         }
 
         private static int GetCurrentYearForEmployee(int employeeId)
@@ -127,6 +126,25 @@ namespace VacacionesRC.App_Start
 
                     if (employeeDays != null)
                         return employeeDays.CurrentYear;
+                    else
+                    {
+                        var employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId);
+                        if (employee != null && employee.AdmissionDate.Value.Year < DateTime.Today.Year)
+                        {
+                            var _employeeDays = db.EmployeeDays
+                                         .Where(e => e.EmployeeId == employeeId)
+                                         .OrderByDescending(o => o.CurrentYear)
+                                         .FirstOrDefault();
+
+                            if (_employeeDays != null)
+                            {
+                                var _date = new DateTime(_employeeDays.CurrentYear, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
+                                return _date.AddYears(1).Year;
+                            }
+
+                            return DateTime.Today.AddYears(-1).Year;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -134,7 +152,7 @@ namespace VacacionesRC.App_Start
                 Helper.SendException(ex);
             }
 
-            return 0;
+            return DateTime.Today.Year;
         }
 
         //Get how many days belong to this employee for the current year
@@ -148,9 +166,10 @@ namespace VacacionesRC.App_Start
                 {
                     Employee employee = Helper.GetEmployee(employeeId);
 
-                    bool currentYearFull = AllDaysTakenCurrentYear(employeeId);
+                    EmployeeDay _employeeDays = AllDaysTakenCurrentYear(employeeId);
+                    bool currentYearFull = _employeeDays != null ? (_employeeDays.TotalDays == (_employeeDays.TakenDays ?? 0)) : false;
                     var __current__ = GetCurrentYearForEmployee(employeeId);
-                    var _currentDate = currentYearFull ? DateTime.Today.AddYears(1) : new DateTime(__current__, 1, 1);
+                    var _currentDate = currentYearFull ? new DateTime((_employeeDays.CurrentYear + 1), 1, 1) : new DateTime(__current__, 1, 1);
 
                     var anniversaryDate = new DateTime(_currentDate.Year, employee.AdmissionDate.Value.Month, employee.AdmissionDate.Value.Day);
                     var renovationDate = anniversaryDate.AddYears(1);//anniversaryDate;
@@ -227,7 +246,10 @@ namespace VacacionesRC.App_Start
             {
                 using (var db = new VacacionesRCEntities())
                 {
-                    int year = AllDaysTakenCurrentYear(employeeId) ? DateTime.Today.AddYears(1).Year : DateTime.Today.Year;
+                    var fullCurrentYear = AllDaysTakenCurrentYear(employeeId);
+                    var allDaysTaken = fullCurrentYear != null ? (fullCurrentYear.TotalDays == (fullCurrentYear.TakenDays ?? 0)) : false;
+
+                    int year = allDaysTaken ? DateTime.Today.AddYears(1).Year : fullCurrentYear.CurrentYear;
 
                     var employeeDays = db.EmployeeDays
                                             .Where(e => e.EmployeeId == employeeId && e.CurrentYear == year)

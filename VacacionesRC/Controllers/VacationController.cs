@@ -209,8 +209,9 @@ namespace VacacionesRC.Controllers
                     }
                 }
 
+                int year = vacation != null ? vacation.Year : 0;
                 DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
-                DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value);
+                DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value, year);
                 string cycle_period = period != null ? period.Value.ToShortDateString() : "";
 
                 var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
@@ -481,9 +482,13 @@ namespace VacacionesRC.Controllers
                             int suspendedDays = 0;
                             var _suspendDate_ = _suspendDate;
 
+                            var holidays = db.Holidays.ToList();
+
                             while (_suspendDate_ <= vacation.EndDate)
                             {
-                                if (_suspendDate_.DayOfWeek != DayOfWeek.Saturday && _suspendDate_.DayOfWeek != DayOfWeek.Sunday)
+                                var existInHoliday = holidays.FirstOrDefault(h => h.Date.Year == _suspendDate_.Year && h.Date.Month == _suspendDate_.Month && h.Date.Day == _suspendDate_.Day);
+
+                                if (_suspendDate_.DayOfWeek != DayOfWeek.Saturday && _suspendDate_.DayOfWeek != DayOfWeek.Sunday && existInHoliday == null)
                                     suspendedDays += 1;
 
                                 _suspendDate_ = _suspendDate_.AddDays(1);
@@ -754,7 +759,8 @@ namespace VacacionesRC.Controllers
                         string environmentVACACIONES = ConfigurationManager.AppSettings["EnvironmentVacaciones"];
                         if (environmentVACACIONES != "DEV")
                         {
-                            string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(employee.AdmissionDate.Value);
+                            int year = vacation != null ? vacation.Year : 0;
+                            string cycle = HelperPayroll.GetPayrollPeriodByAdmissionDate(employee.AdmissionDate.Value, year);
                             DataSet payroll = Helper.GetPayrollDetailForEmployee(vacation.EmployeeId.ToString(), cycle, "N"); //paytype = CETIPOPAGO
                             PayrollDetailHeader? payrollDetail = HelperPayroll.GetPayrollDetail(payroll);
                             if (payrollDetail != null)

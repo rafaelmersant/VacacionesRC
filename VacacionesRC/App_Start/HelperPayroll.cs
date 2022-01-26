@@ -197,12 +197,13 @@ namespace VacacionesRC.App_Start
             return "";
         }
 
-        public static DateTime? GetPayrollPeriodByRenovationDate(DateTime admissionDate)
+        public static DateTime? GetPayrollPeriodByRenovationDate(DateTime admissionDate, int _year = 0)
         {
             int month = admissionDate.Month;
             int day = admissionDate.Day;
-            int year = DateTime.Today.Year;
+            int year = _year == 0 ? DateTime.Today.Year : _year;
             int oldYear = year - 1;
+
 
             if (month == 1 && day > 15)
                 return DateTime.Parse(string.Format("{0}-01-01", year));
