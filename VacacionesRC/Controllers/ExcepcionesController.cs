@@ -64,8 +64,8 @@ namespace VacacionesRC.Controllers
         {
             try
             {
-                if (Year < DateTime.Today.Year)
-                    throw new Exception("El año no puede ser menor al año en curso.");
+                //if (Year < DateTime.Today.Year)
+                //    throw new Exception("El año no puede ser menor al año en curso.");
 
                 if (Year.ToString().Length > 4)
                     throw new Exception("El año digitado parece no válido.");

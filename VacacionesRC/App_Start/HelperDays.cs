@@ -91,15 +91,15 @@ namespace VacacionesRC.App_Start
             }
         }
 
-        private static EmployeeDay AllDaysTakenCurrentYear(int employeeId)
+        private static EmployeeDay AllDaysTakenCurrentYear(int employeeId, int editingYear = 0)
         {
             try
             {
                 using (VacacionesRCEntities db = new VacacionesRCEntities())
                 {
                     var employeeDays = db.EmployeeDays
-                                         .Where(e => e.EmployeeId == employeeId)
-                                         .OrderByDescending(o => o.CreatedDate)
+                                         .Where(e => e.EmployeeId == employeeId && (e.CurrentYear == editingYear || e.TakenDays < 14))
+                                         .OrderBy(o => o.CreatedDate)
                                          .FirstOrDefault();
 
                     return employeeDays;
@@ -240,16 +240,16 @@ namespace VacacionesRC.App_Start
         }
 
         //Update takenDays
-        public static EmployeeDay UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0, DateTime? endDate = null)
+        public static EmployeeDay UpdateTakenDays(int employeeId, int takenDays, int oldDays = 0, DateTime? endDate = null, int editingYear = 0)
         {
             try
             {
                 using (var db = new VacacionesRCEntities())
                 {
-                    var fullCurrentYear = AllDaysTakenCurrentYear(employeeId);
+                    var fullCurrentYear = AllDaysTakenCurrentYear(employeeId, editingYear);
                     var allDaysTaken = fullCurrentYear != null ? (fullCurrentYear.TotalDays == (fullCurrentYear.TakenDays ?? 0)) : false;
 
-                    int year = allDaysTaken ? DateTime.Today.AddYears(1).Year : fullCurrentYear.CurrentYear;
+                    int year = allDaysTaken && editingYear == 0 ? DateTime.Today.AddYears(1).Year : fullCurrentYear.CurrentYear;
 
                     var employeeDays = db.EmployeeDays
                                             .Where(e => e.EmployeeId == employeeId && e.CurrentYear == year)

@@ -353,7 +353,7 @@ namespace VacacionesRC.Controllers
 
                         try
                         {
-                            var employeeDay = HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays, vacationEdit.EndDate);
+                            var employeeDay = HelperDays.UpdateTakenDays(vacationEdit.EmployeeId, vacationEdit.DaysRequested, oldTakenDays, vacationEdit.EndDate, vacationEdit.Year);
                             if (employeeDay != null)
                             {
                                 vacationEdit.Year = employeeDay.CurrentYear;
