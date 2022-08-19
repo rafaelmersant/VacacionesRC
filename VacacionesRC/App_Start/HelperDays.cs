@@ -142,6 +142,8 @@ namespace VacacionesRC.App_Start
                                 return _date.AddYears(1).Year;
                             }
 
+                            if ((DateTime.Today.Year - employee.AdmissionDate.Value.Year) == 1) return DateTime.Today.Year;
+
                             return DateTime.Today.AddYears(-1).Year;
                         }
                     }
@@ -167,7 +169,9 @@ namespace VacacionesRC.App_Start
                     Employee employee = Helper.GetEmployee(employeeId);
 
                     EmployeeDay _employeeDays = AllDaysTakenCurrentYear(employeeId);
-                    bool currentYearFull = _employeeDays != null ? (_employeeDays.TotalDays == (_employeeDays.TakenDays ?? 0)) : false;
+                    bool isCurrentYearDue = _employeeDays != null ? DateTime.Today >= _employeeDays.DueDate.Value : false;
+                    bool currentYearFull = _employeeDays != null && !isCurrentYearDue ? (_employeeDays.TotalDays == (_employeeDays.TakenDays ?? 0)) : isCurrentYearDue;
+
                     var __current__ = GetCurrentYearForEmployee(employeeId);
                     var _currentDate = currentYearFull ? new DateTime((_employeeDays.CurrentYear + 1), 1, 1) : new DateTime(__current__, 1, 1);
 
