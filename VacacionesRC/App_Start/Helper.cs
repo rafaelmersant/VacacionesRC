@@ -214,8 +214,8 @@ namespace VacacionesRC.App_Start
                                         EmployeeId = _employee.EmployeeId,
                                         EmployeeName = emp.ItemArray[1].ToString(),
                                         EmployeePosition = emp.ItemArray[2].ToString(),
-                                        EmployeeDepto = emp.ItemArray[3].ToString(),
-                                        EmployeeDeptoId = int.Parse(emp.ItemArray[6].ToString()),
+                                        EmployeeDepto = emp.ItemArray[13].ToString(),
+                                        EmployeeDeptoId = int.Parse(emp.ItemArray[12].ToString()),
                                         Email = emp.ItemArray[7].ToString(),
                                         Salary = decimal.Parse(emp.ItemArray[8].ToString()),
                                         Location = emp.ItemArray[9].ToString(),
@@ -250,8 +250,8 @@ namespace VacacionesRC.App_Start
                                         }
 
                                         employee.EmployeePosition = emp.ItemArray[2].ToString();
-                                        employee.EmployeeDepto = emp.ItemArray[3].ToString();
-                                        employee.EmployeeDeptoId = int.Parse(emp.ItemArray[6].ToString());
+                                        employee.EmployeeDepto = emp.ItemArray[13].ToString();
+                                        employee.EmployeeDeptoId = int.Parse(emp.ItemArray[12].ToString());
                                         employee.Email = emp.ItemArray[7].ToString();
                                         employee.Salary = decimal.Parse(emp.ItemArray[8].ToString()) * 2;
                                         employee.Location = emp.ItemArray[9].ToString();
@@ -318,8 +318,8 @@ namespace VacacionesRC.App_Start
                             EmployeeId = employeeId,
                             EmployeeName = data.Tables[0].Rows[0].ItemArray[1].ToString(),
                             EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString(),
-                            EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString(),
-                            EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString()),
+                            EmployeeDepto = data.Tables[0].Rows[0].ItemArray[13].ToString(),
+                            EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[12].ToString()),
                             Email = data.Tables[0].Rows[0].ItemArray[7].ToString(),
                             Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()) * 2,
                             Location = data.Tables[0].Rows[0].ItemArray[9].ToString(),
@@ -362,8 +362,8 @@ namespace VacacionesRC.App_Start
                                 }
 
                                 employee.EmployeePosition = data.Tables[0].Rows[0].ItemArray[2].ToString();
-                                employee.EmployeeDepto = data.Tables[0].Rows[0].ItemArray[3].ToString();
-                                employee.EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[6].ToString());
+                                employee.EmployeeDepto = data.Tables[0].Rows[0].ItemArray[13].ToString();
+                                employee.EmployeeDeptoId = int.Parse(data.Tables[0].Rows[0].ItemArray[12].ToString());
                                 employee.Email = data.Tables[0].Rows[0].ItemArray[7].ToString();
                                 employee.Salary = decimal.Parse(data.Tables[0].Rows[0].ItemArray[8].ToString()) * 2;
                                 employee.Location = data.Tables[0].Rows[0].ItemArray[9].ToString();
@@ -413,7 +413,7 @@ namespace VacacionesRC.App_Start
                 //SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO FROM QS36F.RCNOCE00 WHERE CECICLOPAG='20200816' and CEINGDEDUC='I'
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPOPAGO = 'N' ORDER BY CECICLOPAG DESC";
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL, CECODDEPAC, CEDESDEPAC FROM QS36F.RCNOCE00 WHERE CECODEMPLE = " + employeeId + " AND CEINGDEDUC = 'I' AND CETIPOPAGO = 'N' ORDER BY CECICLOPAG DESC";
 
                 if (ConfigurationManager.AppSettings["EnvironmentVacaciones"] != "DEV")
                     sQuery = sQuery.Replace("[", "").Replace("]", "");
@@ -435,7 +435,7 @@ namespace VacacionesRC.App_Start
                 string sQuery = string.Empty;
 
                 sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
-                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CEINGDEDUC = 'I' ORDER BY CECICLOPAG DESC"; //AND CETIPTRANS = 1
+                    "CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL, CECODDEPAC, CEDESDEPAC FROM QS36F.RCNOCE00 WHERE CEINGDEDUC = 'I' ORDER BY CECICLOPAG DESC"; //AND CETIPTRANS = 1
 
                 //sQuery = "SELECT CECODEMPLE, CENOMEMPLE, CENOMCARGO, CENOMDEPTO, CEFINGRESO, CEFRETIRO, CECODDEPTO, CECORREOEL, " +
                 //"CEVALTRANS, CEDESCSUCU, CECUEBANCO, CENUMCEDUL FROM QS36F.RCNOCE00 WHERE CECICLOPAG = '" + cycle + "' AND CEINGDEDUC = 'I' ORDER BY CECODEMPLE DESC"; //AND CETIPTRANS = 1

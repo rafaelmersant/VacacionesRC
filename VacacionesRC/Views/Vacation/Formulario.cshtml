@@ -721,8 +721,8 @@
                     console.log("EXTRA2__:::", form.EmployeeId)
                     console.log('complete FORM variable::', form)*@
 
-                     if ((form.AcceptedDate !== null || form.RejectedDate !== null)
-                         || (form.EmployeeId !== parseInt(@Session["employeeID"].ToString()) && '@Session["role"].ToString()' !== "Admin")) {
+                    if ((form.AcceptedDate !== null || form.RejectedDate !== null)) {
+                         //|| (form.EmployeeId !== parseInt(@Session["employeeID"].ToString()) && '@Session["role"].ToString()' !== "Admin")) {
 
                          if (form.AcceptedDate !== null) {
                             $("#btnPrint").show()

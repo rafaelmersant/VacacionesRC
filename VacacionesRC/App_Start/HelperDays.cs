@@ -251,9 +251,10 @@ namespace VacacionesRC.App_Start
                 using (var db = new VacacionesRCEntities())
                 {
                     var fullCurrentYear = AllDaysTakenCurrentYear(employeeId, editingYear);
-                    var allDaysTaken = fullCurrentYear != null ? (fullCurrentYear.TotalDays == (fullCurrentYear.TakenDays ?? 0)) : false;
+                    bool isCurrentYearDue = fullCurrentYear != null ? DateTime.Today >= fullCurrentYear.DueDate.Value : false;
+                    var allDaysTaken = fullCurrentYear != null && !isCurrentYearDue ? (fullCurrentYear.TotalDays == (fullCurrentYear.TakenDays ?? 0)) : isCurrentYearDue;
 
-                    int year = allDaysTaken && editingYear == 0 ? DateTime.Today.AddYears(1).Year : fullCurrentYear.CurrentYear;
+                    int year = allDaysTaken && editingYear == 0 ? new DateTime(fullCurrentYear.CurrentYear, 1, 1).AddYears(1).Year : fullCurrentYear.CurrentYear;
 
                     var employeeDays = db.EmployeeDays
                                             .Where(e => e.EmployeeId == employeeId && e.CurrentYear == year)
