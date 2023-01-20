@@ -5,7 +5,6 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="5c128793c9a44cf0998e120a63b3570a" Name="Diagram1" >
-        <EntityTypeShape EntityType="VacacionesRCModel.User" Width="1.5" PointX="1.25" PointY="0.5" />
         <EntityTypeShape EntityType="VacacionesRCModel.LoginHistory" Width="1.5" PointX="5.875" PointY="0.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.DaysBySeniority" Width="1.5" PointX="9" PointY="2.25" />
         <EntityTypeShape EntityType="VacacionesRCModel.EmployeeDay" Width="1.5" PointX="0.75" PointY="7.75" />
@@ -15,6 +14,7 @@
         <EntityTypeShape EntityType="VacacionesRCModel.Employee" Width="1.5" PointX="9.375" PointY="5.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.ExceptionsVacation" Width="1.5" PointX="5.375" PointY="9.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.Department" Width="1.5" PointX="7.375" PointY="10.75" />
+        <EntityTypeShape EntityType="VacacionesRCModel.User" Width="1.5" PointX="11.375" PointY="0.75" />
         <EntityTypeShape EntityType="VacacionesRCModel.Vacation" Width="1.5" PointX="9.375" PointY="10.75" />
       </Diagram>
     </edmx:Diagrams>

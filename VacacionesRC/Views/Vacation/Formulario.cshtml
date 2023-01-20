@@ -155,53 +155,64 @@
                 <div id="vacationYear" class="col-12 mt-2 mb-2">
                     <span>Las vacaciones corresponden al año <span id="yearOfVacation" class="font-weight-bold"></span> </span>
                 </div>
+
+                <div id="vacationSign" class="col-12 mt-2 mb-2" style="display: none">
+                    <span id="constanciaSign">La constancia fue firmada (marcada como firmada el: ##signDate## por el usuario ##signUserName##)</span>
+                </div>
+
             </section>
 
-                <div>
-                    <div class="d-inline">
-                        <button id="btnSaveForm" class="btn btn-sm btn-danger buttonCustom pl-5 pr-5 mt-3 ml-1">
-                            <span class="fa fa-save"></span> Guardar Solicitud
-                        </button>
-                    </div>
-                    <div class="d-inline">
-                        <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" style="display: none">
-                            <span class="fa fa-print"></span> Imprimir Solicitud
-                        </button>
-                    </div>
-
-                    @if (Session["role"] != null &&
-                               (Session["role"].ToString().Contains("APROBADOR")
-                                || Session["role"].ToString().Contains("DIRECTOR")
-                                //|| Session["role"].ToString().Contains("APOYO")
-                                || Session["role"].ToString() == "Admin"))
-                    {
-                        <div class="d-inline">
-                            <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
-                                <span class="fa fa-remove"></span> Rechazar
-                            </button>
-                        </div>
-                        <div class="d-inline">
-                            <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
-                                <span class="fa fa-check"></span> Aprobar
-                            </button>
-                        </div>
-                        <div class="d-inline">
-                            <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
-                                <span class="fa fa-times-circle"></span> Suspender
-                            </button>
-                        </div>
-                    }
-
-                    <div class="d-inline">
-                        <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1" style="display: none">
-                            <span class="fa fa-print"></span> Imprimir Constancia
-                        </button>
-                    </div>
-
-                    <div class="d-flex text-center">
-                        <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
-                    </div>
+            <div>
+                <div class="d-inline">
+                    <button id="btnSaveForm" class="btn btn-sm btn-danger buttonCustom pl-5 pr-5 mt-3 ml-1">
+                        <span class="fa fa-save"></span> Guardar Solicitud
+                    </button>
                 </div>
+                <div class="d-inline">
+                    <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" style="display: none">
+                        <span class="fa fa-print"></span> Imprimir Solicitud
+                    </button>
+                </div>
+
+                @if (Session["role"] != null &&
+                           (Session["role"].ToString().Contains("APROBADOR")
+                            || Session["role"].ToString().Contains("DIRECTOR")
+                            //|| Session["role"].ToString().Contains("APOYO")
+                            || Session["role"].ToString() == "Admin"))
+                {
+                    <div class="d-inline">
+                        <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
+                            <span class="fa fa-remove"></span> Rechazar
+                        </button>
+                    </div>
+                    <div class="d-inline">
+                        <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
+                            <span class="fa fa-check"></span> Aprobar
+                        </button>
+                    </div>
+                    <div class="d-inline">
+                        <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
+                            <span class="fa fa-times-circle"></span> Suspender
+                        </button>
+                    </div>
+                }
+
+                <div class="d-inline">
+                    <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1" style="display: none">
+                        <span class="fa fa-print"></span> Imprimir Constancia
+                    </button>
+                </div>
+
+                <div class="d-inline">
+                    <button id="btnSignConst" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" style="display: none">
+                        <span class="fa fa-sign-in"></span> Constancia Firmada
+                    </button>
+                </div>
+
+                <div class="d-flex text-center">
+                    <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
+                </div>
+            </div>
 
                 <span id="message" class="d-block pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
             }
@@ -229,6 +240,10 @@
 
 </div>
 
+<div class="bg-danger text-center" id="printConstanciaMessage" style="display: none">
+    <h4 class="text-white">La constancia debe ser firmada por el colaborador</h4>
+</div>
+
 <div id="printModal" title="Imprimir Formulario de Vacaciones"></div>
 
 @*<link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />*@
@@ -244,16 +259,19 @@
 <script type="text/javascript">
 
     $(document).ready(async function () {
+        $("#printConstanciaMessage").hide();
 
         $("#btnSearchEmployee").removeClass("disabled")
         $("#btnSaveForm").prop("disabled", true)
         $("#returnDateDiv").hide()
         $("#btnPrint").hide()
         $("#btnPrintConst").hide()
+        $("#btnSignConst").hide()
         $("#formHeaderInfo").hide()
         $("#btnReject").hide()
         $("#btnAccept").hide()
-
+        $("#vacationSign").hide()
+                
         const url = window.location.pathname
         const id = url.substring(url.lastIndexOf('/') + 1);
         const employeeId = $("#employeeId").val();
@@ -306,6 +324,30 @@
 
             if (employeeId) {
                await getEmployeeDetail(employeeId)
+            }
+        });
+
+        $("#btnSignConst").click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let idHash = '';
+            const url = window.location.pathname
+            const id = url.substring(url.lastIndexOf('/') + 1);
+            if (id && id !== "Formulario")
+                idHash = id;
+
+            if (confirm("Esta seguro que desea marcar como firmada la constancia?")) {
+                $.ajax({
+                    "url": `/Vacation/SignVacation?vacationId=${idHash}`,
+                    "type": "POST",
+                    "success": async function (response) {
+                        if (response.result === "200")
+                            window.location.reload(true);
+                        else
+                            alert("Hubo un error al tratar de ejecutar esta acción, por favor cierre y abra el la solicitud de vacaciones e intente nuevamente.");
+                    }
+                });
             }
         });
 
@@ -562,7 +604,7 @@
                         else
                             $("#daysAvailable").val(daysAvailable)
                     }
-                    
+
                     /*console.log('daysAvailable', daysAvailable)*/
 
                     //show or hide Constancia
@@ -572,7 +614,12 @@
 
                     console.log(":::Constancia::::", printConstanciaFrom, today, today >= printConstanciaFrom && response.status === "Aprobada")
                     if (today >= printConstanciaFrom && response.status === "Aprobada") {
-                        $("#btnPrintConst").show()
+                        $("#btnPrintConst").show();
+
+                        if (!response.docsigned && "@Session["role"].ToString()" === "Admin") {
+                            $("#printConstanciaMessage").show();
+                            $("#btnSignConst").show();
+                        }
                     }
                     else
                         $("#btnPrintConst").hide()
@@ -613,7 +660,7 @@
                             $("#daysTaken").val(_daysTaken)
                             $("#daysAvailable").val(_daysAvailable)
                         }
-                        
+
                         //console.log("_daysTaken", _daysTaken)
                         //console.log("_daysAvailable", _daysAvailable)
                     }
@@ -675,7 +722,7 @@
 
                 if (response.result === "200") {
                     const form = JSON.parse(response.message);
-                    //console.log('form:', form)
+                    console.log('form:', form)
                     await getEmployeeDetail(form.EmployeeId, form.Id)
 
                     $("#yearOfVacation").html(form.Year);
@@ -711,7 +758,7 @@
                         $("#daysTaken").val(form.DaysTaken)
                         $("#daysAvailable").val(form.DaysAvailable)
                     }
-                        
+
                     $("#employeeId").prop("readonly", true)
                     $("#btnSearchEmployee").addClass("disabled")
 
@@ -765,6 +812,13 @@
 
                     if (currentDate > _startDateVacation && currentDate < _endDateVacation && '@Session["role"].ToString()' == "Admin" && form.Status.includes("Aprobada") && '@ViewBag.SuspendedVacation' === "")
                         $("#btnSuspend").show()
+
+                    if (response.signUserName) {
+                        $("#constanciaSign").html($("#constanciaSign").html().replace("##signDate##", response.signDate).replace("##signUserName##", response.signUserName));
+                        $("#vacationSign").show();
+                    } else {
+                        $("#vacationSign").hide();
+                    }
                 }
                 else if (response.result === "404") {
                     alert('El formulario no fue encontrado.');

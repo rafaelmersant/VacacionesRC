@@ -73,10 +73,10 @@
                         <td>@item.UserRole</td>
 
                         <td align="center">
-                            <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editDepto(@item.DeptoCode, '@item.DeptoName', @item.OwnerId, '@item.UserRole')" title="Editar">
+                            <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editDepto(@item.DeptoCode, '@item.DeptoName.Trim()', @item.OwnerId, '@item.UserRole.Trim()')" title="Editar">
                                 <i class="fa fa-edit"></i>
                             </a>
-                            <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteRecord(@item.DeptoCode, @item.OwnerId, '@item.UserRole', '@item.OwnerName')" title="Eliminar">
+                            <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteRecord(@item.DeptoCode, @item.OwnerId, '@item.UserRole.Trim()', '@item.OwnerName.Trim()')" title="Eliminar">
                                 <i class="fa fa-remove"></i>
                             </a>
                         </td>
@@ -156,7 +156,11 @@
         $("#DeptoCode").val(DeptoCode)
         $("#DeptoName").val(DeptoName)
         $("#OwnerDeptoId").val(OwnerDeptoId)
-        $("#UserRoleId").val(UserRole)
+        $("#UserRoleId").val(UserRole);
+        
+        console.log('UserRole:', UserRole)
+        console.log('#UserRoleId:', $("#UserRoleId").val())
+        //$(`#UserRoleId option[value='${UserRole}'`);//.attr('selected', 'selected');
 
         $("#DeptoCode").prop("readonly", true)
         $("#DeptoName").prop("readonly", false)
@@ -168,14 +172,14 @@
         $("#DeptoCode").val('')
         $("#DeptoName").val('')
         $("#OwnerDeptoId").val('')
-        $("#UserRoleId").val('APROBADOR')
+        $("#UserRoleId").val('')
     }
 
     function newDepto() {
         $("#DeptoCode").val('')
         $("#DeptoName").val('')
         $("#OwnerDeptoId").val('')
-        $("#UserRoleId").val('APROBADOR')
+        $("#UserRoleId").val('')
 
         $("#DeptoCode").prop("readonly", false)
         $("#DeptoName").prop("readonly", false)

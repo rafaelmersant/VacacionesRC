@@ -59,7 +59,11 @@
                                 Fecha Solicitud
                             </th>
                             @if (Session["role"] != null && 
-                                (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString() == "Admin"))
+                                (Session["role"].ToString().Contains("APROBADOR") || 
+                                Session["role"].ToString().Contains("DIRECTOR") || 
+                                Session["role"].ToString().Contains("APOYO") || 
+                                Session["role"].ToString() == "Admin" ||
+                                Session["role"].ToString() == "AdminConsulta"))
                             {
                                 <th>
                                     Código
@@ -94,7 +98,10 @@
                                 Estatus
                             </th>
 
-                            @if (Session["role"] != null && (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString() == "Admin"))
+                            @if (Session["role"] != null && (
+                                 Session["role"].ToString().Contains("APROBADOR") || 
+                                 Session["role"].ToString().Contains("DIRECTOR") || 
+                                 Session["role"].ToString() == "Admin"))
                             {
                                 <th class="text-center" style="width: 15px">Aprobar</th>
                                 <th class="text-center" style="width: 15px">Rechazar</th>
@@ -128,7 +135,11 @@
                             <td>@string.Format("{0:dd/MM/yyyy hh:mm tt}", item.CreatedDate)</td>
 
                             @if (Session["role"] != null &&
-                                (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString() == "Admin"))
+                                (Session["role"].ToString().Contains("APROBADOR") || 
+                                 Session["role"].ToString().Contains("DIRECTOR") || 
+                                 Session["role"].ToString().Contains("APOYO") || 
+                                 Session["role"].ToString() == "Admin" ||
+                                 Session["role"].ToString() == "AdminConsulta"))
                             {
                                 <td>@item.EmployeeId</td>
                                 <td>@item.EmployeeName</td>
@@ -172,7 +183,10 @@
 
                             @if (Session["role"] != null && (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString() == "Admin"))
                             {
-                                if ((Session["employeeId"].ToString() == item.EmployeeId.ToString() && Session["role"].ToString() != "Admin") || (item.RejectedDate != null || item.AcceptedDate != null) || (item.Status.Contains("Suspendida")))
+                                if ((Session["employeeId"].ToString() == item.EmployeeId.ToString() && 
+                                     (Session["role"].ToString() != "Admin") && Session["role"].ToString() != "AdminConsulta") || 
+                                     (item.RejectedDate != null || item.AcceptedDate != null) || 
+                                     (item.Status.Contains("Suspendida")))
                                 {
                                     <td align="center">
                                         <button class="btn btn-sm btn-secondary" disabled>

@@ -27,7 +27,6 @@ namespace VacacionesRC.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<LoginHistory> LoginHistories { get; set; }
         public virtual DbSet<DaysBySeniority> DaysBySeniorities { get; set; }
         public virtual DbSet<EmployeeDay> EmployeeDays { get; set; }
@@ -37,6 +36,7 @@ namespace VacacionesRC.Models
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<ExceptionsVacation> ExceptionsVacations { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Vacation> Vacations { get; set; }
     
         public virtual ObjectResult<GetVacacionesByDeptoOwner_Result> GetVacacionesByDeptoOwner(Nullable<int> ownerId, Nullable<int> year)

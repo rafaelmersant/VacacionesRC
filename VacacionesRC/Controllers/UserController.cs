@@ -325,7 +325,8 @@ namespace VacacionesRC.Controllers
             IList<SelectListItem> roles = new List<SelectListItem>
             {
                 new SelectListItem() {Text="Consulta", Value="Consulta"},
-                new SelectListItem() { Text="Admin", Value="Admin"}
+                new SelectListItem() { Text="Admin", Value="Admin"},
+                new SelectListItem() { Text="Admin Consulta", Value="AdminConsulta"}
             };
             return roles;
         }

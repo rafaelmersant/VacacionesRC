@@ -34,7 +34,7 @@ namespace VacacionesRC.Controllers
                     //Employee employee = db.Employees.FirstOrDefault(e => e.EmployeeId == employeeId && e.Type == "I");
 
                     //Admin users
-                    if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                    if (Session["role"] != null && (Session["role"].ToString() == "Admin" || Session["role"].ToString() == "AdminConsulta"))
                     {
                         var vacations = db.GetVacacionesByDeptoOwner(0, _year).ToList();
 
@@ -104,7 +104,7 @@ namespace VacacionesRC.Controllers
                     }
 
                     //End user
-                    if (Session["role"] != null && Session["role"].ToString() != "Admin" && department == null)
+                    if (Session["role"] != null && Session["role"].ToString() != "Admin" && Session["role"].ToString() != "AdminConsulta" && department == null)
                     {
                         var vacations = db.Vacations.Where(v => v.EmployeeId == employeeId && (v.CreatedDate.Year == _year || _year == 0)).OrderByDescending(o => o.CreatedDate).ToList();
 
@@ -224,7 +224,8 @@ namespace VacacionesRC.Controllers
                         message = employeeDaySerialized,
                         status,
                         availableFrom = avaiableFrom.ToShortDateString(),
-                        previousConstancia = cycle_period
+                        previousConstancia = cycle_period,
+                        docsigned = vacation?.DocSignDate != null
                     },
                     JsonRequestBehavior = JsonRequestBehavior.AllowGet
                 };
@@ -233,6 +234,39 @@ namespace VacacionesRC.Controllers
             {
                 Helper.SendException(ex);
                 return new JsonResult { Data = new { result = "500", message = ex.Message }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
+
+        
+        [HttpPost]
+        public JsonResult SignVacation(string vacationId)
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    var id = Guid.Parse(vacationId);
+                    var vacation = db.Vacations.FirstOrDefault(v => v.IdHash == id);
+
+                    if (vacation != null)
+                    {
+                        int empId = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
+
+                        vacation.DocSignDate = DateTime.Now;
+                        vacation.DocSignUser = empId;
+                        db.SaveChanges();
+                    }
+                    else
+                        return Json(new { result = "404", message = "No encontrado" });
+                }
+
+                return Json(new { result = "200", message = "success" });
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return Json(new { result = "500", message = ex.Message });
             }
         }
 
@@ -644,9 +678,13 @@ namespace VacacionesRC.Controllers
                     vacation = db.Vacations.FirstOrDefault(v => v.IdHash == IdHash);
 
                     if (vacation != null)
-                    {    
+                    {
                         var vacationSerialized = JsonConvert.SerializeObject(vacation);
-                        return new JsonResult { Data = new { result = "200", message = vacationSerialized }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                        var signUser = db.Employees.FirstOrDefault(e => e.EmployeeId == (vacation.DocSignUser ?? 0));
+                        string signUserName = signUser != null ? signUser.EmployeeName.Trim() : "";
+                        string signDate = vacation.DocSignDate?.ToString("dd/MM/yyyy");
+
+                        return new JsonResult { Data = new { result = "200", message = vacationSerialized, signUserName, signDate }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     }
                     else
                     {

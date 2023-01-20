@@ -116,7 +116,7 @@
           <Property Name="IdHash" Type="uniqueidentifier" Nullable="false" />
           <Property Name="EmployeeID" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="PasswordHash" Type="varchar" MaxLength="200" />
-          <Property Name="Role" Type="varchar" MaxLength="10" />
+          <Property Name="Role" Type="varchar" MaxLength="15" />
           <Property Name="Email" Type="varchar" MaxLength="40" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
         </EntityType>
@@ -149,6 +149,8 @@
           <Property Name="ModifiedBy" Type="char" MaxLength="4" />
           <Property Name="ReferenceId" Type="int" />
           <Property Name="ReferenceHash" Type="uniqueidentifier" />
+          <Property Name="DocSignUser" Type="int" />
+          <Property Name="DocSignDate" Type="datetime" />
         </EntityType>
         <Function Name="GetDeptos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetEmployeeOnVacation" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
@@ -182,7 +184,6 @@
     <edmx:ConceptualModels>
       <Schema Namespace="VacacionesRCModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="VacacionesRCEntities" annotation:LazyLoadingEnabled="true" >
-          <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="LoginHistories" EntityType="VacacionesRCModel.LoginHistory" />
           <EntitySet Name="DaysBySeniorities" EntityType="VacacionesRCModel.DaysBySeniority" />
           <EntitySet Name="EmployeeDays" EntityType="VacacionesRCModel.EmployeeDay" />
@@ -206,20 +207,9 @@
           <FunctionImport Name="GetEmployeeVacationRequested" ReturnType="Collection(VacacionesRCModel.GetEmployeeVacationRequested_Result)">
           <Parameter Name="deptoOwnerId" Mode="In" Type="Int32" />
           </FunctionImport>
+          <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
         </EntityContainer>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="IdHash" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IdHash" Type="Guid" Nullable="false" />
-          <Property Name="EmployeeID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="PasswordHash" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Role" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="Email" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
         <EntityType Name="LoginHistory">
           <Key>
             <PropertyRef Name="Id" />
@@ -403,6 +393,18 @@
           <Property Type="String" Name="EmployeeDepto" Nullable="true" MaxLength="150" />
           <Property Type="String" Name="Location" Nullable="true" MaxLength="100" />
         </ComplexType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="IdHash" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdHash" Type="Guid" Nullable="false" />
+          <Property Name="EmployeeID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Role" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
         <EntityType Name="Vacation">
           <Key>
             <PropertyRef Name="IdHash" />
@@ -432,6 +434,8 @@
           <Property Name="ModifiedBy" Type="String" MaxLength="4" FixedLength="true" Unicode="false" />
           <Property Name="ReferenceId" Type="Int32" />
           <Property Name="ReferenceHash" Type="Guid" />
+          <Property Name="DocSignUser" Type="Int32" />
+          <Property Name="DocSignDate" Type="DateTime" Precision="3" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -439,19 +443,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="VacacionesRCModelStoreContainer" CdmEntityContainer="VacacionesRCEntities" >
-          <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="VacacionesRCModel.User">
-              <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Role" ColumnName="Role" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
-                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
-                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="LoginHistories">
             <EntityTypeMapping TypeName="VacacionesRCModel.LoginHistory">
               <MappingFragment StoreEntitySet="LoginHistory">
@@ -661,9 +652,24 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="VacacionesRCModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Vacations">
             <EntityTypeMapping TypeName="VacacionesRCModel.Vacation">
               <MappingFragment StoreEntitySet="Vacation">
+                <ScalarProperty Name="DocSignDate" ColumnName="DocSignDate" />
+                <ScalarProperty Name="DocSignUser" ColumnName="DocSignUser" />
                 <ScalarProperty Name="ReferenceHash" ColumnName="ReferenceHash" />
                 <ScalarProperty Name="ReferenceId" ColumnName="ReferenceId" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />

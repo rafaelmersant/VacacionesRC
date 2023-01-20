@@ -151,9 +151,11 @@ namespace VacacionesRC.Controllers
         {
             IList<SelectListItem> roles = new List<SelectListItem>
             {
+                new SelectListItem() { Text="...", Value=""},
                 new SelectListItem() { Text="APROBADOR", Value="APROBADOR"},
                 new SelectListItem() { Text="APOYO", Value="APOYO"},
                 new SelectListItem() { Text="DIRECTOR", Value="DIRECTOR"}
+                //new SelectListItem() { Text="CONSULTA", Value="CONSULTA"}
             };
             return roles;
         }
