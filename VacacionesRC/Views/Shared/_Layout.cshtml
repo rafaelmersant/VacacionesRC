@@ -6,7 +6,7 @@
 
     <!-- Bootstrap -->
     @*@Styles.Render("~/content/bootstrap/dist/css/bootstrap.min.css")*@
-    
+
     <!-- Font Awesome -->
     @Styles.Render("~/Content/font-awesome.min.css")
 
@@ -26,8 +26,8 @@
 </head>
 <body>
     @*<div style="height: 27px" class="bg-warning text-center">
-        <h4 class="text-light">AMBIENTE DE PRUEBA</h4>
-    </div>*@
+            <h4 class="text-light">AMBIENTE DE PRUEBA</h4>
+        </div>*@
     <div class="wrapper">
         <!-- Sidebar  -->
         <nav id="sidebar">
@@ -38,7 +38,10 @@
             </div>
             <ul class="list-unstyled components">
                 <li><a href="/Vacation/"><i class="fa fa-calendar"></i>Vacaciones</a></li>
-                <li><a href="/Vacation/Formulario"><i class="fa fa-newspaper-o"></i>Formulario (Solicitud)</a></li>
+                @if (Session["role"] != null && Session["role"].ToString() != "AdminConsulta")
+                {
+                    <li><a href="/Vacation/Formulario"><i class="fa fa-newspaper-o"></i>Formulario (Solicitud)</a></li>
+                }
 
                 @if (Session["role"] != null && Session["role"].ToString() == "Admin")
                 {

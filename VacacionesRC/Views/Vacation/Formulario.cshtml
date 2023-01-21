@@ -28,7 +28,10 @@
             <h6 class="panel-title">
                 Información del Colaborador
                 <span class="btn-group pull-right">
-                    <a href="@Url.Action("Formulario","Vacation", new { id = ""})" class="btn btn-danger btn-sm" style="margin-top: -3px">Nueva Solicitud</a>
+                    @if (Session["role"] != null && Session["role"].ToString() != "AdminConsulta")
+                    {
+                        <a href="@Url.Action("Formulario","Vacation", new { id = ""})" class="btn btn-danger btn-sm" style="margin-top: -3px">Nueva Solicitud</a>
+                    }
                 </span>
             </h6>
         </div>
@@ -40,7 +43,7 @@
                     <div class="row">
                         <div class="col-3 mb-1">
                             <label for="validationDefault01">Código</label>
-                            @if (Session["role"] != null && 
+                            @if (Session["role"] != null &&
                                 (Session["role"].ToString().Contains("APROBADOR") || Session["role"].ToString().Contains("DIRECTOR") || Session["role"].ToString().Contains("APOYO") || Session["role"].ToString() == "Admin"))
                             {
                                 <input type="text" id="employeeId" name="employeeId" value="" class="form-control form-control-sm numericOnly" autocomplete="off" style="min-width: 65px !important" />
@@ -106,118 +109,125 @@
             {
                 @Html.AntiForgeryToken()
 
-            <section class="row">
-                <div class="col-8">
-                    <div class="form-row">
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Correspondientes</label>
-                            <input type="text" id="daysTotal" name="daysTotal" value="" class="form-control form-control-sm" autocomplete="off" readonly />
-                        </div>
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Disfrutados</label>
-                            <input type="text" id="daysTaken" name="daysTaken" value="" class="form-control form-control-sm" autocomplete="off" readonly />
-                        </div>
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01">Días Disponibles</label>
-                            <input type="text" id="daysAvailable" name="daysAvailable" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                <section class="row">
+                    <div class="col-8">
+                        <div class="form-row">
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Correspondientes</label>
+                                <input type="text" id="daysTotal" name="daysTotal" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Disfrutados</label>
+                                <input type="text" id="daysTaken" name="daysTaken" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01">Días Disponibles</label>
+                                <input type="text" id="daysAvailable" name="daysAvailable" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+
                         </div>
 
+                        <div class="form-row">
+                            <div class="col-4">
+                                <label for="validationDefault02">Solicitar <b>Desde</b></label>
+                                <input type="text" id="startDate" name="startDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+                            </div>
+
+                            <div class="col-4">
+                                <label for="validationDefault02">Solicitar <b>Hasta</b></label>
+                                <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+                            </div>
+                            <div class="col-4 mb-2">
+                                <label for="validationDefault01" id="requestedDaysLabel">Días Solicitados</label>
+                                <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
+                            </div>
+
+                            <input type="hidden" id="_returnDate" name="_returnDate" value="" />
+                        </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="col-4">
-                            <label for="validationDefault02">Solicitar <b>Desde</b></label>
-                            <input type="text" id="startDate" name="startDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+                    <div class="col-4">
+                        <label for="validationDefault02">Observación</label>
+
+                        <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
+                    </div>
+                    <div id="returnDateDiv" class="mt-2 mb-2">
+                        <span class="ml-3">Le corresponde reintegrarse a las labores el día <span id="returnDate" class="font-weight-bold"></span> </span>
+                    </div>
+
+                    <div id="vacationYear" class="col-12 mt-2 mb-2">
+                        <span>Las vacaciones corresponden al año <span id="yearOfVacation" class="font-weight-bold"></span> </span>
+                    </div>
+
+                    <div id="vacationSign" class="col-12 mt-2 mb-2" style="display: none">
+                        <span id="constanciaSign">La constancia fue firmada (marcada como firmada el: ##signDate## por el usuario ##signUserName##)</span>
+                    </div>
+
+                </section>
+
+                <div>
+
+                    @if (Session["role"] != null && Session["role"].ToString() != "AdminConsulta")
+                    {
+                        <div class="d-inline">
+                            <button id="btnSaveForm" class="btn btn-sm btn-danger buttonCustom pl-5 pr-5 mt-3 ml-1">
+                                <span class="fa fa-save"></span> Guardar Solicitud
+                            </button>
+                        </div>
+                        <div class="d-inline">
+                            <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" style="display: none">
+                                <span class="fa fa-print"></span> Imprimir Solicitud
+                            </button>
+                        </div>
+                    }
+
+                    @if (Session["role"] != null &&
+                               (Session["role"].ToString().Contains("APROBADOR")
+                                || Session["role"].ToString().Contains("DIRECTOR")
+                                //|| Session["role"].ToString().Contains("APOYO")
+                                || Session["role"].ToString() == "Admin"))
+                    {
+                        <div class="d-inline">
+                            <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
+                                <span class="fa fa-remove"></span> Rechazar
+                            </button>
+                        </div>
+                        <div class="d-inline">
+                            <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
+                                <span class="fa fa-check"></span> Aprobar
+                            </button>
+                        </div>
+                        <div class="d-inline">
+                            <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
+                                <span class="fa fa-times-circle"></span> Suspender
+                            </button>
+                        </div>
+                    }
+
+                    @if (Session["role"] != null && Session["role"].ToString() != "AdminConsulta")
+                    {
+                        <div class="d-inline">
+                            <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1" style="display: none">
+                                <span class="fa fa-print"></span> Imprimir Constancia
+                            </button>
                         </div>
 
-                        <div class="col-4">
-                            <label for="validationDefault02">Solicitar <b>Hasta</b></label>
-                            <input type="text" id="endDate" name="endDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
+                        <div class="d-inline">
+                            <button id="btnSignConst" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" style="display: none">
+                                <span class="fa fa-sign-in"></span> Constancia Firmada
+                            </button>
                         </div>
-                        <div class="col-4 mb-2">
-                            <label for="validationDefault01" id="requestedDaysLabel">Días Solicitados</label>
-                            <input type="text" id="daysRequested" name="daysRequested" value="" class="form-control form-control-sm" autocomplete="off" readonly />
-                        </div>
+                    }
 
-                        <input type="hidden" id="_returnDate" name="_returnDate" value="" />
+                    <div class="d-flex text-center">
+                        <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
                     </div>
                 </div>
-
-                <div class="col-4">
-                    <label for="validationDefault02">Observación</label>
-
-                    <textarea id="note" class="form-control form-control-sm col-12" style="height: 98px; font-size: 0.95em"></textarea>
-                </div>
-                <div id="returnDateDiv" class="mt-2 mb-2">
-                    <span class="ml-3">Le corresponde reintegrarse a las labores el día <span id="returnDate" class="font-weight-bold"></span> </span>
-                </div>
-
-                <div id="vacationYear" class="col-12 mt-2 mb-2">
-                    <span>Las vacaciones corresponden al año <span id="yearOfVacation" class="font-weight-bold"></span> </span>
-                </div>
-
-                <div id="vacationSign" class="col-12 mt-2 mb-2" style="display: none">
-                    <span id="constanciaSign">La constancia fue firmada (marcada como firmada el: ##signDate## por el usuario ##signUserName##)</span>
-                </div>
-
-            </section>
-
-            <div>
-                <div class="d-inline">
-                    <button id="btnSaveForm" class="btn btn-sm btn-danger buttonCustom pl-5 pr-5 mt-3 ml-1">
-                        <span class="fa fa-save"></span> Guardar Solicitud
-                    </button>
-                </div>
-                <div class="d-inline">
-                    <button id="btnPrint" class="btn btn-sm btn-success pl-5 pr-5 mt-3 ml-1" style="display: none">
-                        <span class="fa fa-print"></span> Imprimir Solicitud
-                    </button>
-                </div>
-
-                @if (Session["role"] != null &&
-                           (Session["role"].ToString().Contains("APROBADOR")
-                            || Session["role"].ToString().Contains("DIRECTOR")
-                            //|| Session["role"].ToString().Contains("APOYO")
-                            || Session["role"].ToString() == "Admin"))
-                {
-                    <div class="d-inline">
-                        <button id="btnReject" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="rejectRequest()" title="Rechazar" style="display: none">
-                            <span class="fa fa-remove"></span> Rechazar
-                        </button>
-                    </div>
-                    <div class="d-inline">
-                        <button id="btnAccept" class="btn btn-sm btn-success buttonCustom pl-5 pr-5 mt-3 ml-1" onclick="acceptRequest()" title="Aprobar" style="display: none">
-                            <span class="fa fa-check"></span> Aprobar
-                        </button>
-                    </div>
-                    <div class="d-inline">
-                        <button type="button" id="btnSuspend" class="btn btn-sm btn-warning buttonCustom pl-5 pr-5 mt-3 ml-1" style="display: none">
-                            <span class="fa fa-times-circle"></span> Suspender
-                        </button>
-                    </div>
-                }
-
-                <div class="d-inline">
-                    <button id="btnPrintConst" class="btn btn-sm btn-primary pl-5 pr-5 mt-3 ml-1" style="display: none">
-                        <span class="fa fa-print"></span> Imprimir Constancia
-                    </button>
-                </div>
-
-                <div class="d-inline">
-                    <button id="btnSignConst" class="btn btn-sm btn-warning pl-5 pr-5 mt-3 ml-1" style="display: none">
-                        <span class="fa fa-sign-in"></span> Constancia Firmada
-                    </button>
-                </div>
-
-                <div class="d-flex text-center">
-                    <span id="waitingIndicatorSave" class="spinner-border text-danger" style="margin-top: 0px; margin-right: 5px; display: none"></span>
-                </div>
-            </div>
 
                 <span id="message" class="d-block pl-2 pr-2 pb-1 pt-1 mt-3 mb-0">@ViewBag.Message</span>
             }
         </div>
-        
+
         <div class="ml-3">
             @if (ViewBag.SuspendedVacation != null)
             {
@@ -234,7 +244,7 @@
     <input type="hidden" name="daysTakenH" id="daysTakenH" value="" />
     <input type="hidden" name="daysAvailableH" id="daysAvailableH" value="" />
     <input type="hidden" name="availableFrom" id="availableFrom" value="" />
-    
+
     <input type="hidden" name="_renovationDate" id="_renovationDate" value="" />
     <input type="hidden" name="_dueDate" id="_dueDate" value="" />
 
@@ -271,7 +281,7 @@
         $("#btnReject").hide()
         $("#btnAccept").hide()
         $("#vacationSign").hide()
-                
+
         const url = window.location.pathname
         const id = url.substring(url.lastIndexOf('/') + 1);
         const employeeId = $("#employeeId").val();
