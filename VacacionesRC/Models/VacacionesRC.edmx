@@ -166,6 +166,12 @@
           <Parameter Name="OwnerId" Type="int" Mode="In" />
           <Parameter Name="year" Type="int" Mode="In" />
         </Function>
+        <Function Name="GetVacacionesReporteGeneral" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="year" Type="int" Mode="In" />
+          <Parameter Name="location" Type="varchar" Mode="In" />
+          <Parameter Name="deptoCode" Type="int" Mode="In" />
+          <Parameter Name="nombre" Type="varchar" Mode="In" />
+        </Function>
         <EntityContainer Name="VacacionesRCModelStoreContainer">
           <EntitySet Name="DaysBySeniority" EntityType="Self.DaysBySeniority" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Department" EntityType="Self.Department" Schema="dbo" store:Type="Tables" />
@@ -209,6 +215,12 @@
           </FunctionImport>
           <EntitySet Name="Users" EntityType="VacacionesRCModel.User" />
           <EntitySet Name="Vacations" EntityType="VacacionesRCModel.Vacation" />
+          <FunctionImport Name="GetVacacionesReporteGeneral" ReturnType="Collection(VacacionesRCModel.GetVacacionesReporteGeneral_Result)">
+            <Parameter Name="year" Mode="In" Type="Int32" />
+            <Parameter Name="location" Mode="In" Type="String" />
+            <Parameter Name="deptoCode" Mode="In" Type="Int32" />
+            <Parameter Name="nombre" Mode="In" Type="String" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="LoginHistory">
           <Key>
@@ -437,6 +449,39 @@
           <Property Name="DocSignUser" Type="Int32" />
           <Property Name="DocSignDate" Type="DateTime" Precision="3" />
         </EntityType>
+        <ComplexType Name="GetVacacionesReporteGeneral_Result">
+          <Property Type="Int32" Name="Id" Nullable="false" />
+          <Property Type="Guid" Name="IdHash" Nullable="false" />
+          <Property Type="Int32" Name="EmployeeId" Nullable="false" />
+          <Property Type="Int32" Name="DeptoId" Nullable="true" />
+          <Property Type="String" Name="Status" Nullable="false" MaxLength="10" />
+          <Property Type="Int32" Name="DaysTaken" Nullable="false" />
+          <Property Type="Int32" Name="DaysAvailable" Nullable="false" />
+          <Property Type="Int32" Name="DaysRequested" Nullable="false" />
+          <Property Type="DateTime" Name="StartDate" Nullable="false" />
+          <Property Type="DateTime" Name="EndDate" Nullable="false" />
+          <Property Type="DateTime" Name="ReturnDate" Nullable="true" />
+          <Property Type="String" Name="Note" Nullable="true" MaxLength="300" />
+          <Property Type="Int32" Name="Year" Nullable="false" />
+          <Property Type="DateTime" Name="AcceptedDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="AcceptedBy" Nullable="true" MaxLength="4" />
+          <Property Type="DateTime" Name="RejectedDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="RejectedBy" Nullable="true" MaxLength="4" />
+          <Property Type="DateTime" Name="AcceptedRRHHDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="AcceptedRRHHBy" Nullable="true" MaxLength="4" />
+          <Property Type="DateTime" Name="CreatedDate" Nullable="false" Precision="23" />
+          <Property Type="String" Name="CreatedBy" Nullable="true" MaxLength="4" />
+          <Property Type="DateTime" Name="ModifiedDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="ModifiedBy" Nullable="true" MaxLength="4" />
+          <Property Type="Int32" Name="ReferenceId" Nullable="true" />
+          <Property Type="Guid" Name="ReferenceHash" Nullable="true" />
+          <Property Type="Int32" Name="DocSignUser" Nullable="true" />
+          <Property Type="DateTime" Name="DocSignDate" Nullable="true" Precision="23" />
+          <Property Type="String" Name="EmployeeName" Nullable="false" MaxLength="200" />
+          <Property Type="String" Name="EmployeeDepto" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="EmployeePosition" Nullable="false" MaxLength="150" />
+          <Property Type="String" Name="Location" Nullable="true" MaxLength="100" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -698,6 +743,43 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetVacacionesReporteGeneral" FunctionName="VacacionesRCModel.Store.GetVacacionesReporteGeneral">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VacacionesRCModel.GetVacacionesReporteGeneral_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="DeptoId" ColumnName="DeptoId" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="DaysTaken" ColumnName="DaysTaken" />
+                <ScalarProperty Name="DaysAvailable" ColumnName="DaysAvailable" />
+                <ScalarProperty Name="DaysRequested" ColumnName="DaysRequested" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="ReturnDate" ColumnName="ReturnDate" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="AcceptedDate" ColumnName="AcceptedDate" />
+                <ScalarProperty Name="AcceptedBy" ColumnName="AcceptedBy" />
+                <ScalarProperty Name="RejectedDate" ColumnName="RejectedDate" />
+                <ScalarProperty Name="RejectedBy" ColumnName="RejectedBy" />
+                <ScalarProperty Name="AcceptedRRHHDate" ColumnName="AcceptedRRHHDate" />
+                <ScalarProperty Name="AcceptedRRHHBy" ColumnName="AcceptedRRHHBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ReferenceId" ColumnName="ReferenceId" />
+                <ScalarProperty Name="ReferenceHash" ColumnName="ReferenceHash" />
+                <ScalarProperty Name="DocSignUser" ColumnName="DocSignUser" />
+                <ScalarProperty Name="DocSignDate" ColumnName="DocSignDate" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeDepto" ColumnName="EmployeeDepto" />
+                <ScalarProperty Name="EmployeePosition" ColumnName="EmployeePosition" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -83,5 +83,26 @@ namespace VacacionesRC.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetEmployeeVacationRequested_Result>("GetEmployeeVacationRequested", deptoOwnerIdParameter);
         }
+    
+        public virtual ObjectResult<GetVacacionesReporteGeneral_Result> GetVacacionesReporteGeneral(Nullable<int> year, string location, Nullable<int> deptoCode, string nombre)
+        {
+            var yearParameter = year.HasValue ?
+                new ObjectParameter("year", year) :
+                new ObjectParameter("year", typeof(int));
+    
+            var locationParameter = location != null ?
+                new ObjectParameter("location", location) :
+                new ObjectParameter("location", typeof(string));
+    
+            var deptoCodeParameter = deptoCode.HasValue ?
+                new ObjectParameter("deptoCode", deptoCode) :
+                new ObjectParameter("deptoCode", typeof(int));
+    
+            var nombreParameter = nombre != null ?
+                new ObjectParameter("nombre", nombre) :
+                new ObjectParameter("nombre", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetVacacionesReporteGeneral_Result>("GetVacacionesReporteGeneral", yearParameter, locationParameter, deptoCodeParameter, nombreParameter);
+        }
     }
 }

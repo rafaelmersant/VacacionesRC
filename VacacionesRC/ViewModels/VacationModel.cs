@@ -29,6 +29,7 @@ namespace VacacionesRC.ViewModels
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public int Year { get; set; }
+        public string Location { get; set; }
     }
 
     public class DeptoModel

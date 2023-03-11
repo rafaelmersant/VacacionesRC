@@ -1,0 +1,483 @@
+﻿@model IEnumerable<VacacionesRC.ViewModels.VacationModel>
+
+@{
+    ViewBag.Title = "Reporte General";
+    var statusColor = "";
+}
+
+<style type="text/css">
+    tr.tr-hover-class:hover {
+        background: lightgray !important;
+    }
+
+    .filter-panel {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .btn-filter {
+        margin-top: 23px;
+        width: 100%;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <section class="text-dark border-custom border">
+        <div class="bg-secondary text-light panel-custom border">
+            <h6 class="panel-title">
+                Listado de Solicitudes de Vacaciones
+            </h6>
+        </div>
+
+        <div class="container-fluid filter-panel">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="localidad">Localidad:</label>
+                        <select class="form-control form-control-sm" id="location" name="localidad">
+                            <option value="">Todos</option>
+                            <option value="SANTO_DOMINGO">SANTO DOMINGO</option>
+                            <option value="SANTIAGO">SANTIAGO</option>
+                            <option value="OPERACIONES_HAINA">OPERACIONES HAINA</option>
+                            <option value="OPERACIONES_HERRERA">OPERACIONES HERRERA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="departamento">Departamento:</label>
+                        @Html.DropDownList("department", new SelectList(ViewBag.Departments, "Value", "Text"), new
+                                            {
+                                            @class = "form-control form-control-sm",
+                                            @style = "border: 1px solid lightgray; color: gray"
+                                            })
+
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" class="form-control form-control-sm" id="nombre" name="nombre" placeholder="Buscar por nombre...">
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="año">Año:</label>
+                        @Html.DropDownList("IdYear", new SelectList(ViewBag.Years, "Text", "Value"), new
+                                            {
+                                            @class = "form-control form-control-sm",
+                                            @style = "border: 1px solid lightgray; color: gray"
+                                            })
+                    </div>
+                </div>
+
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <button id="btnFiltrar" class="btn btn-primary btn-filter">Filtrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        @if (Model.Count() == 0)
+        {
+            <div class="text-center mt-5 mb-5">
+                <h5>No existen registros para mostrar</h5>
+            </div>
+        }
+        else
+        {
+            <div class="mt-3 ml-2 mr-2">
+                <table id="vacationsTable" class="table table-striped table-bordered table-condensed table-sm mt-4">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">
+                                Fecha Solicitud
+                            </th>
+                            @if (Session["role"] != null &&
+                                (Session["role"].ToString().Contains("APROBADOR") ||
+                                Session["role"].ToString().Contains("DIRECTOR") ||
+                                Session["role"].ToString().Contains("APOYO") ||
+                                Session["role"].ToString() == "Admin" ||
+                                Session["role"].ToString() == "AdminConsulta"))
+                            {
+                                <th>
+                                    Código
+                                </th>
+                                <th>
+                                    Nombre
+                                </th>
+                                <th>
+                                    Puesto
+                                </th>
+                                <th>
+                                    Departamento
+                                </th>
+                                <th>
+                                    Localidad
+                                </th>
+                            }
+
+                            <th style="width: 50px">
+                                Fecha Inicio
+                            </th>
+                            <th style="width: 50px">
+                                Fecha Fin
+                            </th>
+                            <th class="text-center" style="width: 50px">
+                                Días Solicitados
+                            </th>
+                            <th style="width: 50px">
+                                Fecha Regreso
+                            </th>
+                            <th class="text-center" style="width: 10px">
+                                Año
+                            </th>
+                            <th class="text-center" style="width: 80px">
+                                Estatus
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            if (item.Status.Contains("Rechazada"))
+                            {
+                                statusColor = "text-danger";
+                            }
+                            if (item.Status.Contains("Aprobada"))
+                            {
+                                statusColor = "text-success";
+                            }
+                            if (item.Status == "En proceso")
+                            {
+                                statusColor = "text-dark";
+                            }
+                            if (item.Status == "Suspendida")
+                            {
+                                statusColor = "text-dark";
+                            }
+
+                            <tr class="tr-hover-class" onclick="location.href = '@Url.Action("Formulario", "Vacation", new { id = @item.IdHash })'" style="cursor: pointer" title="Click para ver detalle">
+                                <td>@string.Format("{0:dd/MM/yyyy}", item.CreatedDate)</td>
+
+                                @if (Session["role"] != null &&
+                                    (Session["role"].ToString().Contains("APROBADOR") ||
+                                     Session["role"].ToString().Contains("DIRECTOR") ||
+                                     Session["role"].ToString().Contains("APOYO") ||
+                                     Session["role"].ToString() == "Admin" ||
+                                     Session["role"].ToString() == "AdminConsulta"))
+                                {
+                                    <td>@item.EmployeeId</td>
+                                    <td>@item.EmployeeName</td>
+                                    <td>@item.EmployeePosition</td>
+                                    <td>@item.DeptoName</td>
+                                    <td>@item.Location</td>
+                                }
+                                <td>
+                                    <span>@string.Format("{0:dd/MM/yyyy}", item.StartDate)</span>
+                                </td>
+                                <td>
+                                    @if (item.Status.Contains("Suspendida"))
+                                    {
+                                        <span></span>
+                                    }
+                                    else
+                                    {
+                                        <span>@string.Format("{0:dd/MM/yyyy}", item.EndDate)</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (item.Status.Contains("Suspendida"))
+                                    {
+                                        <span>0</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.DaysRequested</span>
+                                    }
+                                </td>
+                                <td>@string.Format("{0:dd/MM/yyyy}", item.ReturnDate)</td>
+                                <td class="text-center">@item.Year</td>
+                                <td class="text-center @(statusColor)"><b>@item.Status</b></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ml-1 mt-3">
+                <button class="btn btn-success" id="exportToExcel">Exportar a Excel</button> <span id="loadingexcell" class="spinner-grow" style="display: none"></span>
+            </div>
+        }
+    </section>
+</div>
+
+
+<link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
+@section scripts {
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/dataTables.bootstrap4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#IdYear").val(@ViewBag.year);
+        $("#location").val('@ViewBag.location');
+        $("#department").val(@ViewBag.department);
+        $("#nombre").val('@ViewBag.nombre');
+
+        $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
+
+        $("#vacationsTable").DataTable({
+            "order": [[0, "desc"]],
+            "pageLength": 100
+        });
+
+        const url = window.location.pathname
+        const id = url.substring(url.lastIndexOf('/') + 1);
+        if (id) {
+            console.log('id', id)
+            $(`#IdYear option[value='${id}'`).attr('selected', 'selected');
+        }
+
+        //Replace Previous -> Anterior
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('Previous', 'Anterior');
+        });
+
+        //Replace Next -> Próximo
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('Next', 'Próximo');
+        });
+
+        //Replace Showing -> Mostrando
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('Showing', 'Mostrando');
+        });
+
+        //Replace Show -> Mostrar
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('Show', 'Mostrar');
+        });
+
+        //Replace Entries -> Registros
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('entries', 'registros');
+        });
+
+        //Replace Search -> Buscar
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('Search', 'Buscar');
+        });
+
+        //No data available in table -> No hay registros disponibles
+        $('body :not(script)').contents().filter(function () {
+            return this.nodeType === 3;
+        }).replaceWith(function () {
+            return this.nodeValue.replace('No data available in table', 'No hay registros disponibles');
+        });
+
+        $("#btnFiltrar").click(function (e) {
+            e.preventDefault();
+
+            const location = $("#location").val();
+            const department = $("#department").val();
+            const year = $("#IdYear").val();
+            const nombre = $("#nombre").val();
+
+            let URL = `/Reportes/ReporteGeneral/?`;
+            let previousParam = false;
+
+            if (location) {
+                URL += `location=${location}`;
+                previousParam = true;
+            }
+
+            if (department > 0) {
+                URL += previousParam ? `&department=${department}` : `department=${department}`;
+                previousParam = true;
+            }
+
+            if (year > 0) {
+                URL += previousParam ? `&year=${year}` : `year=${year}`;
+                previousParam = true;
+            }
+
+            if (nombre) {
+                URL += previousParam ? `&nombre=${nombre}` : `nombre=${nombre}`;
+            }
+
+            window.location = URL;
+        });
+
+        $("#exportToExcel").click(function (e) {
+            e.preventDefault();
+
+            $("#loadingexcell").show();
+
+            const location = $("#location").val();
+            const department = $("#department").val();
+            const year = $("#IdYear").val();
+            const nombre = $("#nombre").val();
+
+            let URL = `/Reportes/GetReportGeneralDataToExcel/?`;
+            let previousParam = false;
+
+            if (location) {
+                URL += `location=${location}`;
+                previousParam = true;
+            }
+            if (department > 0) {
+                URL += previousParam ? `&department=${department}` : `department=${department}`;
+                previousParam = true;
+            }
+            if (year > 0) {
+                URL += previousParam ? `&year=${year}` : `year=${year}`;
+                previousParam = true;
+            }
+            if (nombre) {
+                URL += previousParam ? `&nombre=${nombre}` : `nombre=${nombre}`;
+            }
+
+            $.ajax({
+                "url": URL,
+                "type": "POST",
+                "success": async function (response) {
+                    if (Object.hasOwn(response, "result")) {
+                        console.log(response);
+                        alert('Hubo un error tratando de exportar el contenido a Excel. Favor intentar con un periodo de fecha más corto.');
+                    }
+                    else {
+                        console.log('EXPORTING....');
+                        exportToExcel(response)
+                    }
+
+                    $("#loadingexcell").hide();
+                },
+                "error": function (error) {
+                    console.log('error (export excel):', error);
+
+                    $("#loadingexcell").hide();
+                }
+            });
+
+        });
+    });
+
+    function rejectRequest(id) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        if (confirm(`Seguro que desea RECHAZAR esta solicitud de vacaciones? \n Esta acción no es reversible.`)) {
+            $.ajax({
+                "url": "/Vacation/RejectRequest?id=" + id,
+                "type": "POST",
+                "success": function (response) {
+                    if (response.result === "200") {
+                        window.location.reload();
+                    } else {
+                        console.log(response.message);
+                        if (response.message.includes("501")) {
+                            alert(response.message)
+                        } else {
+                            alert('Hubo un error tratando de rechazar la solicitud de vacaciones.');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function acceptRequest(id) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        if (confirm(`Seguro que desea APROBAR esta solicitud de vacaciones?`)) {
+            $.ajax({
+                "url": "/Vacation/AcceptRequest?id=" + id,
+                "type": "POST",
+                "success": function (response) {
+                    if (response.result === "200") {
+                        window.location.reload();
+                    } else {
+                        console.log(response.message);
+                        if (response.message.includes("501")) {
+                            alert(response.message)
+                        } else {
+                            alert('Hubo un error tratando de aprobar la solicitud de vacaciones.');
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function filterByYear(year) {
+
+        if (year && year != "Todos") {
+            window.location = `/Vacation/Index/${year}`
+        } else {
+            window.location = `/Vacation`
+        }
+    }
+
+    function GetDateFormat(date) {
+        const parts = date.split("/");
+        const dt = new Date(parseInt(parts[2], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[0], 10));
+
+        return dt.toLocaleDateString();
+    }
+
+    function exportToExcel(htmls) {
+        var uri = 'data:application/vnd.ms-excel;base64,';
+        var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+        var base64 = function (s) {
+            return window.btoa(unescape(encodeURIComponent(s)))
+        };
+
+        var format = function (s, c) {
+            return s.replace(/{(\w+)}/g, function (m, p) {
+                return c[p];
+            })
+        };
+
+        var ctx = {
+            worksheet: 'Worksheet',
+            table: htmls
+        }
+
+        const identifier = new Date().getTime();
+
+        var link = document.createElement("a");
+        link.download = `ReporteGeneral_${identifier}.xls`;
+        link.href = uri + base64(format(template, ctx));
+        link.click();
+    }
+
+</script>
+
+

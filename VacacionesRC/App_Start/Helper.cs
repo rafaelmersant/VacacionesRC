@@ -120,6 +120,33 @@ namespace VacacionesRC.App_Start
             return years;
         }
 
+        public static List<SelectListItem> GetDepartments()
+        {
+            List<SelectListItem> departments = new List<SelectListItem>();
+            departments.Add(new SelectListItem { Text = "Todos", Value = "0" });
+
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    var _departments = db.Departments.Where(d => d.UserRole == "DIRECTOR")
+                                         .Select(s => new { s.DeptoCode, s.DeptoName })
+                                         .Distinct()
+                                         .OrderBy(o => o.DeptoName)
+                                         .ToList();
+
+                    foreach(var depto in _departments)
+                        departments.Add(new SelectListItem { Text = depto.DeptoName, Value = depto.DeptoCode.ToString() });
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return departments;
+        }
+
         public static bool SendRecoverPasswordEmail(string newPassword, string email)
         {
             try

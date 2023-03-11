@@ -88,6 +88,135 @@ namespace VacacionesRC.Controllers
             return View(employees);
         }
 
+        public ActionResult ReporteGeneral(int year = 0, string location = "", int department = 0, string nombre = "")
+        {
+            if (Session["role"] == null) return RedirectToAction("Index", "Home");
+
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    List<VacationModel> vacationModels = new List<VacationModel>();
+
+                    //Admin users
+                    if (Session["role"] != null && (Session["role"].ToString() == "Admin" || Session["role"].ToString() == "AdminConsulta"))
+                        vacationModels = GetReportGeneralData(year, location, department, nombre);
+                    
+                    ViewBag.Years = Helper.GetYears();
+                    ViewBag.Departments = Helper.GetDepartments();
+
+                    ViewBag.Year = year;
+                    ViewBag.department = department;
+                    ViewBag.location = location.Replace(" ","_");
+                    ViewBag.nombre = nombre;
+
+                    return View(vacationModels);
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public string GetReportGeneralDataToExcel(int year = 0, string location = "", int department = 0, string nombre = "")
+        {
+            string detailed = "<table width='100%' border=1>";
+            var data = GetReportGeneralData(year, location, department, nombre);
+
+            //HEADER for table
+            detailed += "<tr>";
+            detailed += "<td><b>Fecha Solicitud</b></td>";
+            detailed += "<td><b>Codigo</b></td>";
+            detailed += "<td><b>Nombre</b></td>";
+            detailed += "<td><b>Puesto</b></td>";
+            detailed += "<td><b>Departamento</b></td>";
+            detailed += "<td><b>Localidad</b></td>";
+            detailed += "<td><b>Fecha Inicio</b></td>";
+            detailed += "<td><b>Fecha Fin</b></td>";
+            detailed += "<td><b>Dias Solicitados</b></td>";
+            detailed += "<td><b>Fecha Regreso</b></td>";
+            detailed += "<td><b>Año</b></td>";
+            detailed += "<td><b>Estatus</b></td>";
+
+            foreach (var item in data)
+            {
+                detailed += "</tr>";
+
+                detailed += "<td>" + item.CreatedDate.ToString("dd/MM/yyyy") + "</td>";
+                detailed += "<td>" + item.EmployeeId + "</td>";
+                detailed += "<td>" + item.EmployeeName + "</td>";
+                detailed += "<td>" + item.EmployeePosition + "</td>";
+                detailed += "<td>" + item.DeptoName + "</td>";
+                detailed += "<td>" + item.Location + "</td>";
+                detailed += "<td>" + item.StartDate.ToString("dd/MM/yyyy") + "</td>";
+                detailed += "<td>" + item.EndDate.ToString("dd/MM/yyyy") + "</td>";
+                detailed += "<td>" + item.DaysRequested + "</td>";
+                detailed += "<td>" + item.ReturnDate?.ToString("dd/MM/yyyy") + "</td>";
+                detailed += "<td>" + item.Year + "</td>";
+                detailed += "<td>" + item.Status + "</td>";
+                
+                detailed += "</tr>";
+            }
+
+            detailed += "</table>";
+
+            return detailed;
+        }
+
+        public List<VacationModel> GetReportGeneralData(int year = 0, string location = "", int department = 0, string nombre = "")
+        {
+            List<VacationModel> vacationModels = new List<VacationModel>();
+            location = location.Replace("_", " ");
+
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    var vacations = db.GetVacacionesReporteGeneral(year, location, department, nombre).ToList();
+
+                    foreach (var item in vacations)
+                    {
+                        vacationModels.Add(new VacationModel
+                        {
+                            Id = item.Id,
+                            IdHash = item.IdHash,
+                            EmployeeId = item.EmployeeId,
+                            DeptoId = item.DeptoId.Value,
+                            Status = item.Status,
+                            DaysTaken = item.DaysTaken,
+                            DaysAvailable = item.DaysAvailable,
+                            DaysRequested = item.DaysRequested,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            ReturnDate = item.ReturnDate,
+                            Note = item.Note,
+                            AcceptedDate = item.AcceptedDate,
+                            AcceptedBy = item.AcceptedBy,
+                            RejectedDate = item.RejectedDate,
+                            RejectedBy = item.RejectedBy,
+                            CreatedDate = item.CreatedDate,
+                            CreatedBy = item.CreatedBy,
+                            EmployeeName = item.EmployeeName,
+                            DeptoName = item.EmployeeDepto,
+                            EmployeePosition = item.EmployeePosition,
+                            Year = item.Year,
+                            Location = item.Location
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return vacationModels;
+        }
+
         [HttpPost]
         public JsonResult GetEmployeeOnVacation()
         {
