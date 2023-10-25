@@ -4,10 +4,17 @@
     using (Html.BeginForm("Logout", "User", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
         @Html.AntiForgeryToken()
-       
+
         <ul class="nav navbar-nav navbar-right">
             <li>
-                @Html.ActionLink("Hola " + Session["email"] + "!", "ChangePassword", "User", routeValues: null, htmlAttributes: new { title = "Cambiar Contraseña" })
+                @if (Session["hasEmail"] == "Yes")
+                {
+                    @Html.ActionLink("Hola " + Session["email"] + "!", "ChangePassword", "User", routeValues: null, htmlAttributes: new { title = "Cambiar Contraseña" })
+                }
+                else
+                {
+                    <a href="javascript:void(0);">Hola Colaborador: @Session["employeeID"]</a>
+                }
             </li>
             <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
         </ul>

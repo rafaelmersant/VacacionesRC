@@ -47,13 +47,61 @@
     </div>
 </section>
 
+@if (ViewBag.SelectRole)
+{
+    <section class="container-fluid text-center mt-5">
+        <p class="text-dark">Continuar con el rol de:</p>
+        <button id="btnApoyo" class="btn btn-sm btn-danger buttonCustom w-25">
+            APOYO
+        </button>
+        
+        <button id="btnAprobador" class="btn btn-sm btn-danger buttonCustom w-25 ml-4">
+            APROBADOR
+        </button>
+    </section>
+}
+
 <script type="text/javascript">
 
     $(document).ready(async function () {
+        const employeeId = @Session["employeeID"];
+        await getEmployeeDetail(employeeId);
 
-        const employeeId = @Session["employeeID"]
+        $("#btnApoyo").click(function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
 
-        await getEmployeeDetail(employeeId)
+            $.ajax({
+                "url": `/Home/SetRole?value=APOYO`,
+                "type": "POST",
+                "success": async function (response) {
+                    if (response.result === "200") {
+                        window.location = '/Vacation';
+                    }
+                    else {
+                        alert('Hubo un error al tratar se assignar el rol.');
+                    }
+                }
+            });
+        });
+
+        $("#btnAprobador").click(function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+
+            $.ajax({
+                "url": `/Home/SetRole?value=APROBADOR`,
+                "type": "POST",
+                "success": async function (response) {
+                    if (response.result === "200") {
+                        window.location = '/Vacation';
+                    }
+                    else {
+                        alert('Hubo un error al tratar se assignar el rol.');
+                    }
+                }
+            });
+        });
     })
 
      const CorrespondingDays = async (employeeId) => {
@@ -72,7 +120,7 @@
 
                     if (employeeDay.TakenDays === null)
                         $("#DiasSolicitados").html(`0 días`)
-                    else 
+                    else
                         $("#DiasSolicitados").html(`${employeeDay.TakenDays} días`)
 
 
@@ -81,7 +129,7 @@
                         $("#DiasDisponibles").html(`0 días`)
                     else
                         $("#DiasDisponibles").html(`${daysAvailable} días`)
-                    
+
                 } else {
                     console(response.message)
                 }
@@ -100,7 +148,7 @@
                 console.log('RESULT:', response)
                 if (response.result === "200") {
                     const employee = JSON.parse(response.message);
-                    $("#employeeName").html(employee.EmployeeName) 
+                    $("#employeeName").html(employee.EmployeeName)
 
                     await CorrespondingDays(employeeId);
 

@@ -45,6 +45,7 @@ namespace VacacionesRC.Controllers
                 Session["employeeID"] = null;
                 Session["role"] = null;
                 Session["email"] = null;
+                Session["hasEmail"] = null;
             }
             catch (Exception ex)
             {
@@ -72,6 +73,8 @@ namespace VacacionesRC.Controllers
 
                         Session["employeeID"] = username;
                         Session["role"] = department != null && _user.Role != "Admin" ? department.UserRole : _user.Role;
+
+                        Session["hasEmail"] = !string.IsNullOrEmpty(_user.Email) && _user.Email.Contains("@") ? "Yes" : "No";
 
                         if (!string.IsNullOrEmpty(_user.Email))
                         {

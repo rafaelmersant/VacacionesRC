@@ -87,6 +87,7 @@
 
         $("#btnSuspend").click(async function (e) {
             e.preventDefault();
+            $("#btnSuspend").hide();
 
             const suspendDateFormatted = GetDateFormat($("#suspendDate").val())
             let suspendDate = new Date(suspendDateFormatted).toLocaleDateString()
@@ -114,9 +115,11 @@
                 else {
                     console.log(response.message);
                     alert(response.message);
+                    $("#btnSuspend").show();
                 }
             }).fail(function (error) {
                 alert(error);
+                $("#btnSuspend").show();
             })
             
         });
