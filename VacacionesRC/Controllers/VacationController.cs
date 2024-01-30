@@ -216,6 +216,25 @@ namespace VacacionesRC.Controllers
 
                 var employeeDaySerialized = JsonConvert.SerializeObject(employeeDay);
 
+                //Check if there's any vacation in process for the previous year
+                using (var db = new VacacionesRCEntities())
+                {
+                    int _previousYear = employeeDay.CurrentYear - 1;
+                    var vacationsInProgress = db.Vacations.Where(v => v.Year == _previousYear && v.EmployeeId == employeeId && v.Status == "En proceso").FirstOrDefault();
+                    if (vacationsInProgress != null)
+                    {
+                        return new JsonResult
+                        {
+                            Data = new
+                            {
+                                result = "404",
+                                message = "Para solicitar vacaciones debe completar las que tienen En Proceso actualmente (deben ser Aprobadas/Rechazadas)",
+                            },
+                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                        };
+                    }
+                }
+
                 return new JsonResult
                 {
                     Data = new

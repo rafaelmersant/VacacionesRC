@@ -564,6 +564,14 @@
             "success": async function (response) {
                 console.log("GetCorrespondingDays ::: => Started");
 
+                if (response.result === "404") {
+                    alert(response.message);
+                    $("#startDate").prop("disabled", true);
+                    $("#endDate").prop("disabled", true);
+
+                    return false;
+                }
+
                 if (response.result === "200") {
                     /*console.log('CorrespondingDays', response)*/
                     $("#availableFrom").val(response.availableFrom)
@@ -583,6 +591,13 @@
                     if (!$("#requestStatus").html().includes("Aprobada") && !$("#requestStatus").html().includes("Rechazada") && !$("#requestStatus").html().includes("Suspendida")) {
                         console.log("new assignment takenDay");
                         $("#daysTaken").val(employeeDay.TakenDays);
+                    }
+
+                    if ($("#requestStatus").html().includes("Suspendida")) {
+                        $("#startDate").prop("disabled", true);
+                        $("#endDate").prop("disabled", true);
+
+                        $("#btnSaveForm").prop("disabled", true);
                     }
 
                     if (!$("#requestStatus").html().includes('Suspendida') || !$("#requestStatus").html().includes('Aprobada') || !$("#requestStatus").html().includes('Rechazada')) {
