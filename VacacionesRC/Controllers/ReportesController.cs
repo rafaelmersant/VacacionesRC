@@ -139,7 +139,7 @@ namespace VacacionesRC.Controllers
             detailed += "<td><b>Fecha Fin</b></td>";
             detailed += "<td><b>Dias Solicitados</b></td>";
             detailed += "<td><b>Fecha Regreso</b></td>";
-            detailed += "<td><b>Año</b></td>";
+            detailed += "<td><b>Cumplidas en el Año</b></td>";
             detailed += "<td><b>Estatus</b></td>";
 
             foreach (var item in data)
@@ -237,7 +237,7 @@ namespace VacacionesRC.Controllers
                 detailed += "<td><b>Fecha Fin</b></td>";
                 detailed += "<td><b>Fecha Retorno</b></td>";
                 detailed += "<td><b>Días Disponibles</b></td>";
-                detailed += "<td><b>Año</b></td>";
+                detailed += "<td><b>Cumplidas en el Año</b></td>";
 
                 foreach (var employee in employees)
                 {
@@ -286,7 +286,7 @@ namespace VacacionesRC.Controllers
                 detailed += "<td><b>Fecha Inicio</b></td>";
                 detailed += "<td><b>Fecha Fin</b></td>";
                 detailed += "<td><b>Fecha Retorno</b></td>";
-                detailed += "<td><b>Año</b></td>";
+                detailed += "<td><b>Cumplidas en el Año</b></td>";
                 detailed += "<td><b>Estatus</b></td>";
 
                 foreach (var employee in employees)

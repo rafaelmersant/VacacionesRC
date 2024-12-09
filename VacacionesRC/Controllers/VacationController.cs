@@ -221,7 +221,7 @@ namespace VacacionesRC.Controllers
                 {
                     int _previousYear = employeeDay.CurrentYear - 1;
                     var vacationsInProgress = db.Vacations.Where(v => v.Year == _previousYear && v.EmployeeId == employeeId && v.Status == "En proceso").FirstOrDefault();
-                    if (vacationsInProgress != null)
+                    if (vacationsInProgress != null && vacation == null)
                     {
                         return new JsonResult
                         {
