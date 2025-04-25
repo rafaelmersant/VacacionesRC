@@ -476,7 +476,7 @@ namespace VacacionesRC.Controllers
             }
         }
 
-        private List<EmployeePendingVacationModel> GetVacacionesPendientes()
+        private List<EmployeePendingVacationModel> GetVacacionesPendientesOLD()
         {
             try
             {
@@ -519,14 +519,158 @@ namespace VacacionesRC.Controllers
             }
         }
 
+        private List<EmployeePendingVacationModel> GetVacacionesPendientes()
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    var _employees = db.Employees.Where(e => e.TerminateDate == null && e.Type == "I").ToList();
+
+                    int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
+                    int deptoCode = int.Parse(Session["depto"].ToString());
+
+                    if (Session["role"].ToString() != "Admin")
+                        _employees = _employees.Where(e => e.EmployeeDeptoId == deptoCode).ToList();
+
+                    List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
+
+                    VacationController vacationController = new VacationController();
+
+                    foreach (var employee in _employees)
+                    {
+                        try
+                        {
+                            JsonResult result = vacationController.GetCorrespondingDays(employee.EmployeeId);
+                            dynamic data = result.Data;
+                            EmployeeDay _employeesDay = JsonConvert.DeserializeObject<EmployeeDay>(data.message);
+
+                            _employeesDay.DueDate = _employeesDay?.DueDate.Value.AddYears(-1);
+                            _employeesDay.RenovationDate = _employeesDay?.RenovationDate.Value.AddYears(-1);
+
+                            //If this person has a exception, then add 6 more months to allow to take the vacations
+                            var exception = db.ExceptionsVacations.FirstOrDefault(e => e.EmployeeId == employee.EmployeeId && e.Year == _employeesDay.CurrentYear);
+                            _employeesDay.DueDate = exception != null ? _employeesDay.DueDate.Value.AddMonths(6) : _employeesDay.DueDate;
+
+                            int daysToDueVacation = (_employeesDay.DueDate.Value - DateTime.Today).Days;
+                            int daysAvailable = _employeesDay.TotalDays - _employeesDay.TakenDays.Value;
+
+                            if ((daysToDueVacation > 0 && daysToDueVacation < 60) && daysAvailable > 0)
+                            {
+                                employees.Add(new EmployeePendingVacationModel
+                                {
+                                    EmployeeId = employee.EmployeeId,
+                                    EmployeeName = employee.EmployeeName,
+                                    EmployeeDepto = employee.EmployeeDepto,
+                                    EmployeePosition = employee.EmployeePosition,
+                                    EmployeeLocation = employee.Location,
+                                    AdmissionDate = employee.AdmissionDate.Value,
+                                    RenovationDate = _employeesDay.RenovationDate.Value,
+                                    DueVacationDate = _employeesDay.DueDate.Value,
+                                    DaysToDueVacation = daysToDueVacation,
+                                    TimeInCompany = (DateTime.Today - employee.AdmissionDate).Value.Days,
+                                    DaysRequested = _employeesDay.TakenDays.Value,
+                                    DaysAvailable = daysAvailable
+                                });
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Helper.SendException(ex);
+                        }
+                    }
+
+                    return employees;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return null;
+            }
+        }
+
         private List<EmployeePendingVacationModel> GetVacacionesVencidas()
         {
             try
             {
                 using (var db = new VacacionesRCEntities())
                 {
+                    var _employees = db.Employees.Where(e => e.TerminateDate == null && e.Type == "I").ToList();
+
                     int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
-                    
+                    int deptoCode = int.Parse(Session["depto"].ToString());
+
+                    if (Session["role"].ToString() != "Admin")
+                        _employees = _employees.Where(e => e.EmployeeDeptoId == deptoCode).ToList();
+
+                    List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
+
+                    VacationController vacationController = new VacationController();
+
+                    foreach (var employee in _employees)
+                    {
+                        try
+                        {
+                            JsonResult result = vacationController.GetCorrespondingDays(employee.EmployeeId);
+                            dynamic data = result.Data;
+                            EmployeeDay _employeesDay = JsonConvert.DeserializeObject<EmployeeDay>(data.message);
+
+                            _employeesDay.DueDate = _employeesDay?.DueDate.Value.AddYears(-1);
+                            _employeesDay.RenovationDate = _employeesDay?.RenovationDate.Value.AddYears(-1);
+
+                            //If this person has a exception, then add 6 more months to allow to take the vacations
+                            var exception = db.ExceptionsVacations.FirstOrDefault(e => e.EmployeeId == employee.EmployeeId && e.Year == _employeesDay.CurrentYear);
+                            _employeesDay.DueDate = exception != null ? _employeesDay.DueDate.Value.AddMonths(6) : _employeesDay.DueDate;
+
+                            int daysToDueVacation = (_employeesDay.DueDate.Value - DateTime.Today).Days;
+                            int daysAvailable = _employeesDay.TotalDays - _employeesDay.TakenDays.Value;
+
+                            if (daysToDueVacation <= 0 && daysAvailable > 0)
+                            {
+                                employees.Add(new EmployeePendingVacationModel
+                                {
+                                    EmployeeId = employee.EmployeeId,
+                                    EmployeeName = employee.EmployeeName,
+                                    EmployeeDepto = employee.EmployeeDepto,
+                                    EmployeePosition = employee.EmployeePosition,
+                                    EmployeeLocation = employee.Location,
+                                    AdmissionDate = employee.AdmissionDate.Value,
+                                    RenovationDate = _employeesDay.RenovationDate.Value,
+                                    DueVacationDate = _employeesDay.DueDate.Value,
+                                    DaysToDueVacation = daysToDueVacation,
+                                    TimeInCompany = (DateTime.Today - employee.AdmissionDate).Value.Days,
+                                    DaysRequested = _employeesDay.TakenDays.Value,
+                                    DaysAvailable = daysAvailable
+                                });
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Helper.SendException(ex);
+                        }
+                    }
+
+                    return employees;
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return null;
+            }
+        }
+
+        private List<EmployeePendingVacationModel> GetVacacionesVencidasOLD()
+        {
+            try
+            {
+                using (var db = new VacacionesRCEntities())
+                {
+                    int deptoOwner = Session["employeeID"] != null ? int.Parse(Session["employeeID"].ToString()) : 0;
+
                     List<EmployeePendingVacationModel> employees = new List<EmployeePendingVacationModel>();
 
                     var _employees = db.GetEmployeePendingVacation(deptoOwner).Where(f => !f.daysToDueVacation.HasValue || f.daysToDueVacation.Value < 0).ToList();

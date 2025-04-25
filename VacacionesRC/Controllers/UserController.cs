@@ -73,6 +73,7 @@ namespace VacacionesRC.Controllers
 
                         Session["employeeID"] = username;
                         Session["role"] = department != null && _user.Role != "Admin" ? department.UserRole : _user.Role;
+                        Session["depto"] = department != null ? department.DeptoCode : 0;
 
                         Session["hasEmail"] = !string.IsNullOrEmpty(_user.Email) && _user.Email.Contains("@") ? "Yes" : "No";
 
