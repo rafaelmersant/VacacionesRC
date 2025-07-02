@@ -1,8 +1,12 @@
 ﻿using Sentry.Protocol;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using VacacionesRC.App_Start;
 using VacacionesRC.Models;
@@ -41,6 +45,47 @@ namespace VacacionesRC.Controllers
             }
 
             return View();
+        }
+
+        public ActionResult TestEmailAdmin()
+        {
+            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+
+            try
+            {
+                string content = "Su nueva contraseña es: <b>" + "testingpassword" + "</b>";
+
+                SmtpClient smtp = new SmtpClient
+                {
+                    Host = ConfigurationManager.AppSettings["smtpClient"],
+                    Port = int.Parse(ConfigurationManager.AppSettings["PortMail"]),
+                    UseDefaultCredentials = false,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
+                    EnableSsl = true,
+                };
+
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.Body = content;
+                message.Subject = "NUEVA CONTRASEÑA SISTEMA DE GESTION Y ADMINISTRACION DE VACACIONES";
+                message.To.Add(new MailAddress("rafaelmersant@sagaracorp.com"));
+
+                string address = ConfigurationManager.AppSettings["EMail"];
+                string displayName = ConfigurationManager.AppSettings["EMailName"];
+                message.From = new MailAddress(address, displayName);
+
+                smtp.Send(message);
+
+                return Content("Email Enviado!");
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+
+                return Content(ex.ToString());
+            }
         }
 
         public ActionResult About()

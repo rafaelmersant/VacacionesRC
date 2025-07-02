@@ -555,7 +555,9 @@ namespace VacacionesRC.Controllers
                             int daysToDueVacation = (_employeesDay.DueDate.Value - DateTime.Today).Days;
                             int daysAvailable = _employeesDay.TotalDays - _employeesDay.TakenDays.Value;
 
-                            if ((daysToDueVacation > 0 && daysToDueVacation < 60) && daysAvailable > 0)
+                            int daysOld = 90;
+
+                            if ((daysToDueVacation > 0 && daysToDueVacation < daysOld) && daysAvailable > 0)
                             {
                                 employees.Add(new EmployeePendingVacationModel
                                 {

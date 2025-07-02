@@ -17,6 +17,9 @@ namespace VacacionesRC.App_Start
     {
         public static bool SendRawEmail(string emailto, string subject, string body)
         {
+            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+
             try
             {
                 SmtpClient smtp = new SmtpClient
@@ -26,7 +29,7 @@ namespace VacacionesRC.App_Start
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                    EnableSsl = false,
+                    EnableSsl = true,
                 };
 
                 MailMessage message = new MailMessage();
@@ -149,6 +152,9 @@ namespace VacacionesRC.App_Start
 
         public static bool SendRecoverPasswordEmail(string newPassword, string email)
         {
+            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+
             try
             {
                 string content = "Su nueva contraseña es: <b>" + newPassword + "</b>";
@@ -160,7 +166,7 @@ namespace VacacionesRC.App_Start
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                    EnableSsl = false,
+                    EnableSsl = true,
                 };
 
                 MailMessage message = new MailMessage();
@@ -649,6 +655,9 @@ namespace VacacionesRC.App_Start
         public static void SendEmailVacationNotification(string EmailResponsableDepto, string NombreColaborador, string PuestoColaborador, 
                                                          string FechaInicio, string FechaHasta, string FechaRetorno, string RedirectURL)
         {
+            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+
             try
             {
                 SmtpClient smtp = new SmtpClient
@@ -658,7 +667,7 @@ namespace VacacionesRC.App_Start
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential(ConfigurationManager.AppSettings["usrEmail"], ConfigurationManager.AppSettings["pwdEmail"]),
-                    EnableSsl = false,
+                    EnableSsl = true,
                 };
 
                 string formTemplate = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates/");
