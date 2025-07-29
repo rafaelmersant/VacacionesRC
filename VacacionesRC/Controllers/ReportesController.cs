@@ -541,6 +541,9 @@ namespace VacacionesRC.Controllers
                     {
                         try
                         {
+                            //Skip it for employee with less than a year in the company
+                            if ((DateTime.Today - employee.AdmissionDate).Value.TotalDays <= 366) continue;
+
                             JsonResult result = vacationController.GetCorrespondingDays(employee.EmployeeId);
                             dynamic data = result.Data;
                             EmployeeDay _employeesDay = JsonConvert.DeserializeObject<EmployeeDay>(data.message);
@@ -615,6 +618,9 @@ namespace VacacionesRC.Controllers
                     {
                         try
                         {
+                            //Skip it for employee with less than a year in the company
+                            if ((DateTime.Today - employee.AdmissionDate).Value.TotalDays <= 366) continue;
+                            
                             JsonResult result = vacationController.GetCorrespondingDays(employee.EmployeeId);
                             dynamic data = result.Data;
                             EmployeeDay _employeesDay = JsonConvert.DeserializeObject<EmployeeDay>(data.message);
