@@ -98,7 +98,8 @@ namespace VacacionesRC.App_Start
                 using (VacacionesRCEntities db = new VacacionesRCEntities())
                 {
                     var employeeDays = db.EmployeeDays
-                                         .Where(e => e.EmployeeId == employeeId && (e.CurrentYear == editingYear || e.TakenDays < 14))
+                                         .Where(e => e.EmployeeId == employeeId && (e.CurrentYear == editingYear || e.TakenDays < 14)
+                                                 && e.DueDate >= DateTime.Today)
                                          .OrderBy(o => o.CreatedDate)
                                          .FirstOrDefault();
 
@@ -120,7 +121,7 @@ namespace VacacionesRC.App_Start
                 using (VacacionesRCEntities db = new VacacionesRCEntities())
                 {
                     var employeeDays = db.EmployeeDays
-                                         .Where(e => e.EmployeeId == employeeId && e.TakenDays < 14)
+                                         .Where(e => e.EmployeeId == employeeId && e.TakenDays < 14 && e.DueDate >= DateTime.Today)
                                          .OrderBy(o => o.CurrentYear)
                                          .FirstOrDefault();
 

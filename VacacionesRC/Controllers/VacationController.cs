@@ -209,7 +209,7 @@ namespace VacacionesRC.Controllers
                     }
                 }
 
-                int year = vacation != null ? vacation.Year : 0;
+                int year = vacation != null ? vacation.Year : DateTime.Today.Year - 1;
                 DateTime avaiableFrom = employeeDay.RenovationDate.Value.AddMonths(-6);
                 DateTime? period = HelperPayroll.GetPayrollPeriodByRenovationDate(employeeDay.RenovationDate.Value, year);
                 string cycle_period = period != null ? period.Value.ToShortDateString() : "";
